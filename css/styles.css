@@ -16,6 +16,7 @@ body {
   font-family: Georgia, 'Times New Roman', serif;
   line-height: 1.6;
   overflow-x: hidden;
+  scroll-snap-type: y mandatory;
 }
 
 section {
@@ -23,6 +24,7 @@ section {
   padding: 12vh 10vw;
   display: flex;
   align-items: center;
+  scroll-snap-align: start;
 }
 
 .content {
@@ -77,6 +79,7 @@ p  { font-size: 1.15rem; }
 /* Typed quote */
 .typed {
   font-style: normal;
+  font-family: Georgia, 'Times New Roman', serif;
   margin-top: 2rem;
   min-height: 2rem;
   white-space: pre-wrap;
@@ -104,6 +107,32 @@ nav a {
 
 nav a:hover {
   opacity: 0.7;
+}
+
+/* Scroll hint arrow */
+.scroll-hint {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.arrow {
+  font-size: 2rem;
+  color: var(--accent);
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(10px);
+  }
 }
 
 /* Link styling */
