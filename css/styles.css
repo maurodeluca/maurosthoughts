@@ -124,6 +124,11 @@ nav a:hover {
   color: var(--accent);
   animation: bounce 2s infinite;
   cursor: pointer;
+  opacity: 1;
+}
+
+.section-arrow:hover {
+  opacity: 0.7;
 }
 
 .section-arrow.last-section {
