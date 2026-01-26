@@ -1,0 +1,113 @@
+:root {
+  --bg: #0d0d0d;
+  --text: #f5f5f5;
+  --accent: #b11212;
+  --muted: #888;
+  --terminal-bg: #111;
+  --terminal-border: #b11212;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+section {
+  min-height: 100vh;
+  padding: 12vh 10vw;
+  display: flex;
+  align-items: center;
+}
+
+.content {
+  max-width: 720px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.9s ease;
+}
+
+.content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+h1 { font-size: 3.2rem; }
+h2 { font-size: 2.1rem; }
+p  { font-size: 1.15rem; }
+
+.accent { color: var(--accent); }
+.muted { color: var(--muted); }
+
+.divider {
+  width: 60px;
+  height: 2px;
+  background: var(--accent);
+  margin: 2rem 0;
+}
+
+/* Terminal-style console */
+.terminal {
+  background: var(--terminal-bg);
+  border-left: 4px solid var(--terminal-border);
+  padding: 1rem 1.2rem;
+  margin-bottom: 2rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+}
+
+.cursor-line .cursor::after {
+  content: "_";
+  animation: blink 1s infinite;
+  margin-left: 4px;
+}
+
+@keyframes blink {
+  0%,50%,100% { opacity: 1; }
+  25%,75% { opacity: 0; }
+}
+
+/* Typed quote */
+.typed {
+  font-style: normal;
+  margin-top: 0.5rem;
+  min-height: 2rem;
+  white-space: pre-wrap;
+}
+
+/* Hidden nav */
+nav {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+}
+
+nav.visible { opacity: 1; pointer-events: auto; }
+
+nav a {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid var(--accent);
+}
+
+/* Manifesto typewriter effect */
+.typed#manifesto {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  border-left: 2px solid var(--accent);
+  padding-left: 0.5rem;
+  min-height: 15rem; /* Adjust to fit the manifesto */
+  animation: none;
+}
