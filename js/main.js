@@ -19,7 +19,7 @@ document.querySelectorAll('nav a').forEach(link => {
 document.querySelectorAll('.content').forEach(el => observer.observe(el));
 
 /* Typed quote (once) */
-const quote = "I write to understand things better. Sometimes that means disagreeing with the system.";
+const quote = "I write to understand things better. \n Sometimes that means disagreeing with the system.";
 const target = document.getElementById('typed');
 function typeOnce(text, element, speed = 50) {
   if (!element) return;
