@@ -10,12 +10,21 @@ document.querySelectorAll('.content').forEach(el => observer.observe(el));
 /* Typed quote (once) */
 const quote = "hello world.";
 const target = document.getElementById('typed');
-function typeOnce(quote, target) {
+function typeOnce(text, element, speed = 50) {
+  if (!element) return;
+
   let i = 0;
-  if (target && i < quote.length) {
-    target.textContent += quote.charAt(i);
-    i++;
+  element.textContent = ""; // reset before typing
+
+  function type() {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      setTimeout(type, speed);
+    }
   }
+
+  type();
 }
 if (target) typeOnce(quote, target);
 
