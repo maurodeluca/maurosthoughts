@@ -75,7 +75,7 @@ p  { font-size: 1.15rem; }
 /* Typed quote */
 .typed {
   font-style: normal;
-  margin-top: 0.5rem;
+  margin-top: 2rem;
   min-height: 2rem;
   white-space: pre-wrap;
 }
