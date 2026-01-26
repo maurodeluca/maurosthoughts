@@ -208,3 +208,7 @@ nav a:hover {
 .back-link:hover {
   opacity: 1;
 }
+
+.manifest-page .section-arrow {
+  display: none;
+}
