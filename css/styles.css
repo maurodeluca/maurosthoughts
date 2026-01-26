@@ -194,3 +194,17 @@ nav a:hover {
   text-align: justify;
   text-align-last: left;
 }
+
+.back-link {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.4s ease;
+  z-index: 1000;
+}
+
+.back-link:hover {
+  opacity: 1;
+}

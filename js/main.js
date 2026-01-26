@@ -103,4 +103,3 @@ let idx = 0;
 
 // Delay slightly so it doesn't clash with intro typing
 if (manIntroTarget && manifestoTarget) typeText(manifestoIntro, manIntroTarget, 40, () => setTimeout(typeText, 800));
-
