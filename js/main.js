@@ -22,18 +22,21 @@ if (target) typeOnce();
 
 /* Section navigation with arrows */
 const sections = document.querySelectorAll('section');
-const arrows = document.querySelectorAll('.section-arrow');
 
-arrows.forEach((arrow, index) => {
-  arrow.addEventListener('click', () => {
-    if (arrow.classList.contains('last-section')) {
-      // Scroll to top
-      sections[0].scrollIntoView({ behavior: 'smooth' });
-    } else if (index < sections.length - 1) {
-      // Scroll to next section
-      sections[index + 1].scrollIntoView({ behavior: 'smooth' });
-    }
-  });
+document.addEventListener('click', (e) => {
+  const arrow = e.target.closest('.section-arrow');
+  if (!arrow) return;
+  
+  const currentSection = arrow.closest('section');
+  const currentIndex = Array.from(sections).indexOf(currentSection);
+  
+  if (arrow.classList.contains('last-section')) {
+    // Scroll to top
+    sections[0].scrollIntoView({ behavior: 'smooth' });
+  } else if (currentIndex < sections.length - 1) {
+    // Scroll to next section
+    sections[currentIndex + 1].scrollIntoView({ behavior: 'smooth' });
+  }
 });
 
 /* Show nav at end */
