@@ -20,6 +20,22 @@ function typeOnce() {
 }
 if (target) typeOnce();
 
+/* Section navigation with arrows */
+const sections = document.querySelectorAll('section');
+const arrows = document.querySelectorAll('.section-arrow');
+
+arrows.forEach((arrow, index) => {
+  arrow.addEventListener('click', () => {
+    if (arrow.classList.contains('last-section')) {
+      // Scroll to top
+      sections[0].scrollIntoView({ behavior: 'smooth' });
+    } else if (index < sections.length - 1) {
+      // Scroll to next section
+      sections[index + 1].scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+
 /* Show nav at end */
 window.addEventListener('scroll', () => {
   const end = document.getElementById('end').getBoundingClientRect();
