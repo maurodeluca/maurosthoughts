@@ -5,16 +5,16 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.3 });
 
-document.querySelectorAll('nav a').forEach(link => {
+document.querySelectorAll('nav a[href^="#"]').forEach(link => {
   link.addEventListener('click', e => {
     e.preventDefault();
-    const id = link.getAttribute('href').substring(1);
-    const section = document.getElementById(id);
+    const section = document.getElementById(link.hash.substring(1));
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
     }
   });
 });
+
 
 document.querySelectorAll('.content').forEach(el => observer.observe(el));
 
