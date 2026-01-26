@@ -11,14 +11,14 @@ document.querySelectorAll('.content').forEach(el => observer.observe(el));
 const quote = "hello world.";
 const target = document.getElementById('typed');
 let i = 0;
-function typeOnce() {
+function typeOnce(quote, target) {
   if (target && i < quote.length) {
     target.textContent += quote.charAt(i);
     i++;
     setTimeout(typeOnce, 50);
   }
 }
-if (target) typeOnce();
+if (target) typeOnce(quote, target);
 
 /* Section navigation with arrows */
 const sections = document.querySelectorAll('section');
@@ -62,9 +62,9 @@ window.addEventListener('scroll', () => {
   }
 });
 
-quote = "I wrote this to remember what mattered before metrics.";
-target = document.getElementById('typed');
-if(target) typeOnce();
+const manifestoIntro = "I wrote this to remember what mattered before metrics.";
+const manIntroTarget = document.getElementById('intro');
+if(manIntroTarget) typeOnce(manifestoIntro, manIntroTarget);
 // Manifesto content
 const manifestoText = `
 I’m done pretending the hiring and recruitment industry isn’t deeply broken.
