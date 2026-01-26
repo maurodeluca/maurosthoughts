@@ -62,7 +62,7 @@ p  { font-size: 1.15rem; }
   width: 60px;
   height: 2px;
   background: var(--accent);
-  margin: 0;       /* remove default margin *
+  margin: 0;       /* remove default margin */
 }
 
 /* Terminal-style console */
