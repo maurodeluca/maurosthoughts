@@ -50,7 +50,9 @@ const manifestoTarget = document.getElementById('manifesto');
 let idx = 0;
 
 function typeManifesto() {
-  if (!manifestoTarget || idx >= manifestoText.length) return;
+  if (!manifestoTarget) return;
+  if (idx >= manifestoText.length) return;
+  
   manifestoTarget.textContent += manifestoText.charAt(idx);
   idx++;
   setTimeout(typeManifesto, 25); // speed in ms per character
