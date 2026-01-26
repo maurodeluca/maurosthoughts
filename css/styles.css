@@ -119,21 +119,15 @@ nav a:hover {
 .section-arrow {
   position: fixed;
   bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
+  left: calc(50% + 15px);
   font-size: 2rem;
   color: var(--accent);
   animation: bounce 2s infinite;
   cursor: pointer;
-  transition: opacity 0.3s ease;
-  z-index: 100;
-}
-
-.section-arrow:hover {
-  opacity: 0.7;
 }
 
 .section-arrow.last-section {
+  left: calc(50% - 15px);
   animation: bounce-up 2s infinite;
 }
 
@@ -148,10 +142,10 @@ nav a:hover {
 
 @keyframes bounce-up {
   0%, 100% {
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
   50% {
-    transform: translateX(-50%) translateY(-10px);
+    transform: translateY(-10px);
   }
 }
 
