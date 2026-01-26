@@ -15,7 +15,6 @@ function typeOnce(quote, target) {
   if (target && i < quote.length) {
     target.textContent += quote.charAt(i);
     i++;
-    setTimeout(typeOnce, 50);
   }
 }
 if (target) typeOnce(quote, target);
