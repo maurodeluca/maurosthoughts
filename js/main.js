@@ -21,23 +21,26 @@ document.querySelectorAll('.content').forEach(el => observer.observe(el));
 /* Typed quote (once) */
 const quote = "I write to understand things better. \n Sometimes that means disagreeing with the system.";
 const target = document.getElementById('typed');
-function typeOnce(text, element, speed = 50) {
+function typeText(text, element, speed = 40, callback) {
   if (!element) return;
 
   let i = 0;
-  element.textContent = ""; // reset before typing
+  element.textContent = "";
 
   function type() {
     if (i < text.length) {
       element.textContent += text.charAt(i);
       i++;
       setTimeout(type, speed);
+    } else if (callback) {
+      callback();
     }
   }
 
   type();
 }
-if (target) typeOnce(quote, target);
+
+if (target) typeText(quote, target);
 
 /* Section navigation with arrows */
 const sections = document.querySelectorAll('section');
@@ -75,7 +78,7 @@ document.addEventListener('click', (e) => {
 
 const manifestoIntro = "I wrote this to remember what mattered before metrics.";
 const manIntroTarget = document.getElementById('intro');
-if(manIntroTarget) typeOnce(manifestoIntro, manIntroTarget);
+
 // Manifesto content
 const manifestoText = `
 I’m done pretending the hiring and recruitment industry isn’t deeply broken.
@@ -97,14 +100,6 @@ The system is.
 const manifestoTarget = document.getElementById('manifesto');
 let idx = 0;
 
-function typeManifesto() {
-  if (!manifestoTarget) return;
-  if (idx >= manifestoText.length) return;
-  
-  manifestoTarget.textContent += manifestoText.charAt(idx);
-  idx++;
-  setTimeout(typeManifesto, 25); // speed in ms per character
-}
 
 // Delay slightly so it doesn't clash with intro typing
-if (manifestoTarget) setTimeout(typeManifesto, 800);
+if (manIntroTarget && manifestoTarget) typeText(manifestoIntro, manIntroTarget, 40, () => setTimeout(typeManifesto, 800));
