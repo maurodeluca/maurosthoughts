@@ -67,23 +67,13 @@ p  { font-size: 1.15rem; }
 
 /* Terminal-style console */
 .terminal {
-  position: relative;        /* for absolute positioning of pseudo-element */
+  position: absolute;        /* for absolute positioning of pseudo-element */
   background: transparent;
   padding: 1rem 1.2rem 1rem 1.8rem;  /* extra left space for the line */
   margin-bottom: 2rem;
   font-family: 'Courier New', monospace;
   font-size: 1.1rem;
   text-align: left;
-}
-
-.terminal::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;                /* thickness of the vertical line */
-  height: 100%;              /* spans the full height of the terminal */
-  background: var(--terminal-border);
 }
 
 .cursor-line .cursor {
