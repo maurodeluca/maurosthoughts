@@ -60,7 +60,7 @@ sections.forEach(section => sectionObserver.observe(section));
 document.addEventListener('click', (e) => {
   const arrow = e.target.closest('.section-arrow');
   if (!arrow) return;
-  
+
   if (arrow.classList.contains('last-section')) {
     // Scroll up one section when possible, otherwise go to top
     if (currentSectionIndex > 0) {
@@ -98,8 +98,12 @@ The system is.
 `;
 
 const manifestoTarget = document.getElementById('manifesto');
-let idx = 0;
-
 
 // Delay slightly so it doesn't clash with intro typing
-if (manIntroTarget && manifestoTarget) typeText(manifestoIntro, manIntroTarget, 40, () => setTimeout(typeText, 800));
+if (manIntroTarget && manifestoTarget) {
+  typeText(manifestoIntro, manIntroTarget, 45, () => {
+    setTimeout(() => {
+      typeText(manifestoText, manifestoTarget, 25);
+    }, 400);
+  });
+}
