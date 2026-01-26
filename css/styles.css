@@ -55,7 +55,7 @@ p  { font-size: 1.15rem; }
 
 /* Terminal-style console */
 .terminal {
-  background: var(--terminal-bg);
+  background: transparent;
   border-left: 4px solid var(--terminal-border);
   padding: 1rem 1.2rem;
   margin-bottom: 2rem;
@@ -67,11 +67,14 @@ p  { font-size: 1.15rem; }
   background: var(--accent);
   padding: 0 4px;
   animation: blink 1s infinite;
+  display: inline-block;
 }
 
 .cursor-line .cursor::after {
   content: "_";
-  margin-left: 4px;
+  background: var(--accent);
+  padding: 0 4px;
+  animation: blink 1s infinite;
 }
 
 @keyframes blink {
