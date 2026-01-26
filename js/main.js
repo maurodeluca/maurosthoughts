@@ -5,10 +5,16 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.3 });
 
-document.querySelectorAll('nav a[href^="#"]').forEach(link => {
+document.querySelectorAll('nav a').forEach(link => {
   link.addEventListener('click', e => {
+    const href = link.getAttribute('href');
+
+    // Only hijack in-page anchors
+    if (!href.startsWith('#')) return;
+
     e.preventDefault();
-    const section = document.getElementById(link.hash.substring(1));
+    const id = href.substring(1);
+    const section = document.getElementById(id);
     if (section) {
       section.scrollIntoView({ behavior: 'smooth' });
     }
