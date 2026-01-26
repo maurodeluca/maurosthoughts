@@ -63,16 +63,20 @@ p  { font-size: 1.15rem; }
   font-size: 1.1rem;
 }
 
+.cursor-line .cursor {
+  background: var(--accent);
+  padding: 0 4px;
+  animation: blink 1s infinite;
+}
+
 .cursor-line .cursor::after {
   content: "_";
-  animation: blink 1s infinite;
   margin-left: 4px;
-  color: var(--accent);
 }
 
 @keyframes blink {
-  0%,50%,100% { opacity: 1; }
-  25%,75% { opacity: 0; }
+  0%,50%,100% { opacity: 1; background: var(--accent); }
+  25%,75% { opacity: 0; background: transparent; }
 }
 
 /* Typed quote */
