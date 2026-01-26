@@ -10,8 +10,8 @@ document.querySelectorAll('.content').forEach(el => observer.observe(el));
 /* Typed quote (once) */
 const quote = "hello world.";
 const target = document.getElementById('typed');
-let i = 0;
 function typeOnce(quote, target) {
+  let i = 0;
   if (target && i < quote.length) {
     target.textContent += quote.charAt(i);
     i++;
