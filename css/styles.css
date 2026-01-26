@@ -191,4 +191,6 @@ nav a:hover {
   padding-left: 0.5rem;
   min-height: 15rem; /* Adjust to fit the manifesto */
   animation: none;
+  text-align: justify;
+  text-align-last: left;
 }
