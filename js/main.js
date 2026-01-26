@@ -12,13 +12,13 @@ const quote = "I wrote this to remember what mattered before metrics.";
 const target = document.getElementById('typed');
 let i = 0;
 function typeOnce() {
-  if (i < quote.length) {
+  if (target && i < quote.length) {
     target.textContent += quote.charAt(i);
     i++;
     setTimeout(typeOnce, 50);
   }
 }
-typeOnce();
+if (target) typeOnce();
 
 /* Show nav at end */
 window.addEventListener('scroll', () => {
@@ -50,12 +50,12 @@ const manifestoTarget = document.getElementById('manifesto');
 let idx = 0;
 
 function typeManifesto() {
-  if (idx < manifestoText.length) {
+  if (manifestoTarget && idx < manifestoText.length) {
     manifestoTarget.textContent += manifestoText.charAt(idx);
     idx++;
     setTimeout(typeManifesto, 25); // speed in ms per character
   }
 }
 
-// Delay slightly so it doesn’t clash with intro typing
-setTimeout(typeManifesto, 800);
+// Delay slightly so it doesn't clash with intro typing
+if (manifestoTarget) setTimeout(typeManifesto, 800);
