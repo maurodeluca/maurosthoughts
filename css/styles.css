@@ -65,9 +65,10 @@ p  { font-size: 1.15rem; }
 
 .cursor-line .cursor {
   background: var(--accent);
-  padding: 0 4px;
-  animation: blink 1s infinite;
+  padding-left: 2px;
+  padding-right: 2px;
   display: inline-block;
+  animation: blink 2s infinite;
 }
 
 .cursor-line .cursor::after {
