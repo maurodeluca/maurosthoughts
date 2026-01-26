@@ -80,6 +80,7 @@ p  { font-size: 1.15rem; }
 .typed {
   font-style: normal;
   font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.15rem;
   margin-top: 2rem;
   min-height: 2rem;
   white-space: pre-wrap;
