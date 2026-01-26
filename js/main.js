@@ -20,24 +20,8 @@ function typeOnce() {
 }
 typeOnce();
 
-/* Section scroll lock */
-let locked = false;
-const lockSections = document.querySelectorAll('section[data-lock]');
-
+/* Show nav at end */
 window.addEventListener('scroll', () => {
-  lockSections.forEach(sec => {
-    const rect = sec.getBoundingClientRect();
-    if (rect.top < 50 && rect.bottom > window.innerHeight / 2 && !locked) {
-      locked = true;
-      document.body.style.overflow = 'hidden';
-      setTimeout(() => {
-        document.body.style.overflow = '';
-        locked = false;
-      }, 600);
-    }
-  });
-
-  /* Show nav at end */
   const end = document.getElementById('end').getBoundingClientRect();
   if (end.top < window.innerHeight) {
     document.getElementById('nav').classList.add('visible');
