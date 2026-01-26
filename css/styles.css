@@ -65,13 +65,13 @@ p  { font-size: 1.15rem; }
 
 .cursor-line .cursor {
   background: var(--accent);
-  padding: 0 10px;
-  animation: blink 2s infinite;
+  padding: 0 4px;
+  animation: blink 1s infinite;
+  display: inline-block;
 }
 
 .cursor-line .cursor::after {
   content: "_";
-  margin-left: 4px;
 }
 
 @keyframes blink {
