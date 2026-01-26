@@ -39,6 +39,7 @@ section {
   opacity: 0;
   transform: translateY(40px);
   transition: all 0.9s ease;
+  position: relative; /* establish positioning context */
 }
 
 .content.visible {
@@ -54,10 +55,14 @@ p  { font-size: 1.15rem; }
 .muted { color: var(--muted); }
 
 .divider {
+  position: absolute;
+  bottom: 0;       /* stick to the bottom of .content */
+  left: 50%;
+  transform: translateX(-50%);
   width: 60px;
   height: 2px;
   background: var(--accent);
-  margin: 2rem 0;
+  margin: 0;       /* remove default margin *
 }
 
 /* Terminal-style console */
