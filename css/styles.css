@@ -99,28 +99,35 @@ p  { font-size: 1.15rem; }
   white-space: pre-wrap;
 }
 
-/* Hidden nav */
+/* nav */
 nav {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.8s ease;
+  top: 20px;
+  left: 20px;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity 0.4s ease;
+  z-index: 1000;
 }
-
-nav.visible { opacity: 1; pointer-events: auto; }
 
 nav a {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   color: var(--text);
   text-decoration: none;
-  border-bottom: 1px solid var(--accent);
+  font-size: 0.9rem;
+  border-bottom: none;
+  opacity: 0.6;
 }
 
+nav a::before {
+  content: "↳ ";
+  opacity: 0.4;
+}
+
+
 nav a:hover {
-  opacity: 0.7;
+  opacity: 1;
 }
 
 /* Section navigation arrows */

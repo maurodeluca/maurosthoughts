@@ -54,14 +54,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-/* Show nav at end */
-window.addEventListener('scroll', () => {
-  const end = document.getElementById('end').getBoundingClientRect();
-  if (end.top < window.innerHeight) {
-    document.getElementById('nav').classList.add('visible');
-  }
-});
-
 const manifestoIntro = "I wrote this to remember what mattered before metrics.";
 const manIntroTarget = document.getElementById('intro');
 if(manIntroTarget) typeOnce(manifestoIntro, manIntroTarget);
