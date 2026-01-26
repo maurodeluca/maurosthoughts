@@ -65,11 +65,13 @@ p  { font-size: 1.15rem; }
   content: "_";
   animation: blink 1s infinite;
   margin-left: 4px;
+  background: var(--accent);
+  padding: 0 4px;
 }
 
 @keyframes blink {
-  0%,50%,100% { opacity: 1; }
-  25%,75% { opacity: 0; }
+  0%,50%,100% { opacity: 1; background: var(--accent); }
+  25%,75% { opacity: 0; background: transparent; }
 }
 
 /* Typed quote */
