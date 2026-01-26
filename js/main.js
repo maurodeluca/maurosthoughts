@@ -22,20 +22,29 @@ if (target) typeOnce();
 
 /* Section navigation with arrows */
 const sections = document.querySelectorAll('section');
+let currentSectionIndex = 0;
+
+// Track which section is in view
+const sectionObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      currentSectionIndex = Array.from(sections).indexOf(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+sections.forEach(section => sectionObserver.observe(section));
 
 document.addEventListener('click', (e) => {
   const arrow = e.target.closest('.section-arrow');
   if (!arrow) return;
   
-  const currentSection = arrow.closest('section');
-  const currentIndex = Array.from(sections).indexOf(currentSection);
-  
   if (arrow.classList.contains('last-section')) {
     // Scroll to top
     sections[0].scrollIntoView({ behavior: 'smooth' });
-  } else if (currentIndex < sections.length - 1) {
+  } else if (currentSectionIndex < sections.length - 1) {
     // Scroll to next section
-    sections[currentIndex + 1].scrollIntoView({ behavior: 'smooth' });
+    sections[currentSectionIndex + 1].scrollIntoView({ behavior: 'smooth' });
   }
 });
 
