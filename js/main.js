@@ -40,11 +40,17 @@ document.addEventListener('click', (e) => {
   if (!arrow) return;
   
   if (arrow.classList.contains('last-section')) {
-    // Scroll to top
-    sections[0].scrollIntoView({ behavior: 'smooth' });
-  } else if (currentSectionIndex < sections.length - 1) {
-    // Scroll to next section
-    sections[currentSectionIndex + 1].scrollIntoView({ behavior: 'smooth' });
+    // Scroll up one section when possible, otherwise go to top
+    if (currentSectionIndex > 0) {
+      sections[currentSectionIndex - 1].scrollIntoView({ behavior: 'smooth' });
+    } else {
+      sections[0].scrollIntoView({ behavior: 'smooth' });
+    }
+  } else {
+    // Down arrow: Scroll to next section when possible
+    if (currentSectionIndex < sections.length - 1) {
+      sections[currentSectionIndex + 1].scrollIntoView({ behavior: 'smooth' });
+    }
   }
 });
 
