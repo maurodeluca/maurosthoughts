@@ -8,7 +8,7 @@ const observer = new IntersectionObserver(entries => {
 document.querySelectorAll('.content').forEach(el => observer.observe(el));
 
 /* Typed quote (once) */
-const quote = "I wrote this to remember what mattered before metrics.";
+const quote = "hello world.";
 const target = document.getElementById('typed');
 let i = 0;
 function typeOnce() {
@@ -62,6 +62,9 @@ window.addEventListener('scroll', () => {
   }
 });
 
+quote = "I wrote this to remember what mattered before metrics.";
+target = document.getElementById('typed');
+if(target) typeOnce();
 // Manifesto content
 const manifestoText = `
 I’m done pretending the hiring and recruitment industry isn’t deeply broken.
