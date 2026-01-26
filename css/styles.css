@@ -35,6 +35,7 @@ section {
 }
 
 .content {
+  position: relative; /* establish a local positioning context */
   max-width: 720px;
   opacity: 0;
   transform: translateY(40px);
@@ -54,21 +55,35 @@ p  { font-size: 1.15rem; }
 .muted { color: var(--muted); }
 
 .divider {
+  position: absolute;      /* stick it inside .content */
+  bottom: 0;               /* bottom of the .content block */
+  left: 50%;
+  transform: translateX(-50%);
   width: 60px;
   height: 2px;
   background: var(--accent);
-  margin: 2rem 0;
+  margin: 0;
 }
 
 /* Terminal-style console */
 .terminal {
+  position: relative;        /* for absolute positioning of pseudo-element */
   background: transparent;
-  border-left: 4px solid var(--terminal-border);
-  padding: 1rem 1.2rem;
+  padding: 1rem 1.2rem 1rem 1.8rem;  /* extra left space for the line */
   margin-bottom: 2rem;
   font-family: 'Courier New', monospace;
   font-size: 1.1rem;
   text-align: left;
+}
+
+.terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;                /* thickness of the vertical line */
+  height: 100%;              /* spans the full height of the terminal */
+  background: var(--terminal-border);
 }
 
 .cursor-line .cursor {
