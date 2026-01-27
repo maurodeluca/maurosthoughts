@@ -65,6 +65,8 @@ p  { font-size: 1.15rem; }
 
 /* Terminal-style console */
 .terminal {
+  max-width: 100%;
+  overflow: hidden;
   position: absolute;
   top: -1rem;
   background: transparent;
@@ -256,10 +258,25 @@ h1 {
     text-align: center;
     overflow-wrap: anywhere;
   }
-}
 
-@media (max-width: 768px) {
   h1 span.accent {
     display: inline-block;
+  }
+
+  .terminal {
+    overfow: hidden;
+    font-size: 0.95rem;
+    padding: 0.8rem 1rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cursor-line {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
