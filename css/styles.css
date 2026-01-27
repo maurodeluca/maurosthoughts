@@ -10,7 +10,6 @@
 * { box-sizing: border-box; }
 
 body {
-  height: 100%;
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -20,7 +19,12 @@ body {
   overflow-x: hidden;
 }
 
-html { height: 100%; overflow-x: hidden; }
+html { overflow-x: hidden; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;   /* 👈 important */
+}
 
 section {
   min-height: 100vh;
@@ -31,8 +35,15 @@ section {
 }  
 
 .home-page {
-  overflow: hidden;
+  height: 100vh;
+  overflow-y: scroll;        /* 👈 this is the missing piece */
+  overflow-x: hidden;
   scroll-snap-type: y mandatory;
+  scroll-behavior: auto;     /* keep it non-smooth */
+}
+
+.home-page section {
+  scroll-snap-align: start;
 }
 
 .content {
