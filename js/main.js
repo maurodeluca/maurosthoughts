@@ -59,19 +59,6 @@ async function loadManifesto() {
 
 loadManifesto();
 
-/* Section scrolling logic */
-const sections = document.querySelectorAll('section');
-let currentSectionIndex = 0;
-let isScrolling = false;
-
-function scrollToSection(index) {
-  if (index < 0 || index >= sections.length) return;
-  isScrolling = true;
-  sections[index].scrollIntoView({ behavior: "auto" });
-  currentSectionIndex = index;
-  setTimeout(() => { isScrolling = false; }, 500); // throttle wheel
-}
-
 /* Track which section is in view (for arrow nav) */
 const sectionObserver = new IntersectionObserver(entries => {
   entries.forEach(entry => {
@@ -94,38 +81,6 @@ document.addEventListener('click', (e) => {
     scrollToSection(currentSectionIndex + 1);
   }
 });
-
-const isManifestPage = document.body.classList.contains('manifest-page');
-const homePage = document.querySelector('.home-page');
-
-if (!isManifestPage && homePage) {
-  let isScrolling = false;
-
-  homePage.addEventListener(
-    'wheel',
-    (e) => {
-      e.preventDefault();
-      if (isScrolling) return;
-
-      isScrolling = true;
-
-      if (e.deltaY > 0) {
-        if (currentSectionIndex < sections.length - 1) {
-          sections[currentSectionIndex + 1].scrollIntoView({ behavior: 'auto' });
-        }
-      } else {
-        if (currentSectionIndex > 0) {
-          sections[currentSectionIndex - 1].scrollIntoView({ behavior: 'auto' });
-        }
-      }
-
-      setTimeout(() => {
-        isScrolling = false;
-      }, 700);
-    },
-    { passive: false }
-  );
-}
 
 /* Optional: hijack in-page nav links for instant snapping */
 document.querySelectorAll('nav a').forEach(link => {
