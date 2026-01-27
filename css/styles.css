@@ -217,6 +217,14 @@ nav a:hover {
   text-align-last: left;
 }
 
+.typed#intro {
+  font-size: 1.15rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  text-align: center;
+  text-align-last: center;
+}
+
 .back-link {
   position: fixed;
   top: 20px;
