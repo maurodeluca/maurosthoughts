@@ -14,12 +14,11 @@
 /* =========================
    Base document
 ========================= */
-
 html,
 body {
   height: 100%;
   margin: 0;
-  overflow: hidden; /* browser never scrolls */
+  overflow: hidden; /* browser scroll disabled */
 }
 
 body {
@@ -35,37 +34,45 @@ html {
 }
 
 /* =========================
-   Sections (base)
+   Sections (default)
 ========================= */
-
 section {
   padding: 0 10vw;
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 }
 
 /* =========================
-   Home page scroll container
+   Homepage scroll container
 ========================= */
-
 .home-page {
   height: 100vh;
   overflow-y: scroll;
   overflow-x: hidden;
   scroll-snap-type: y mandatory;
   scroll-behavior: auto;
+
+  display: flex;
+  flex-direction: column; /* ensures vertical stacking */
 }
 
+/* Each section fills exactly one viewport */
 .home-page section {
-  min-height: 100vh;
+  flex: 0 0 100vh;        /* fix height exactly */
   scroll-snap-align: start;
+
+  display: flex;           /* keep your alignment */
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;        /* prevent inner overflow from breaking layout */
 }
 
 /* =========================
    Content reveal
 ========================= */
-
 .content {
   position: relative;
   width: 400px;
@@ -84,7 +91,6 @@ section {
 /* =========================
    Typography
 ========================= */
-
 h1 {
   max-width: 100%;
   font-size: 3.2rem;
@@ -117,7 +123,6 @@ p {
 /* =========================
    Terminal-style console
 ========================= */
-
 .terminal {
   position: absolute;
   top: -1rem;
@@ -144,14 +149,11 @@ p {
 }
 
 @keyframes blink {
-  0%,
-  50%,
-  100% {
+  0%, 50%, 100% {
     opacity: 1;
     background: var(--accent);
   }
-  25%,
-  75% {
+  25%, 75% {
     opacity: 0;
     background: transparent;
   }
@@ -160,7 +162,6 @@ p {
 /* =========================
    Typed text
 ========================= */
-
 .typed {
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.15rem;
@@ -190,7 +191,6 @@ p {
 /* =========================
    Navigation
 ========================= */
-
 nav {
   position: fixed;
   top: 20px;
@@ -219,7 +219,6 @@ nav a:hover {
 /* =========================
    Section navigation arrows
 ========================= */
-
 .section-arrow {
   position: fixed;
   bottom: 30px;
@@ -240,8 +239,7 @@ nav a:hover {
 }
 
 @keyframes bounce {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0);
   }
   50% {
@@ -250,8 +248,7 @@ nav a:hover {
 }
 
 @keyframes bounce-up {
-  0%,
-  100% {
+  0%, 100% {
     transform: translateY(0);
   }
   50% {
@@ -262,7 +259,6 @@ nav a:hover {
 /* =========================
    Links
 ========================= */
-
 .accent-link {
   color: var(--accent);
   text-decoration: none;
@@ -277,7 +273,6 @@ nav a:hover {
 /* =========================
    Manifest page overrides
 ========================= */
-
 .manifest-page {
   overflow-y: auto;
   overflow-x: hidden;
@@ -304,7 +299,6 @@ nav a:hover {
 /* =========================
    Responsive
 ========================= */
-
 @media (max-width: 768px) {
   h1 {
     font-size: 2.1rem;
