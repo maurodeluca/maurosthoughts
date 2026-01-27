@@ -35,7 +35,6 @@ section {
 }
 
 .content {
-  position: relative; /* establish a local positioning context */
   max-width: 720px;
   opacity: 0;
   transform: translateY(40px);
@@ -55,21 +54,17 @@ p  { font-size: 1.15rem; }
 .muted { color: var(--muted); }
 
 .divider {
-  position: absolute;      /* stick it inside .content */
-  bottom: 0;               /* bottom of the .content block */
-  left: 50%;
-  transform: translateX(-50%);
   width: 60px;
   height: 2px;
   background: var(--accent);
-  margin: 0;
+  margin: 2rem 0;
 }
 
 /* Terminal-style console */
 .terminal {
-  position: absolute;        /* for absolute positioning of pseudo-element */
   background: transparent;
-  padding: 1rem 1.2rem 1rem 1.8rem;  /* extra left space for the line */
+  border-left: 4px solid var(--terminal-border);
+  padding: 1rem 1.2rem;
   margin-bottom: 2rem;
   font-family: 'Courier New', monospace;
   font-size: 1.1rem;
