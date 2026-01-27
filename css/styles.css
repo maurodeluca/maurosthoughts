@@ -43,21 +43,7 @@ section {
   text-align-last: center
 }
 
-.contentManifest {
-  max-width: 750px;
-  opacity: 0;
-  transform: translateY(40px);
-  transition: all 0.9s ease;
-  text-align: center;
-  text-align-last: center
-}
-
 .content.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.contentManifest.visible {
   opacity: 1;
   transform: translateY(0);
 }
