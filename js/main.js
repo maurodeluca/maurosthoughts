@@ -96,11 +96,12 @@ document.addEventListener('click', (e) => {
 });
 
 const isManifestPage = document.body.classList.contains('manifest-page');
+const homePage = document.querySelector('.home-page');
 
-if (!isManifestPage) {
+if (!isManifestPage && homePage) {
   let isScrolling = false;
 
-  window.addEventListener(
+  homePage.addEventListener(
     'wheel',
     (e) => {
       e.preventDefault();
