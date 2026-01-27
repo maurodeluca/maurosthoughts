@@ -44,7 +44,7 @@ section {
 }
 
 .contentManifest {
-  width: 750px;
+  max-width: 750px;
   opacity: 0;
   transform: translateY(40px);
   transition: all 0.9s ease;
