@@ -10,19 +10,17 @@
 * { box-sizing: border-box; }
 
 body {
+  height: 100%;
   margin: 0;
   background: var(--bg);
   color: var(--text);
   font-family: Georgia, 'Times New Roman', serif;
   line-height: 1.6;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
   scroll-behavior: auto;
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
-html { height: 100%; overflow: hidden; }
+html { height: 100%; overflow-x: hidden; }
 
 section {
   min-height: 100vh;
@@ -32,6 +30,11 @@ section {
   justify-content: center;
   scroll-snap-align: start;
 }  
+
+.home-page {
+  overflow: hidden;
+  scroll-snap-type: y mandatory;
+}
 
 .content {
   position: relative;
@@ -254,10 +257,10 @@ nav a:hover {
   scroll-behavior: smooth
 }
 
-.manifest-page .section {
+.manifest-page section {
   min-height: auto;
   height: auto;
-  align-item: flex-start;
+  align-items: flex-start;
 }
 
 @media (max-width: 768px) {
@@ -273,7 +276,7 @@ nav a:hover {
   }
 
   .terminal {
-    overfow: hidden;
+    overflow: hidden;
     font-size: 0.95rem;
     padding: 0.8rem 1rem;
     margin-bottom: 1.5rem;
