@@ -48,9 +48,21 @@ section {
   transform: translateY(0);
 }
 
-h1 { font-size: 3.2rem; }
-h2 { font-size: 2.1rem; }
-p  { font-size: 1.15rem; }
+h1 
+{ 
+  max-width: 100%;
+  font-size: 3.2rem;
+}
+
+h2 
+{ 
+  font-size: 2.1rem;   
+}
+
+p
+{ 
+  font-size: 1.15rem;
+}
 
 .accent { color: var(--accent); }
 .muted { color: var(--muted); }
@@ -210,8 +222,6 @@ nav a:hover {
   text-align-last: center;
 }
 
-
-
 .back-link {
   position: fixed;
   top: 20px;
@@ -237,20 +247,17 @@ nav a:hover {
   margin-top: 6rem;
 }
 
-body.manifest-page {
+.manifest-page {
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-snap-type: none
+  scroll-snap-type: none;
+  scroll-behavior: smooth
 }
 
-body.manifest-page section {
+.manifest-page .section {
   min-height: auto;
   height: auto;
   align-item: flex-start;
-}
-
-h1 {
-  max-width: 100%;
 }
 
 @media (max-width: 768px) {
