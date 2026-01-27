@@ -34,7 +34,6 @@ section {
 } 
 
 .content {
-  position: relative;
   max-width: 720px;
   opacity: 0;
   transform: translateY(40px);
@@ -54,7 +53,6 @@ p  { font-size: 1.15rem; }
 .muted { color: var(--muted); }
    
 .divider {
-  positon: absolute; 
   bottom: 1rem; 
   left: 50%; 
   width: 60px;
@@ -64,7 +62,6 @@ p  { font-size: 1.15rem; }
 
 /* Terminal-style console */
 .terminal {
-  position: relative;
   background: transparent;
   border-left: 4px solid var(--terminal-border);
   padding: 1rem 1.2rem;
@@ -72,16 +69,6 @@ p  { font-size: 1.15rem; }
   font-family: 'Courier New', monospace;
   font-size: 1.1rem;
   text-align: left;
-}
-
-.terminal::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--terminal-border);
 }
 
 .cursor-line .cursor {
@@ -210,14 +197,6 @@ nav a:hover {
 }
 
 .typed#typed {
-  font-size: 1.15rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  text-align: left;
-  text-align-last: left;
-}
-
-.typed#intro {
   font-size: 1.15rem;
   line-height: 1.5;
   white-space: pre-wrap;

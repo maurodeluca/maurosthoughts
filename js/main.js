@@ -26,8 +26,7 @@ document.querySelectorAll('.content').forEach(el => observer.observe(el));
 
 /* Typed quote (once) */
 const quote = `
-I write to understand things better.
-Sometimes that means disagreeing with the system.
+I write to understand things better. Sometimes that means disagreeing with the system.
 `;
 const target = document.getElementById('typed');
 function typeText(text, element, speed = 40, callback) {
@@ -104,7 +103,7 @@ Work matters, but it is not everything. People are not problems to be solved in 
 
 If this resonates, you are not broken.
 The system is.
-`;
+`; 
 
 const manifestoTarget = document.getElementById('manifesto');
 
