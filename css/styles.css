@@ -19,7 +19,8 @@ html,
 body {
   height: 100%;
   margin: 0;
-  overflow: hidden; /* browser never scrolls */
+  overflow: hidden;
+  /* browser never scrolls */
 }
 
 body {
@@ -144,12 +145,14 @@ p {
 }
 
 @keyframes blink {
+
   0%,
   50%,
   100% {
     opacity: 1;
     background: var(--accent);
   }
+
   25%,
   75% {
     opacity: 0;
@@ -185,9 +188,12 @@ p {
   min-height: 15rem;
   text-align: justify;
   text-align-last: left;
-  hyphens: auto;             /* allow words to break */
-  word-spacing: normal;      /* reset any extra spacing */
-  overflow-wrap: break-word; /* prevent huge gaps */
+  hyphens: auto;
+  /* allow words to break */
+  word-spacing: normal;
+  /* reset any extra spacing */
+  overflow-wrap: break-word;
+  /* prevent huge gaps */
 }
 
 /* =========================
@@ -243,20 +249,24 @@ nav a:hover {
 }
 
 @keyframes bounce {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(10px);
   }
 }
 
 @keyframes bounce-up {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
@@ -326,7 +336,7 @@ nav a:hover {
     padding: 0.8rem 1rem;
     max-width: 320px;
     margin: 0 auto 1.5rem;
-    margin-bottom: 3rem; 
+    margin-bottom: 3rem;
   }
 
   .cursor-line {
@@ -342,6 +352,12 @@ nav a:hover {
   .divider {
     margin-top: 1.5rem;
     margin-bottom: 3rem;
+  }
+
+  .github-corner {
+    bottom: 18px;
+    right: 18px;
+    opacity: 0.7;
   }
 }
 
@@ -360,7 +376,8 @@ nav a:hover {
 /* Firefox */
 .home-page,
 .manifest-page {
-  scrollbar-width: none; /* hides scrollbar */
+  scrollbar-width: none;
+  /* hides scrollbar */
 }
 
 /* IE / old Edge */
@@ -372,7 +389,8 @@ nav a:hover {
 .home-page,
 .manifest-page {
   overflow-y: scroll;
-  -webkit-overflow-scrolling: touch; /* smooth iOS momentum */
+  -webkit-overflow-scrolling: touch;
+  /* smooth iOS momentum */
 }
 
 /* Hide scrollbar visuals */
@@ -383,7 +401,24 @@ nav a:hover {
 
 .home-page,
 .manifest-page {
-  scrollbar-width: none;     /* Firefox */
-  -ms-overflow-style: none;  /* old Edge */
+  scrollbar-width: none;
+  /* Firefox */
+  -ms-overflow-style: none;
+  /* old Edge */
 }
 
+.github-corner {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  color: var(--muted);
+  opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+
+.github-corner:hover {
+  opacity: 1;
+  color: var(--accent);
+  transform: translateY(-2px);
+}
