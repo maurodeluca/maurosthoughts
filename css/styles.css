@@ -40,7 +40,7 @@ section {
   transform: translateY(40px);
   transition: all 0.9s ease;
   text-align: center;
-  text-align-after: center
+  text-align-last: center;
 }
 
 .content.visible {
