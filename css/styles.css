@@ -34,10 +34,13 @@ section {
 } 
 
 .content {
+  position: relative;
   max-width: 720px;
   opacity: 0;
   transform: translateY(40px);
   transition: all 0.9s ease;
+  text-align: center;
+  text-align-after: center
 }
 
 .content.visible {
@@ -53,6 +56,7 @@ p  { font-size: 1.15rem; }
 .muted { color: var(--muted); }
    
 .divider {
+  positon: absolute;
   bottom: 1rem; 
   left: 50%; 
   width: 60px;
@@ -90,7 +94,6 @@ p  { font-size: 1.15rem; }
 
 /* Typed quote */
 .typed {
-  position: absolute;
   font-style: normal;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.15rem;
@@ -199,6 +202,13 @@ nav a:hover {
 .typed#typed {
   font-size: 1.15rem;
   line-height: 1.5;
+  white-space: pre-wrap;
+  text-align: center;
+  text-align-last: center;
+}
+
+.typed#typedA {
+  font-size: 1.15rem;
   white-space: pre-wrap;
   text-align: center;
   text-align-last: center;
