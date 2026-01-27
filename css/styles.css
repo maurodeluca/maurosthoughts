@@ -350,3 +350,21 @@ nav a:hover {
     margin-top: 7rem;
   }
 }
+
+/* Chrome, Edge, Safari */
+.home-page::-webkit-scrollbar,
+.manifest-page::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+.home-page,
+.manifest-page {
+  scrollbar-width: none; /* hides scrollbar */
+}
+
+/* IE / old Edge */
+.home-page,
+.manifest-page {
+  -ms-overflow-style: none;
+}
