@@ -18,10 +18,11 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
   scroll-snap-type: y mandatory;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  overflow: hidden;
 }
 
-html { height: 100%; }
+html { height: 100%; overflow: hidden; }
 
 section {
   min-height: 100vh;
@@ -29,9 +30,8 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  scroll-snap-align: center;
-  scroll-snap-stop: always;
-} 
+  scroll-snap-align: start;
+}  
 
 .content {
   position: relative;
@@ -40,10 +40,25 @@ section {
   transform: translateY(40px);
   transition: all 0.9s ease;
   text-align: center;
-  text-align-last: center;
+  text-align-last: center
+}
+
+.contentManifest {
+  position: relative;
+  width: 750px;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.9s ease;
+  text-align: center;
+  text-align-last: center
 }
 
 .content.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.contentManifest.visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -56,7 +71,6 @@ p  { font-size: 1.15rem; }
 .muted { color: var(--muted); }
    
 .divider {
-  positon: absolute;
   bottom: 1rem; 
   left: 50%; 
   width: 60px;
@@ -66,6 +80,8 @@ p  { font-size: 1.15rem; }
 
 /* Terminal-style console */
 .terminal {
+  position: absolute;
+  top: -1rem;
   background: transparent;
   border-left: 4px solid var(--terminal-border);
   padding: 1rem 1.2rem;

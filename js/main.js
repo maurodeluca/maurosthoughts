@@ -5,34 +5,11 @@ const observer = new IntersectionObserver(entries => {
   });
 }, { threshold: 0.3 });
 
-document.querySelectorAll('nav a').forEach(link => {
-  link.addEventListener('click', e => {
-    const href = link.getAttribute('href');
-
-    // Only hijack in-page anchors
-    if (!href.startsWith('#')) return;
-
-    e.preventDefault();
-    const id = href.substring(1);
-    const section = document.getElementById(id);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth' });
-    }
-  });
-});
-
-
 document.querySelectorAll('.content').forEach(el => observer.observe(el));
 
-/* Typed quote (once) */
-const quote = `
-I write to understand things better.
-Sometimes that means disagreeing with the system.
-`;
-const target = document.getElementById('typed');
+/* Typed quote / manifesto */
 function typeText(text, element, speed = 40, callback) {
   if (!element) return;
-
   let i = 0;
   element.textContent = "";
 
@@ -49,48 +26,17 @@ function typeText(text, element, speed = 40, callback) {
   type();
 }
 
-if (target) {
-  typeText(quote, target);
-}
+const target = document.getElementById('typed');
+const quote = `
+I write to understand things better.
+Sometimes that means disagreeing with the system.
+`;
 
-/* Section navigation with arrows */
-const sections = document.querySelectorAll('section');
-let currentSectionIndex = 0;
+if (target) typeText(quote, target);
 
-// Track which section is in view
-const sectionObserver = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      currentSectionIndex = Array.from(sections).indexOf(entry.target);
-    }
-  });
-}, { threshold: 0.5 });
-
-sections.forEach(section => sectionObserver.observe(section));
-
-document.addEventListener('click', (e) => {
-  const arrow = e.target.closest('.section-arrow');
-  if (!arrow) return;
-
-  if (arrow.classList.contains('last-section')) {
-    // Scroll up one section when possible, otherwise go to top
-    if (currentSectionIndex > 0) {
-      sections[currentSectionIndex - 1].scrollIntoView({ behavior: 'smooth' });
-    } else {
-      sections[0].scrollIntoView({ behavior: 'smooth' });
-    }
-  } else {
-    // Down arrow: Scroll to next section when possible
-    if (currentSectionIndex < sections.length - 1) {
-      sections[currentSectionIndex + 1].scrollIntoView({ behavior: 'smooth' });
-    }
-  }
-});
-
+/* Manifesto typing */
 const manifestoIntro = "I wrote this to remember what mattered before metrics.";
 const manIntroTarget = document.getElementById('intro');
-
-// Manifesto content
 const manifestoText = `
 I’m done pretending the hiring and recruitment industry isn’t deeply broken.
 
@@ -106,11 +52,10 @@ Work matters, but it is not everything. People are not problems to be solved in 
 
 If this resonates, you are not broken.
 The system is.
-`; 
+`;
 
 const manifestoTarget = document.getElementById('manifesto');
 
-// Delay slightly so it doesn't clash with intro typing
 if (manIntroTarget && manifestoTarget) {
   typeText(manifestoIntro, manIntroTarget, 45, () => {
     setTimeout(() => {
@@ -118,4 +63,62 @@ if (manIntroTarget && manifestoTarget) {
     }, 400);
   });
 }
- 
+
+/* Section scrolling logic */
+const sections = document.querySelectorAll('section');
+let currentSectionIndex = 0;
+let isScrolling = false;
+
+function scrollToSection(index) {
+  if (index < 0 || index >= sections.length) return;
+  isScrolling = true;
+  sections[index].scrollIntoView({ behavior: "auto" });
+  currentSectionIndex = index;
+  setTimeout(() => { isScrolling = false; }, 500); // throttle wheel
+}
+
+/* Track which section is in view (for arrow nav) */
+const sectionObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      currentSectionIndex = Array.from(sections).indexOf(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
+
+sections.forEach(section => sectionObserver.observe(section));
+
+/* Arrow click navigation */
+document.addEventListener('click', (e) => {
+  const arrow = e.target.closest('.section-arrow');
+  if (!arrow) return;
+
+  if (arrow.classList.contains('last-section')) {
+    scrollToSection(currentSectionIndex - 1);
+  } else {
+    scrollToSection(currentSectionIndex + 1);
+  }
+});
+
+/* Wheel scroll snapping */
+window.addEventListener('wheel', (e) => {
+  if (isScrolling) return;
+
+  if (e.deltaY > 0) {
+    scrollToSection(currentSectionIndex + 1);
+  } else if (e.deltaY < 0) {
+    scrollToSection(currentSectionIndex - 1);
+  }
+});
+
+/* Optional: hijack in-page nav links for instant snapping */
+document.querySelectorAll('nav a').forEach(link => {
+  link.addEventListener('click', e => {
+    const href = link.getAttribute('href');
+    if (!href.startsWith('#')) return;
+    e.preventDefault();
+    const id = href.substring(1);
+    const section = document.getElementById(id);
+    if (section) scrollToSection(Array.from(sections).indexOf(section));
+  });
+});
