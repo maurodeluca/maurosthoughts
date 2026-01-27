@@ -183,7 +183,7 @@ p {
   border-left: 2px solid var(--accent);
   padding: 1rem 1.2rem;
   min-height: 15rem;
-  text-align: left;
+  text-align: justify;
   text-align-last: left;
 }
 
@@ -320,7 +320,6 @@ nav a:hover {
   .terminal {
     font-size: 0.95rem;
     padding: 0.8rem 1rem;
-    width: 100%;
     max-width: 320px;
     margin: 0 auto 1.5rem;
   }
