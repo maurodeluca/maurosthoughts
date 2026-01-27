@@ -31,7 +31,7 @@ section {
   justify-content: center;
   scroll-snap-align: center;
   scroll-snap-stop: always;
-}
+} 
 
 .content {
   position: relative;
@@ -206,6 +206,14 @@ nav a:hover {
   min-height: 15rem; /* Adjust to fit the manifesto */
   animation: none;
   text-align: justify;
+  text-align-last: left;
+}
+
+.typed#typed {
+  font-size: 1.15rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  text-align: left;
   text-align-last: left;
 }
 

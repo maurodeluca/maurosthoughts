@@ -25,7 +25,10 @@ document.querySelectorAll('nav a').forEach(link => {
 document.querySelectorAll('.content').forEach(el => observer.observe(el));
 
 /* Typed quote (once) */
-const quote = "I write to understand things better. \n Sometimes that means disagreeing with the system.";
+const quote = `
+I write to understand things better.
+Sometimes that means disagreeing with the system.
+`;
 const target = document.getElementById('typed');
 function typeText(text, element, speed = 40, callback) {
   if (!element) return;
@@ -113,3 +116,4 @@ if (manIntroTarget && manifestoTarget) {
     }, 400);
   });
 }
+ 
