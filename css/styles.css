@@ -227,3 +227,9 @@ nav a:hover {
 .manifest-page .section-arrow {
   display: none;
 }
+
+.manifest-page .content {
+  max-width: 720px;    /* keep the content width limited */
+  width: 100%;          /* let it shrink on small screens */
+  margin: 0 auto;       /* center horizontally */
+}
