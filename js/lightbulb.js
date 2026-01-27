@@ -3,8 +3,9 @@ import { GLTFLoader } from 'https://unpkg.com/three@0.182.0/examples/jsm/loaders
 
 const container = document.getElementById('lightbulb-container');
 const section = document.getElementById('lightbulb');
+const textElement = section.querySelector('h2');
 
-if (!container || !section) throw new Error('Container or section missing');
+if (!container || !section || !textElement) throw new Error('Missing elements');
 
 // --- Scene ---
 const scene = new THREE.Scene();
@@ -28,7 +29,6 @@ scene.add(ambient);
 
 // Point light for the bulb, with decay
 const bulbLight = new THREE.PointLight(0xffa500, 0, 1, 10);
-bulbLight.position.set(0, 0, 0);
 scene.add(bulbLight);
 
 // --- Load bulb ---
@@ -40,9 +40,8 @@ loader.load(
     (gltf) => {
         bulb = gltf.scene;
         bulb.scale.set(5, 5, 5);
-        ambient.position.x = bulb.position.x;
-        ambient.position.y = bulb.position.y;
-        ambient.position.z = bulb.position.z;
+        ambient.position.copy(bulb.position);
+        bulbLight.position.copy(bulb.position);
         scene.add(bulb);
         bulb.traverse((child) => {
             if (child.isMesh && child.material) {
@@ -50,6 +49,8 @@ loader.load(
                 child.material.emissiveIntensity = 0;
             }
         });
+        // Initialize position
+        updateBulbY();
     },
     undefined,
     (err) => console.error(err)
@@ -60,6 +61,24 @@ let t = 0;
 let baseIntensity = 0.5;
 const warmColor = new THREE.Color(0xff9b2f); // dim filament
 const hotColor  = new THREE.Color(0xfff1c1); // hot white-orange
+
+// Helper: map text Y to Three.js world Y
+function getTextOffsetY() {
+  const rect = textElement.getBoundingClientRect();
+  const containerRect = container.getBoundingClientRect();
+  return rect.top - containerRect.top; // pixels from top of container
+}
+
+function updateBulbY() {
+  const textOffset = getTextOffsetY();
+  const containerHeight = container.clientHeight;
+
+  // Normalize 0 (bottom) -> 1 (top)
+  const normalized = 1 - textOffset / containerHeight;
+
+  const BULB_OFFSET = -0.1; // units above text
+  return normalized + BULB_OFFSET;
+}
 
 // --- Camera responsiveness ---
 function updateCamera() {
@@ -95,10 +114,11 @@ function animate() {
 
     // Background glow
     const glowStrength = intensity * 0.6;
+    const glowPercent = 100 - (bulb ? updateBulbY() * 80 : 50);
 
     section.style.background = `
     radial-gradient(
-      circle at 50% 25%,
+      circle at 50% ${glowPercent}%,
       rgba(255, 170, 60, ${0.15 * glowStrength}),
       rgba(13, 13, 13, 1) 70%
     )
@@ -110,7 +130,7 @@ function animate() {
 
     // Float bulb
     if (bulb) {
-        bulb.position.y = 0.4 + Math.sin(t) * 0.03;
+    bulb.position.y = updateBulbY() + Math.sin(t) * 0.03;
 
         bulb.traverse((child) => {
             if (child.isMesh && child.material?.emissive) {
