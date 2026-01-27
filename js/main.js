@@ -1,7 +1,6 @@
 /* ============================
    Reveal on scroll
 ============================ */
-
 const revealObserver = new IntersectionObserver(
   entries => {
     entries.forEach(entry => {
@@ -20,7 +19,6 @@ document.querySelectorAll('.content').forEach(el => {
 /* ============================
    Typewriter utility
 ============================ */
-
 function typeText(text, element, speed = 40, callback) {
   if (!element) return;
   let i = 0;
@@ -42,7 +40,6 @@ function typeText(text, element, speed = 40, callback) {
 /* ============================
    Typed quote (homepage)
 ============================ */
-
 const quoteTarget = document.getElementById('typed');
 const quoteText = `
 I write to understand things better.
@@ -56,10 +53,8 @@ if (quoteTarget) {
 /* ============================
    Manifesto typing
 ============================ */
-
 const manifestoIntro =
   "I wrote this to remember what mattered before metrics.";
-
 const manIntroTarget = document.getElementById('intro');
 const manifestoTarget = document.getElementById('manifesto');
 
@@ -83,16 +78,13 @@ async function loadManifesto() {
 loadManifesto();
 
 /* ============================
-   Section tracking (arrows/nav)
+   Homepage arrow + scroll navigation
 ============================ */
-
 const homePage = document.querySelector('.home-page');
-const sections = homePage
-  ? Array.from(homePage.querySelectorAll('section'))
-  : [];
-
+const sections = homePage ? Array.from(homePage.querySelectorAll('section')) : [];
 let currentSectionIndex = 0;
 
+// Track which section is currently in view
 const sectionObserver = new IntersectionObserver(
   entries => {
     entries.forEach(entry => {
@@ -101,21 +93,19 @@ const sectionObserver = new IntersectionObserver(
       }
     });
   },
-  { threshold: 0.3 }
+  { threshold: 0.5 }
 );
 
 sections.forEach(section => sectionObserver.observe(section));
 
+// Scroll to a section helper
 function scrollToSection(index) {
-  if (index < 0 || index >= sections.length) return;
-  sections[index].scrollIntoView({ behavior: 'auto' });
+  if (!homePage || index < 0 || index >= sections.length) return;
+  sections[index].scrollIntoView({ behavior: 'auto', block: 'start' });
   currentSectionIndex = index;
 }
 
-/* ============================
-   Arrow navigation
-============================ */
-
+// Arrow navigation
 document.addEventListener('click', e => {
   const arrow = e.target.closest('.section-arrow');
   if (!arrow) return;
@@ -127,10 +117,35 @@ document.addEventListener('click', e => {
   }
 });
 
-/* ============================
-   In-page nav links (instant)
-============================ */
+/* Optional: wheel navigation for one-section-at-a-time scrolling */
+if (homePage) {
+  let isScrolling = false;
 
+  homePage.addEventListener(
+    'wheel',
+    e => {
+      e.preventDefault();
+      if (isScrolling) return;
+
+      isScrolling = true;
+
+      if (e.deltaY > 0 && currentSectionIndex < sections.length - 1) {
+        scrollToSection(currentSectionIndex + 1);
+      } else if (e.deltaY < 0 && currentSectionIndex > 0) {
+        scrollToSection(currentSectionIndex - 1);
+      }
+
+      setTimeout(() => {
+        isScrolling = false;
+      }, 700);
+    },
+    { passive: false }
+  );
+}
+
+/* ============================
+   Nav link handling
+============================ */
 document.querySelectorAll('nav a').forEach(link => {
   link.addEventListener('click', e => {
     const href = link.getAttribute('href');
