@@ -368,3 +368,22 @@ nav a:hover {
 .manifest-page {
   -ms-overflow-style: none;
 }
+
+.home-page,
+.manifest-page {
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch; /* smooth iOS momentum */
+}
+
+/* Hide scrollbar visuals */
+.home-page::-webkit-scrollbar,
+.manifest-page::-webkit-scrollbar {
+  display: none;
+}
+
+.home-page,
+.manifest-page {
+  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;  /* old Edge */
+}
+
