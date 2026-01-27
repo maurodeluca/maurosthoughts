@@ -233,3 +233,14 @@ nav a:hover {
   width: 100%;          /* let it shrink on small screens */
   margin: 0 auto;       /* center horizontally */
 }
+
+body.manifest-page {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: none
+}
+
+body.manifest-page section {
+  scroll-snap-align: none;
+  min-height: auto;
+}
