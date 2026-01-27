@@ -26,13 +26,9 @@ document.querySelectorAll('.content').forEach(el => observer.observe(el));
 
 /* Typed quote (once) */
 const quote = `
-I write to understand things better.
+I write to understand things better.                               Sometimes that means disagreeing with the system.
 `;
 const target = document.getElementById('typed');
-const quote2 = `
-Sometimes that means disagreeing with the system.
-`;
-const target2 = document.getElementById('typedA');
 function typeText(text, element, speed = 40, callback) {
   if (!element) return;
 
@@ -52,13 +48,7 @@ function typeText(text, element, speed = 40, callback) {
   type();
 }
 
-if (target && target2) {
-  typeText(quote, target, 40, () => {
-    setTimeout(() => {
-      typeText(quote2, target2, 40);
-    }, 40);
-  });
-}
+if (target) typeText(quote, target);
 
 /* Section navigation with arrows */
 const sections = document.querySelectorAll('section');
