@@ -185,6 +185,9 @@ p {
   min-height: 15rem;
   text-align: justify;
   text-align-last: left;
+  hyphens: auto;             /* allow words to break */
+  word-spacing: normal;      /* reset any extra spacing */
+  overflow-wrap: break-word; /* prevent huge gaps */
 }
 
 /* =========================
