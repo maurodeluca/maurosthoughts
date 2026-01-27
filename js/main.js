@@ -143,6 +143,27 @@ if (homePage) {
   );
 }
 
+const isManifestPage = document.body.classList.contains('manifest-page');
+
+if (!isManifestPage) {
+  window.addEventListener('keydown', (e) => {
+    // Ignore if user is typing in an input/textarea
+    const tag = document.activeElement.tagName.toLowerCase();
+    if (tag === 'input' || tag === 'textarea') return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      scrollToSection(currentSectionIndex + 1);
+    }
+
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      scrollToSection(currentSectionIndex - 1);
+    }
+  });
+}
+
+
 /* ============================
    Nav link handling
 ============================ */
