@@ -234,6 +234,7 @@ nav a:hover {
   max-width: 720px;    /* keep the content width limited */
   width: 100%;          /* let it shrink on small screens */
   margin: 0 auto;       /* center horizontally */
+  margin-top: 6rem;
 }
 
 body.manifest-page {
@@ -243,8 +244,9 @@ body.manifest-page {
 }
 
 body.manifest-page section {
-  scroll-snap-align: none;
   min-height: auto;
+  height: auto;
+  align-item: flex-start;
 }
 
 h1 {
@@ -278,5 +280,15 @@ h1 {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+  
+  .typed#manifesto {
+    min-height: auto;
+  }
+}
+
+@supports (-webkit-touch-callout: none) {
+  .manifest-page .content {
+    margin-top: 7rem;
   }
 }
