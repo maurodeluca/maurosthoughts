@@ -244,3 +244,22 @@ body.manifest-page section {
   scroll-snap-align: none;
   min-height: auto;
 }
+
+h1 {
+  max-width: 100%;
+}
+
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2.1rem;
+    line-height: 1.15;
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 768px) {
+  h1 span.accent {
+    display: inline-block;
+  }
+}
