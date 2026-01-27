@@ -95,16 +95,36 @@ document.addEventListener('click', (e) => {
   }
 });
 
-/* Wheel scroll snapping */
-window.addEventListener('wheel', (e) => {
-  if (isScrolling) return;
+const isManifestPage = document.body.classList.contains('manifest-page');
 
-  if (e.deltaY > 0) {
-    scrollToSection(currentSectionIndex + 1);
-  } else if (e.deltaY < 0) {
-    scrollToSection(currentSectionIndex - 1);
-  }
-});
+if (!isManifestPage) {
+  let isScrolling = false;
+
+  window.addEventListener(
+    'wheel',
+    (e) => {
+      e.preventDefault();
+      if (isScrolling) return;
+
+      isScrolling = true;
+
+      if (e.deltaY > 0) {
+        if (currentSectionIndex < sections.length - 1) {
+          sections[currentSectionIndex + 1].scrollIntoView({ behavior: 'auto' });
+        }
+      } else {
+        if (currentSectionIndex > 0) {
+          sections[currentSectionIndex - 1].scrollIntoView({ behavior: 'auto' });
+        }
+      }
+
+      setTimeout(() => {
+        isScrolling = false;
+      }, 700);
+    },
+    { passive: false }
+  );
+}
 
 /* Optional: hijack in-page nav links for instant snapping */
 document.querySelectorAll('nav a').forEach(link => {
