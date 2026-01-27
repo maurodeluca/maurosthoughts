@@ -1,24 +1,13 @@
-/* ============================
-   Reveal on scroll
-============================ */
-const revealObserver = new IntersectionObserver(
-  entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-      }
-    });
-  },
-  { threshold: 0.3 }
-);
+/* Reveal on scroll */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.3 });
 
-document.querySelectorAll('.content').forEach(el => {
-  revealObserver.observe(el);
-});
+document.querySelectorAll('.content').forEach(el => observer.observe(el));
 
-/* ============================
-   Typewriter utility
-============================ */
+/* Typed quote / manifesto */
 function typeText(text, element, speed = 40, callback) {
   if (!element) return;
   let i = 0;
@@ -37,22 +26,15 @@ function typeText(text, element, speed = 40, callback) {
   type();
 }
 
-/* ============================
-   Typed quote (homepage)
-============================ */
-const quoteTarget = document.getElementById('typed');
-const quoteText = `
+const target = document.getElementById('typed');
+const quote = `
 I write to understand things better.
 Sometimes that means disagreeing with the system.
 `;
 
-if (quoteTarget) {
-  typeText(quoteText, quoteTarget, 40);
-}
+if (target) typeText(quote, target);
 
-/* ============================
-   Manifesto typing
-============================ */
+/* Manifesto typing */
 const manifestoIntro =
   "I wrote this to remember what mattered before metrics.";
 const manIntroTarget = document.getElementById('intro');
@@ -77,36 +59,32 @@ async function loadManifesto() {
 
 loadManifesto();
 
-/* ============================
-   Homepage arrow + scroll navigation
-============================ */
-const homePage = document.querySelector('.home-page');
-const sections = homePage ? Array.from(homePage.querySelectorAll('section')) : [];
+/* Section scrolling logic */
+const sections = document.querySelectorAll('section');
 let currentSectionIndex = 0;
+let isScrolling = false;
 
-// Track which section is currently in view
-const sectionObserver = new IntersectionObserver(
-  entries => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        currentSectionIndex = sections.indexOf(entry.target);
-      }
-    });
-  },
-  { threshold: 0.5 }
-);
+function scrollToSection(index) {
+  if (index < 0 || index >= sections.length) return;
+  isScrolling = true;
+  sections[index].scrollIntoView({ behavior: "auto" });
+  currentSectionIndex = index;
+  setTimeout(() => { isScrolling = false; }, 500); // throttle wheel
+}
+
+/* Track which section is in view (for arrow nav) */
+const sectionObserver = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      currentSectionIndex = Array.from(sections).indexOf(entry.target);
+    }
+  });
+}, { threshold: 0.5 });
 
 sections.forEach(section => sectionObserver.observe(section));
 
-// Scroll to a section helper
-function scrollToSection(index) {
-  if (!homePage || index < 0 || index >= sections.length) return;
-  sections[index].scrollIntoView({ behavior: 'auto', block: 'start' });
-  currentSectionIndex = index;
-}
-
-// Arrow navigation
-document.addEventListener('click', e => {
+/* Arrow click navigation */
+document.addEventListener('click', (e) => {
   const arrow = e.target.closest('.section-arrow');
   if (!arrow) return;
 
@@ -117,46 +95,25 @@ document.addEventListener('click', e => {
   }
 });
 
-/* Optional: wheel navigation for one-section-at-a-time scrolling */
-if (homePage) {
-  let isScrolling = false;
+/* Wheel scroll snapping */
+window.addEventListener('wheel', (e) => {
+  if (isScrolling) return;
 
-  homePage.addEventListener(
-    'wheel',
-    e => {
-      e.preventDefault();
-      if (isScrolling) return;
+  if (e.deltaY > 0) {
+    scrollToSection(currentSectionIndex + 1);
+  } else if (e.deltaY < 0) {
+    scrollToSection(currentSectionIndex - 1);
+  }
+});
 
-      isScrolling = true;
-
-      if (e.deltaY > 0 && currentSectionIndex < sections.length - 1) {
-        scrollToSection(currentSectionIndex + 1);
-      } else if (e.deltaY < 0 && currentSectionIndex > 0) {
-        scrollToSection(currentSectionIndex - 1);
-      }
-
-      setTimeout(() => {
-        isScrolling = false;
-      }, 700);
-    },
-    { passive: false }
-  );
-}
-
-/* ============================
-   Nav link handling
-============================ */
+/* Optional: hijack in-page nav links for instant snapping */
 document.querySelectorAll('nav a').forEach(link => {
   link.addEventListener('click', e => {
     const href = link.getAttribute('href');
-    if (!href || !href.startsWith('#')) return;
-
+    if (!href.startsWith('#')) return;
     e.preventDefault();
-    const id = href.slice(1);
-    const targetSection = document.getElementById(id);
-
-    if (!targetSection) return;
-    const index = sections.indexOf(targetSection);
-    if (index !== -1) scrollToSection(index);
+    const id = href.substring(1);
+    const section = document.getElementById(id);
+    if (section) scrollToSection(Array.from(sections).indexOf(section));
   });
 });
