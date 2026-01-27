@@ -7,40 +7,73 @@
   --terminal-border: #b11212;
 }
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
+
+/* =========================
+   Base document
+========================= */
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  overflow: hidden; /* browser never scrolls */
+}
 
 body {
-  margin: 0;
   background: var(--bg);
   color: var(--text);
   font-family: Georgia, 'Times New Roman', serif;
   line-height: 1.6;
-  overflow-x: hidden;
-  overflow-y: auto;
-  scroll-snap-type: y mandatory;
   scroll-behavior: auto;
-  overflow: hidden;
 }
 
-html { height: 100%; overflow: hidden; }
+html {
+  overflow-x: hidden;
+}
+
+/* =========================
+   Sections (base)
+========================= */
 
 section {
-  min-height: 100vh;
   padding: 0 10vw;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* =========================
+   Home page scroll container
+========================= */
+
+.home-page {
+  height: 100vh;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: auto;
+}
+
+.home-page section {
+  min-height: 100vh;
   scroll-snap-align: start;
-}  
+}
+
+/* =========================
+   Content reveal
+========================= */
 
 .content {
   position: relative;
   width: 400px;
   opacity: 0;
   transform: translateY(40px);
-  transition: all 0.9s ease;
+  transition: opacity 0.9s ease, transform 0.9s ease;
   text-align: center;
-  text-align-last: center
+  text-align-last: center;
 }
 
 .content.visible {
@@ -48,27 +81,47 @@ section {
   transform: translateY(0);
 }
 
-h1 { font-size: 3.2rem; }
-h2 { font-size: 2.1rem; }
-p  { font-size: 1.15rem; }
+/* =========================
+   Typography
+========================= */
 
-.accent { color: var(--accent); }
-.muted { color: var(--muted); }
-   
+h1 {
+  max-width: 100%;
+  font-size: 3.2rem;
+}
+
+h2 {
+  font-size: 2.1rem;
+}
+
+p {
+  font-size: 1.15rem;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+.muted {
+  color: var(--muted);
+}
+
 .divider {
-  bottom: 1rem; 
-  left: 50%; 
+  bottom: 1rem;
+  left: 50%;
   width: 60px;
   height: 2px;
   background: var(--accent);
 }
 
-/* Terminal-style console */
+/* =========================
+   Terminal-style console
+========================= */
+
 .terminal {
-  max-width: 100%;
-  overflow: hidden;
   position: absolute;
   top: -1rem;
+  max-width: 100%;
   background: transparent;
   border-left: 4px solid var(--terminal-border);
   padding: 1rem 1.2rem;
@@ -76,12 +129,12 @@ p  { font-size: 1.15rem; }
   font-family: 'Courier New', monospace;
   font-size: 1.1rem;
   text-align: left;
+  overflow: hidden;
 }
 
 .cursor-line .cursor {
   background: var(--accent);
-  padding-left: 2px;
-  padding-right: 2px;
+  padding: 0 2px;
   display: inline-block;
   animation: blink 2s infinite;
 }
@@ -91,13 +144,24 @@ p  { font-size: 1.15rem; }
 }
 
 @keyframes blink {
-  0%,50%,100% { opacity: 1; background: var(--accent); }
-  25%,75% { opacity: 0; background: transparent; }
+  0%,
+  50%,
+  100% {
+    opacity: 1;
+    background: var(--accent);
+  }
+  25%,
+  75% {
+    opacity: 0;
+    background: transparent;
+  }
 }
 
-/* Typed quote */
+/* =========================
+   Typed text
+========================= */
+
 .typed {
-  font-style: normal;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.15rem;
   line-height: 1.6;
@@ -106,14 +170,31 @@ p  { font-size: 1.15rem; }
   white-space: pre-wrap;
 }
 
-/* nav */
+.typed#typed {
+  text-align: center;
+  text-align-last: center;
+}
+
+.typed#manifesto {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  border-left: 2px solid var(--accent);
+  padding: 1rem 1.2rem;
+  min-height: 15rem;
+  text-align: left;
+  text-align-last: left;
+}
+
+/* =========================
+   Navigation
+========================= */
+
 nav {
   position: fixed;
   top: 20px;
   left: 20px;
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.4s ease;
   z-index: 1000;
 }
 
@@ -123,7 +204,6 @@ nav a {
   color: var(--text);
   text-decoration: none;
   font-size: 0.9rem;
-  border-bottom: none;
   opacity: 0.6;
 }
 
@@ -132,12 +212,14 @@ nav a::before {
   opacity: 0.4;
 }
 
-
 nav a:hover {
   opacity: 1;
 }
 
-/* Section navigation arrows */
+/* =========================
+   Section navigation arrows
+========================= */
+
 .section-arrow {
   position: fixed;
   bottom: 30px;
@@ -146,7 +228,6 @@ nav a:hover {
   color: var(--accent);
   animation: bounce 2s infinite;
   cursor: pointer;
-  opacity: 1;
 }
 
 .section-arrow:hover {
@@ -159,7 +240,8 @@ nav a:hover {
 }
 
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -168,7 +250,8 @@ nav a:hover {
 }
 
 @keyframes bounce-up {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -176,7 +259,10 @@ nav a:hover {
   }
 }
 
-/* Link styling */
+/* =========================
+   Links
+========================= */
+
 .accent-link {
   color: var(--accent);
   text-decoration: none;
@@ -188,42 +274,21 @@ nav a:hover {
   opacity: 0.7;
 }
 
-/* Manifesto typewriter effect */
-.typed#manifesto {
-  font-family: 'Courier New', monospace;
-  font-size: 1rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  border-left: 2px solid var(--accent);
-  padding: 1rem 1.2rem;
-  min-height: 15rem; /* Adjust to fit the manifesto */
-  animation: none;
-  text-align: left;
-  text-align-last: left;
+/* =========================
+   Manifest page overrides
+========================= */
+
+.manifest-page {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
 }
 
-.typed#typed {
-  font-size: 1.15rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  text-align: center;
-  text-align-last: center;
-}
-
-
-
-.back-link {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity 0.4s ease;
-  z-index: 1000;
-}
-
-.back-link:hover {
-  opacity: 1;
+.manifest-page section {
+  min-height: auto;
+  height: auto;
+  align-items: flex-start;
 }
 
 .manifest-page .section-arrow {
@@ -231,27 +296,14 @@ nav a:hover {
 }
 
 .manifest-page .content {
-  max-width: 720px;    /* keep the content width limited */
-  width: 100%;          /* let it shrink on small screens */
-  margin: 0 auto;       /* center horizontally */
-  margin-top: 6rem;
+  max-width: 720px;
+  width: 100%;
+  margin: 6rem auto 0;
 }
 
-body.manifest-page {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: none
-}
-
-body.manifest-page section {
-  min-height: auto;
-  height: auto;
-  align-item: flex-start;
-}
-
-h1 {
-  max-width: 100%;
-}
+/* =========================
+   Responsive
+========================= */
 
 @media (max-width: 768px) {
   h1 {
@@ -266,14 +318,11 @@ h1 {
   }
 
   .terminal {
-    overfow: hidden;
     font-size: 0.95rem;
     padding: 0.8rem 1rem;
-    margin-bottom: 1.5rem;
     width: 100%;
     max-width: 320px;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto 1.5rem;
   }
 
   .cursor-line {
@@ -281,7 +330,7 @@ h1 {
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  
+
   .typed#manifesto {
     min-height: auto;
   }
