@@ -114,11 +114,10 @@ function animate() {
 
     // Background glow
     const glowStrength = intensity * 0.6;
-    const glowPercent = 100 - (bulb ? updateBulbY() * 80 : 50);
 
     section.style.background = `
     radial-gradient(
-      circle at 50% ${glowPercent}%,
+      circle at 50% 25%,
       rgba(255, 170, 60, ${0.15 * glowStrength}),
       rgba(13, 13, 13, 1) 70%
     )
