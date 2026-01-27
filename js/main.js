@@ -37,32 +37,27 @@ if (target) typeText(quote, target);
 /* Manifesto typing */
 const manifestoIntro = "I wrote this to remember what mattered before metrics.";
 const manIntroTarget = document.getElementById('intro');
-const manifestoText = `
-I’m done pretending the hiring and recruitment industry isn’t deeply broken.
-
-We’re living through a global job market collapse dressed up as “opportunity.” Mass layoffs, fake job postings, endless interview rounds, automated rejections, and a culture of suspicion so ingrained that interviewers now assume your CV is a work of fiction by default. Every interaction feels less like a conversation and more like an interrogation designed to catch you bluffing.
-
-Somewhere along the way, curiosity, growth, and humanity became liabilities.
-
-I took a gap year to broaden my horizons and explore other areas of my life. To recover. To live. Life has a way of throwing events at you that feel impossible to overcome. Decisions I made, paths I took, outcomes I couldn’t foresee. Those moments shape your mental health as much as your career.
-
-I realized that instead of begging for acceptance, I needed to sing my own praises. Quietly, internally, to remind myself that my work, choices, learning, and growth mattered. Not for anyone else. Not for the approval of committees or directors.
-
-Work matters, but it is not everything. People are not problems to be solved in forty-five minutes. Intelligence is not demonstrated by how efficiently someone jumps through hoops someone else decided mattered. Life and capability are far more complex than any test, and that is not your fault.
-
-If this resonates, you are not broken.
-The system is.
-`;
-
 const manifestoTarget = document.getElementById('manifesto');
 
-if (manIntroTarget && manifestoTarget) {
-  typeText(manifestoIntro, manIntroTarget, 45, () => {
-    setTimeout(() => {
-      typeText(manifestoText, manifestoTarget, 25);
-    }, 400);
-  });
+// Fetch manifesto from file
+async function loadManifesto() {
+  try {
+    const response = await fetch('../../content/writings/manifesto.txt');
+    const text = await response.text();
+
+    if (manIntroTarget && manifestoTarget) {
+      typeText(manifestoIntro, manIntroTarget, 45, () => {
+        setTimeout(() => {
+          typeText(text, manifestoTarget, 20);
+        }, 400);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to load manifesto:', err);
+  }
 }
+
+loadManifesto();
 
 /* Section scrolling logic */
 const sections = document.querySelectorAll('section');
