@@ -31,10 +31,10 @@ section {
   justify-content: center;
   scroll-snap-align: center;
   scroll-snap-stop: always;
-  text-align: center;
 }
 
 .content {
+  position: relative;
   max-width: 720px;
   opacity: 0;
   transform: translateY(40px);
@@ -52,16 +52,19 @@ p  { font-size: 1.15rem; }
 
 .accent { color: var(--accent); }
 .muted { color: var(--muted); }
-
+   
 .divider {
+  positon: absolute; 
+  bottom: 1rem; 
+  left: 50%; 
   width: 60px;
   height: 2px;
   background: var(--accent);
-  margin: 2rem 0;
 }
 
 /* Terminal-style console */
 .terminal {
+  position: relative;
   background: transparent;
   border-left: 4px solid var(--terminal-border);
   padding: 1rem 1.2rem;
@@ -69,6 +72,16 @@ p  { font-size: 1.15rem; }
   font-family: 'Courier New', monospace;
   font-size: 1.1rem;
   text-align: left;
+}
+
+.terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: var(--terminal-border);
 }
 
 .cursor-line .cursor {
@@ -90,6 +103,7 @@ p  { font-size: 1.15rem; }
 
 /* Typed quote */
 .typed {
+  position: absolute;
   font-style: normal;
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 1.15rem;
