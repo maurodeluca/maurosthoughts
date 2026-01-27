@@ -35,7 +35,7 @@ section {
 
 .content {
   position: relative;
-  max-width: 720px;
+  width: 400px;
   opacity: 0;
   transform: translateY(40px);
   transition: all 0.9s ease;
@@ -207,12 +207,7 @@ nav a:hover {
   text-align-last: center;
 }
 
-.typed#typedA {
-  font-size: 1.15rem;
-  white-space: pre-wrap;
-  text-align: center;
-  text-align-last: center;
-}
+
 
 .back-link {
   position: fixed;
