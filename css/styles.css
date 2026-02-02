@@ -424,6 +424,10 @@ nav a:hover {
   .typed#manifesto {
     min-height: auto;
   }
+  
+  .types#existence {
+    min-height: auto;
+  }
 
   .divider {
     margin-top: 1.5rem;
