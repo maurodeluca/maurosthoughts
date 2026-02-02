@@ -51,31 +51,50 @@ if (quoteTarget) {
 }
 
 /* ============================
-   Manifesto typing
+   Generic typing loader
 ============================ */
-const manifestoIntro =
-  "I wrote this to remember what mattered before metrics.";
-const manIntroTarget = document.getElementById('intro');
-const manifestoTarget = document.getElementById('manifesto');
 
-async function loadManifesto() {
+async function loadTypedText({
+  introText,
+  introElementId,
+  contentElementId,
+  filePath,
+  introSpeed = 45,
+  contentSpeed = 20,
+  delay = 400
+}) {
+  const introTarget = document.getElementById(introElementId);
+  const contentTarget = document.getElementById(contentElementId);
+
+  if (!introTarget || !contentTarget) return;
+
   try {
-    const response = await fetch('../../content/writings/manifesto.txt');
+    const response = await fetch(filePath);
     const text = await response.text();
 
-    if (manIntroTarget && manifestoTarget) {
-      typeText(manifestoIntro, manIntroTarget, 45, () => {
-        setTimeout(() => {
-          typeText(text, manifestoTarget, 20);
-        }, 400);
-      });
-    }
+    typeText(introText, introTarget, introSpeed, () => {
+      setTimeout(() => {
+        typeText(text, contentTarget, contentSpeed);
+      }, delay);
+    });
   } catch (err) {
-    console.error('Failed to load manifesto:', err);
+    console.error(`Failed to load ${filePath}:`, err);
   }
 }
 
-loadManifesto();
+loadTypedText({
+  introText: "I wrote this to remember what mattered before metrics.",
+  introElementId: "intro",
+  contentElementId: "manifesto",
+  filePath: "../../content/writings/manifesto.txt"
+});
+
+loadTypedText({
+  introText: "On being here, briefly.",
+  introElementId: "intro",
+  contentElementId: "existence",
+  filePath: "../../content/writings/existence.txt"
+});
 
 /* ============================
    Homepage arrow + scroll navigation
@@ -141,11 +160,7 @@ if (homePage) {
     },
     { passive: false }
   );
-}
 
-const isManifestPage = document.body.classList.contains('manifest-page');
-
-if (!isManifestPage) {
   window.addEventListener('keydown', (e) => {
     // Ignore if user is typing in an input/textarea
     const tag = document.activeElement.tagName.toLowerCase();
