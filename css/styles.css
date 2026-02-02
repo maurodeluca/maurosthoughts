@@ -196,6 +196,24 @@ p {
   /* prevent huge gaps */
 }
 
+.typed#existence {
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  border-left: 2px solid var(--accent);
+  padding: 1rem 1.2rem;
+  min-height: 15rem;
+  text-align: justify;
+  text-align-last: left;
+  hyphens: auto;
+  /* allow words to break */
+  word-spacing: normal;
+  /* reset any extra spacing */
+  overflow-wrap: break-word;
+  /* prevent huge gaps */
+}
+
 /* =========================
    Shape
 ========================= */
@@ -348,6 +366,30 @@ nav a:hover {
   margin: 6rem auto 0;
 }
 
+.existence-page {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-snap-type: none;
+  scroll-behavior: auto;
+}
+
+.existence-page section {
+  min-height: auto;
+  height: auto;
+  align-items: flex-start;
+}
+
+.existence-page .section-arrow {
+  display: none;
+}
+
+.existence-page .content {
+  max-width: 720px;
+  width: 100%;
+  margin: 6rem auto 0;
+}
+
+
 /* =========================
    Responsive
 ========================= */
@@ -399,29 +441,36 @@ nav a:hover {
   .manifest-page .content {
     margin-top: 7rem;
   }
+  .existence-page .content {
+    margin-top: 7rem;
+  }
 }
 
 /* Chrome, Edge, Safari */
 .home-page::-webkit-scrollbar,
-.manifest-page::-webkit-scrollbar {
+.manifest-page::-webkit-scrollbar,
+.existence-page::-webkit-scrollbar {
   display: none;
 }
 
 /* Firefox */
 .home-page,
-.manifest-page {
+.manifest-page,
+.existence-page {
   scrollbar-width: none;
   /* hides scrollbar */
 }
 
 /* IE / old Edge */
 .home-page,
-.manifest-page {
+.manifest-page,
+.existence-page {
   -ms-overflow-style: none;
 }
 
 .home-page,
-.manifest-page {
+.manifest-page,
+.existence-page {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   /* smooth iOS momentum */
@@ -429,12 +478,14 @@ nav a:hover {
 
 /* Hide scrollbar visuals */
 .home-page::-webkit-scrollbar,
-.manifest-page::-webkit-scrollbar {
+.manifest-page::-webkit-scrollbar,
+.existence-page::-webkit-scrollbar {
   display: none;
 }
 
 .home-page,
-.manifest-page {
+.manifest-page,
+.existence-page {
   scrollbar-width: none;
   /* Firefox */
   -ms-overflow-style: none;
