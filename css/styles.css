@@ -35,22 +35,7 @@ html {
   overflow-x: hidden;
 }
 
-.typing-toggle {
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-  background: transparent;
-  border: 1px solid var(--accent);
-  color: var(--text);
-  font-family: 'Courier New', monospace;
-  padding: 6px 10px;
-  cursor: pointer;
-  opacity: 0.6;
-}
 
-.typing-toggle:hover {
-  opacity: 1;
-}
 
 /* =========================
    Sections (base)
@@ -97,6 +82,28 @@ section {
 .content.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.typing-toggle {
+  position: absolute;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  padding: 6px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+  top: -1rem;
+  max-width: 100%;
+  background: transparent;
+  margin-bottom: 3rem;
+  font-size: 1.1rem;
+  text-align: left;
+  overflow: hidden;
+}
+
+.typing-toggle:hover {
+  opacity: 1;
 }
 
 /* =========================
