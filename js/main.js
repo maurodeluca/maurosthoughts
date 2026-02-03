@@ -95,20 +95,23 @@ async function loadTypedText({
   }
 }
 
-loadTypedText({
-  introText: "I wrote this to remember what mattered before metrics.",
-  introElementId: "intro",
-  contentElementId: "manifesto",
-  filePath: "../../content/writings/manifesto.txt"
-});
+if (document.getElementById('manifesto')) {
+  loadTypedText({
+    introText: "I wrote this to remember what mattered before metrics.",
+    introElementId: "intro",
+    contentElementId: "manifesto",
+    filePath: "../../content/writings/manifesto.txt"
+  });
+} 
 
-loadTypedText({
-  introText: "On being here, briefly.",
-  introElementId: "intro",
-  contentElementId: "existence",
-  filePath: "../../content/writings/existence.txt"
-});
-
+if (document.getElementById('existence')) {
+  loadTypedText({
+    introText: "On being here, briefly.",
+    introElementId: "intro",
+    contentElementId: "existence",
+    filePath: "../../content/writings/existence.txt"
+  });
+}
 function skipTyping(target, text) {
   target.textContent = text;
   // optionally set a finished flag if needed
