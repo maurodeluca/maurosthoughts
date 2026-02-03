@@ -314,6 +314,7 @@ nav a:hover {
   color: var(--accent);
   animation: bounce 2s infinite;
   cursor: pointer;
+  z-index: 100;
 }
 
 .section-arrow:hover {
