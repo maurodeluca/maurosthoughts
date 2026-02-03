@@ -47,14 +47,14 @@ function skipTyping(target, text) {
 }
 
 const skipBtn = document.getElementById('skipTyping');
-
-skipBtn.addEventListener('click', () => {
-  skipTyping = true;
-  if (introTarget) skipTyping(introTarget, introText);
-  if (contentTarget) skipTyping(contentTarget, text);
-  if (quoteTarget) skipTyping(quoteTarget, quoteText);
-});
-
+if (skipBtn) {
+  skipBtn.addEventListener('click', () => {
+    skipTyping = true;
+    if (introTarget) skipTyping(introTarget, introText);
+    if (contentTarget) skipTyping(contentTarget, text);
+    if (quoteTarget) skipTyping(quoteTarget, quoteText);
+  });
+}
 /* ============================
    Typed quote (homepage)
 ============================ */
