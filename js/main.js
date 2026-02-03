@@ -19,14 +19,21 @@ document.querySelectorAll('.content').forEach(el => {
 /* ============================
    Typewriter utility
 ============================ */
-let skipTyping = false;
+let typingSkipped = false;
+
 function typeText(text, element, speed = 40, callback) {
-  if (skipTyping) return;
+  if (typingSkipped) return;
   if (!element) return;
   let i = 0;
   element.textContent = "";
 
   function type() {
+    if (typingSkipped) {
+      element.textContent = text; // immediately fill text
+      if (callback) callback();
+      return;
+    }
+    
     if (i < text.length) {
       element.textContent += text.charAt(i);
       i++;
@@ -39,25 +46,10 @@ function typeText(text, element, speed = 40, callback) {
   type();
 }
 
-const toggleBtn = document.getElementById('typingToggle');
-
-function skipTyping(target, text) {
-  target.textContent = text;
-  // optionally set a finished flag if needed
-}
-
-const skipBtn = document.getElementById('skipTyping');
-if (skipBtn) {
-  skipBtn.addEventListener('click', () => {
-    skipTyping = true;
-    if (introTarget) skipTyping(introTarget, introText);
-    if (contentTarget) skipTyping(contentTarget, text);
-    if (quoteTarget) skipTyping(quoteTarget, quoteText);
-  });
-}
 /* ============================
    Typed quote (homepage)
 ============================ */
+
 const quoteTarget = document.getElementById('typed');
 const quoteText = `
 I write to understand things better.
@@ -71,6 +63,8 @@ if (quoteTarget) {
 /* ============================
    Generic typing loader
 ============================ */
+let globalIntroTarget, globalContentTarget;
+let globalIntroText, globalContentText;
 
 async function loadTypedText({
   introText,
@@ -81,19 +75,19 @@ async function loadTypedText({
   contentSpeed = 20,
   delay = 400
 }) {
-  skipTyping = false;
-  const introTarget = document.getElementById(introElementId);
-  const contentTarget = document.getElementById(contentElementId);
+  typingSkipped = false;
+  globalIntroTarget = document.getElementById(introElementId);
+  globalContentTarget = document.getElementById(contentElementId);
 
-  if (!introTarget || !contentTarget) return;
+  if (!globalIntroTarget || !globalContentTarget) return;
 
   try {
     const response = await fetch(filePath);
-    const text = await response.text();
-
-    typeText(introText, introTarget, introSpeed, () => {
+    globalContentText = await response.text();
+    globalIntroText = introText;
+    typeText(globalIntroText, globalIntroTarget, introSpeed, () => {
       setTimeout(() => {
-        typeText(text, contentTarget, contentSpeed);
+        typeText(globalContentText, globalContentTarget, contentSpeed);
       }, delay);
     });
   } catch (err) {
@@ -115,9 +109,25 @@ loadTypedText({
   filePath: "../../content/writings/existence.txt"
 });
 
+function skipTyping(target, text) {
+  target.textContent = text;
+  // optionally set a finished flag if needed
+}
+
+const skipBtn = document.getElementById('skipTyping');
+if (skipBtn) {
+  skipBtn.addEventListener('click', () => {
+    skipTyping = true;
+    skipTyping(globalIntroTarget, globalIntroText);
+    if (globalContentTarget) skipTyping(globalContentTarget, globalContentText);
+    if (quoteTarget) skipTyping(quoteTarget, quoteText);
+  });
+}
+
 /* ============================
    Homepage arrow + scroll navigation
 ============================ */
+
 const homePage = document.querySelector('.home-page');
 const sections = homePage ? Array.from(homePage.querySelectorAll('section')) : [];
 let currentSectionIndex = 0;
