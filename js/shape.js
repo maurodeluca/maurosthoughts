@@ -22,7 +22,6 @@ if (container) {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   container.appendChild(renderer.domElement);
 
-  // Ensure canvas can detect clicks
   renderer.domElement.style.width = '100%';
   renderer.domElement.style.height = '100%';
   renderer.domElement.style.display = 'block';
@@ -32,26 +31,28 @@ if (container) {
   renderer.domElement.style.touchAction = 'none';
   renderer.domElement.style.pointerEvents = 'auto';
 
-  // --- Geometry ---
+  // --- Geometry / Material (brighter) ---
   const geometry = new THREE.IcosahedronGeometry(1.2, 0);
   const material = new THREE.MeshStandardMaterial({
-    color: 0xb11212,
+    color: 0xff5555,         // brighter red
     wireframe: true,
     metalness: 0.4,
     roughness: 0.3,
+    emissive: 0x330000,
+    emissiveIntensity: 0.5
   });
   const mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
 
-  // --- Lights ---
-  const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+  // --- Lights (stronger) ---
+  const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
   dirLight.position.set(3, 3, 3);
   scene.add(dirLight);
 
-  const ambLight = new THREE.AmbientLight(0xffffff, 0.6);
+  const ambLight = new THREE.AmbientLight(0xffffff, 0.8);
   scene.add(ambLight);
 
-  // --- Animation / Spin ---
+  // --- Spin variables ---
   let t = 0;
   let spinSpeedX = 0.003;
   let spinSpeedY = 0.004;
@@ -59,6 +60,7 @@ if (container) {
   let lastPointer = { x: 0, y: 0 };
   let pointerDelta = { x: 0, y: 0 };
 
+  // --- Pointer / touch handling ---
   const onPointerDown = (e) => {
     isDragging = true;
     renderer.domElement.style.cursor = 'grabbing';
@@ -70,8 +72,10 @@ if (container) {
     if (!isDragging) return;
     const x = e.clientX || e.touches?.[0].clientX;
     const y = e.clientY || e.touches?.[0].clientY;
-    pointerDelta.x = (x - lastPointer.x) * 0.01;
-    pointerDelta.y = (y - lastPointer.y) * 0.01;
+
+    const factor = e.touches ? 0.05 : 0.01; // bigger scale for touch
+    pointerDelta.x = (x - lastPointer.x) * factor;
+    pointerDelta.y = (y - lastPointer.y) * factor;
 
     mesh.rotation.y += pointerDelta.x;
     mesh.rotation.x += pointerDelta.y;
@@ -87,7 +91,6 @@ if (container) {
     spinSpeedY = pointerDelta.x * 2;
   };
 
-  // --- Event listeners ---
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
   renderer.domElement.addEventListener('pointermove', onPointerMove);
   window.addEventListener('pointerup', onPointerUp);
@@ -111,6 +114,7 @@ if (container) {
       if (Math.abs(spinSpeedY) < 0.001) spinSpeedY = 0.004;
     }
 
+    // Floating motion
     mesh.position.y = Math.sin(t) * 0.15;
 
     renderer.render(scene, camera);
@@ -119,7 +123,7 @@ if (container) {
 
   animate();
 
-  // --- Resize ---
+  // --- Responsive resize ---
   window.addEventListener('resize', () => {
     const w = container.clientWidth;
     const h = container.clientHeight;
