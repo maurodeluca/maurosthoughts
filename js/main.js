@@ -37,6 +37,19 @@ function typeText(text, element, speed = 40, callback) {
   type();
 }
 
+const toggleBtn = document.getElementById('typingToggle');
+
+toggleBtn.addEventListener('click', () => {
+  typingEnabled = !typingEnabled;
+  toggleBtn.textContent = typingEnabled ? 'pause typing' : 'resume typing';
+
+  // Resume typing if turned back on
+  if (typingEnabled) {
+    if (target && i < quote.length) typeOnce();
+    if (manifestoTarget && idx < manifestoText.length) typeManifesto();
+  }
+});
+
 function skipTyping(target, text) {
   target.textContent = text;
   // optionally set a finished flag if needed
