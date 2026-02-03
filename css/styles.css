@@ -35,6 +35,23 @@ html {
   overflow-x: hidden;
 }
 
+.typing-toggle {
+  position: fixed;
+  bottom: 30px;
+  left: 30px;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  padding: 6px 10px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.typing-toggle:hover {
+  opacity: 1;
+}
+
 /* =========================
    Sections (base)
 ========================= */
