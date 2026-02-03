@@ -367,24 +367,24 @@ nav a:hover {
    Manifest page overrides
 ========================= */
 
-.manifest-page {
+.manifesto-page {
   overflow-y: auto;
   overflow-x: hidden;
   scroll-snap-type: none;
   scroll-behavior: auto;
 }
 
-.manifest-page section {
+.manifesto-page section {
   min-height: auto;
   height: auto;
   align-items: flex-start;
 }
 
-.manifest-page .section-arrow {
+.manifesto-page .section-arrow {
   display: none;
 }
 
-.manifest-page .content {
+.manifesto-page .content {
   max-width: 720px;
   width: 100%;
   margin: 6rem auto 0;
@@ -474,7 +474,7 @@ nav a:hover {
 }
 
 @supports (-webkit-touch-callout: none) {
-  .manifest-page .content {
+  .manifesto-page .content {
     margin-top: 7rem;
   }
   .existence-page .content {
@@ -484,14 +484,14 @@ nav a:hover {
 
 /* Chrome, Edge, Safari */
 .home-page::-webkit-scrollbar,
-.manifest-page::-webkit-scrollbar,
+.manifesto-page::-webkit-scrollbar,
 .existence-page::-webkit-scrollbar {
   display: none;
 }
 
 /* Firefox */
 .home-page,
-.manifest-page,
+.manifesto-page,
 .existence-page {
   scrollbar-width: none;
   /* hides scrollbar */
@@ -499,13 +499,13 @@ nav a:hover {
 
 /* IE / old Edge */
 .home-page,
-.manifest-page,
+.manifesto-page,
 .existence-page {
   -ms-overflow-style: none;
 }
 
 .home-page,
-.manifest-page,
+.manifesto-page,
 .existence-page {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
@@ -514,13 +514,13 @@ nav a:hover {
 
 /* Hide scrollbar visuals */
 .home-page::-webkit-scrollbar,
-.manifest-page::-webkit-scrollbar,
+.manifesto-page::-webkit-scrollbar,
 .existence-page::-webkit-scrollbar {
   display: none;
 }
 
 .home-page,
-.manifest-page,
+.manifesto-page,
 .existence-page {
   scrollbar-width: none;
   /* Firefox */
