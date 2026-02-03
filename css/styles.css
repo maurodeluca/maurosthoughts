@@ -36,7 +36,7 @@ html {
 }
 
 .typing-toggle {
-  position: fixed;
+  position: absolute;
   bottom: 30px;
   left: 30px;
   background: transparent;
