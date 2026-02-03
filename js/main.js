@@ -1,3 +1,8 @@
+// TODO (tomorrow): Refactor this file into modules:
+// - core/typing.js
+// - core/reveal.js
+// - pages/home.js / manifesto.js / existence.js
+
 /* ============================
    Reveal on scroll
 ============================ */
