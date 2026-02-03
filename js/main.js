@@ -37,6 +37,17 @@ function typeText(text, element, speed = 40, callback) {
   type();
 }
 
+function skipTyping(target, text) {
+  target.textContent = text;
+  // optionally set a finished flag if needed
+}
+
+skipBtn.addEventListener('click', () => {
+  skipTyping(introTarget, introText);
+  skipTyping(contentTarget, text);
+  skipTyping(quoteTarget, quoteText); // if you want quote too
+});
+
 /* ============================
    Typed quote (homepage)
 ============================ */
