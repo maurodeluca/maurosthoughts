@@ -118,9 +118,12 @@ const skipBtn = document.getElementById('skipTyping');
 if (skipBtn) {
   skipBtn.addEventListener('click', () => {
     skipTyping = true;
-    skipTyping(globalIntroTarget, globalIntroText);
-    if (globalContentTarget) skipTyping(globalContentTarget, globalContentText);
-    if (quoteTarget) skipTyping(quoteTarget, quoteText);
+    if (globalIntroTarget) 
+      skipTyping(globalIntroTarget, globalIntroText);
+    if (globalContentTarget) 
+      skipTyping(globalContentTarget, globalContentText);
+    if (quoteTarget) 
+      skipTyping(quoteTarget, quoteText);
   });
 }
 
