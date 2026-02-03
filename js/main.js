@@ -42,10 +42,12 @@ function skipTyping(target, text) {
   // optionally set a finished flag if needed
 }
 
+const skipBtn = document.getElementById('skipTyping');
+
 skipBtn.addEventListener('click', () => {
-  skipTyping(introTarget, introText);
-  skipTyping(contentTarget, text);
-  skipTyping(quoteTarget, quoteText); // if you want quote too
+  if (introTarget) skipTyping(introTarget, introText);
+  if (contentTarget) skipTyping(contentTarget, text);
+  if (quoteTarget) skipTyping(quoteTarget, quoteText); // if you want quote too
 });
 
 /* ============================
