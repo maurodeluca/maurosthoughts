@@ -19,7 +19,9 @@ document.querySelectorAll('.content').forEach(el => {
 /* ============================
    Typewriter utility
 ============================ */
+let skipTyping = false;
 function typeText(text, element, speed = 40, callback) {
+  if (skipTyping) return;
   if (!element) return;
   let i = 0;
   element.textContent = "";
@@ -39,17 +41,6 @@ function typeText(text, element, speed = 40, callback) {
 
 const toggleBtn = document.getElementById('typingToggle');
 
-toggleBtn.addEventListener('click', () => {
-  typingEnabled = !typingEnabled;
-  toggleBtn.textContent = typingEnabled ? 'pause typing' : 'resume typing';
-
-  // Resume typing if turned back on
-  if (typingEnabled) {
-    if (target && i < quote.length) typeOnce();
-    if (manifestoTarget && idx < manifestoText.length) typeManifesto();
-  }
-});
-
 function skipTyping(target, text) {
   target.textContent = text;
   // optionally set a finished flag if needed
@@ -58,9 +49,10 @@ function skipTyping(target, text) {
 const skipBtn = document.getElementById('skipTyping');
 
 skipBtn.addEventListener('click', () => {
+  skipTyping = true;
   if (introTarget) skipTyping(introTarget, introText);
   if (contentTarget) skipTyping(contentTarget, text);
-  if (quoteTarget) skipTyping(quoteTarget, quoteText); // if you want quote too
+  if (quoteTarget) skipTyping(quoteTarget, quoteText);
 });
 
 /* ============================
@@ -89,6 +81,7 @@ async function loadTypedText({
   contentSpeed = 20,
   delay = 400
 }) {
+  skipTyping = false;
   const introTarget = document.getElementById(introElementId);
   const contentTarget = document.getElementById(contentElementId);
 
