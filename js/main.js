@@ -121,6 +121,7 @@ const skipBtn = document.getElementById('skipTyping');
 if (skipBtn) {
   skipBtn.addEventListener('click', () => {
     typingSkipped = true;
+    skipBtn.style.display = 'none';
     if (globalIntroTarget) 
       skipTyping(globalIntroTarget, globalIntroText);
     if (globalContentTarget) 
