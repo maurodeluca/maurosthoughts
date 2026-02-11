@@ -546,6 +546,28 @@ nav a:hover {
   transform: translateY(-2px);
 }
 
+/* =========================
+   Footer/Copyright
+========================= */
+
+footer.copyright {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  text-align: center;
+  padding: 15px 10vw;
+  background: rgba(13, 13, 13, 0.95);
+  border-top: 1px solid var(--accent);
+  font-size: 0.9rem;
+  color: var(--muted);
+  z-index: 999;
+}
+
+footer.copyright p {
+  margin: 0;
+}
+
 #shape-container {
   width: 120px;
   height: 120px;
