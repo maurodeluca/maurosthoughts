@@ -556,16 +556,16 @@ footer.copyright {
   left: 0;
   right: 0;
   text-align: center;
-  padding: 15px 10vw;
   background: rgba(13, 13, 13, 0.95);
   border-top: 1px solid var(--accent);
-  font-size: 0.45rem;
+  padding: 5px 10vw;
   color: var(--muted);
   z-index: 999;
 }
 
 footer.copyright p {
   margin: 0;
+  font-size: 0.5rem;
 }
 
 #shape-container {
