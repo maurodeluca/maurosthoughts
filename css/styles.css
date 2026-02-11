@@ -559,7 +559,7 @@ footer.copyright {
   padding: 15px 10vw;
   background: rgba(13, 13, 13, 0.95);
   border-top: 1px solid var(--accent);
-  font-size: 0.9rem;
+  font-size: 0.45rem;
   color: var(--muted);
   z-index: 999;
 }
