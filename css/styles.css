@@ -558,7 +558,7 @@ footer.copyright {
   text-align: center;
   background: rgba(13, 13, 13, 0.95);
   border-top: 1px solid var(--accent);
-  padding: 5px 10vw;
+  padding: 4px 10vw;
   color: var(--muted);
   z-index: 999;
 }
