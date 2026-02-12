@@ -21,6 +21,5 @@ const skipBtn = document.getElementById('skipTyping');
 if (skipBtn) {
   skipBtn.addEventListener('click', () => {
     setTypingSkipped(true);
-    skipBtn.style.display = 'none';
   });
 }

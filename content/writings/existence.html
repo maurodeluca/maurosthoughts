@@ -5,13 +5,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>maurosthoughts - acreatureintime</title>
-  <meta name="description" content="A short reflection on existence and the life that happens — a writing from maurosthoughts." />
+  <meta name="description"
+    content="A short reflection on existence and the life that happens — a writing from maurosthoughts." />
   <meta name="author" content="maurodeluca" />
   <link rel="canonical" href="/content/writings/existence.html" />
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="article" />
   <meta property="og:title" content="a creature in time — maurosthoughts" />
-  <meta property="og:description" content="A short reflection on existence and the life that happens — a writing from maurosthoughts." />
+  <meta property="og:description"
+    content="A short reflection on existence and the life that happens — a writing from maurosthoughts." />
   <meta property="og:url" content="/content/writings/existence.html" />
   <meta name="twitter:card" content="summary" />
   <link rel="stylesheet" href="../../css/styles.css">
@@ -59,7 +61,20 @@
   <nav id="nav" class="visible">
     <a href="../../index.html">home</a>
   </nav>
-
+  <!-- Radio player (compact) -->
+  <div id="radio-player" class="radio-player" aria-hidden="false">
+    <div class="radio-controls-compact">
+      <svg class="music-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
+        fill="var(--accent)">
+        <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z" />
+      </svg>
+      <button class="radio-play" aria-label="Play/Pause" data-playing="false">▶</button>
+    </div>
+    <div class="radio-progress" title="Live progress">
+      <div class="radio-progress-fill"></div>
+    </div>
+    <input class="radio-volume" type="range" min="0" max="1" step="0.01" value="0.7" aria-label="Volume">
+  </div>
   <footer class="copyright">
     <p>&copy; 2026 maurosthoughts. sll rights reserved.</p>
   </footer>

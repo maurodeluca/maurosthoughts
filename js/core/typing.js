@@ -25,6 +25,7 @@ function typeText(text, element, speed = 40, callback) {
   function type() {
     if (typingSkipped) {
       element.innerHTML = htmlText;
+      typingSkipped = false;
       if (callback) callback();
       return;
     }
@@ -52,10 +53,13 @@ function typeText(text, element, speed = 40, callback) {
   }
 
   type();
+  typingSkipped = false;
+
 }
 
 function skipTyping(target, text) {
   target.textContent = text;
+  typingSkipped = false;
 }
 
 function setTypingSkipped(value) {

@@ -483,9 +483,9 @@ nav a:hover {
   }
   
   .typing-toggle {
-    font-size: 0.95rem;
+    font-size: 0.5rem;
     padding: 0.8rem 1rem;
-    max-width: 320px;
+    max-width: calc(100% - 200px);
     margin: 0 auto 1.5rem;
     margin-bottom: 3rem;
   }
@@ -493,7 +493,7 @@ nav a:hover {
   .control-buttons {
     position: static;
     display: flex;
-    justify-content: center;
+    justify-content: right;
     gap: 0.6rem;
     margin-bottom: 1rem;
   }
@@ -649,4 +649,151 @@ footer.copyright p {
   height: 120px;
   margin: 0 auto 1.5rem;
   pointer-events: none; /* never blocks scroll / clicks */
+}
+
+/* Radio player */
+.radio-player {
+  position: fixed;
+  right: 10px;
+  top: 20px; 
+  background: rgba(8,8,8,0.9);
+  border: 1px solid rgba(177,18,18,0.12);
+  color: var(--text);
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(6px);
+}
+
+.radio-player .radio-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.radio-title {
+  font-size: 0.95rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(255,255,255,0.06);
+  color: var(--text);
+  padding: 6px 8px;
+  margin-right: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.radio-controls button:hover { opacity: 0.95; }
+
+/* compact controls used in the minimal UI */
+.radio-controls-compact { display:flex; gap:6px; align-items:center; }
+.radio-controls-compact button { background: transparent; border: 1px solid rgba(255,255,255,0.06); color: var(--text); padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+
+.radio-right { display:flex; flex-direction: column; gap:6px; align-items: flex-end; }
+.radio-progress { width: 160px; height: 6px; background: rgba(255,255,255,0.04); border-radius: 6px; cursor: pointer; overflow: hidden; }
+.radio-progress-fill { width: 0%; height: 100%; background: var(--accent); }
+.radio-progress.live { cursor: default; }
+.radio-progress.live .radio-progress-fill { animation: pulse 1.6s infinite; }
+
+/* default live state (paused) */
+.radio-progress.live .radio-progress-fill {
+  background: white;
+  animation: none;
+}
+
+/* only pulse when actively playing */
+.radio-player.playing .radio-progress.live .radio-progress-fill {
+  background: var(--accent);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scaleX(1); opacity: 0.9; }
+  50% { transform: scaleX(0.96); opacity: 0.6; }
+  100% { transform: scaleX(1); opacity: 0.9; }
+}
+.radio-meta { display:flex; gap:8px; align-items:center; }
+.radio-time { font-size: 0.75rem; color: var(--muted); min-width: 72px; text-align:right; }
+.radio-volume { width: 80px; }
+
+/* Volume slider: red track and thumb */
+.radio-volume {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: rgba(177,18,18,0.12);
+  border-radius: 6px;
+  outline: none;
+  padding: 0;
+}
+.radio-volume::-webkit-slider-runnable-track {
+  height: 6px;
+  background: rgba(177,18,18,0.25);
+  border-radius: 6px;
+}
+.radio-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-top: -4px;
+  box-shadow: 0 0 0 4px rgba(177,18,18,0.12);
+  cursor: pointer;
+}
+.radio-volume::-moz-range-track {
+  height: 6px;
+  background: rgba(177,18,18,0.25);
+  border-radius: 6px;
+}
+.radio-volume::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.music-icon {
+  display: inline-block;
+  margin-right: 4px;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease, fill 0.3s ease;
+}
+
+/* pulsing while playing */
+.radio-player.playing .music-icon {
+  animation: pulse 1.6s infinite;
+  fill: var(--accent); /* red while playing */
+}
+
+/* white when paused */
+.radio-player:not(.playing) .music-icon {
+  fill: white;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+
+
+@media (max-width: 720px) {
+  .radio-player { max-width: calc(100% - 130px); /* leave space for nav on left */ }
+  .radio-title { max-width: 140px; }
 }
