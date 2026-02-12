@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const root = document.getElementById('radio-player');
     if (!root) return;
 
+    if (root.dataset.initialized === 'true') return;
+        root.dataset.initialized = 'true';
+
     const btnPlay = root.querySelector('.radio-play');
     const progress = root.querySelector('.radio-progress');
     const progressFill = root.querySelector('.radio-progress-fill');
@@ -33,11 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
         progress.classList.remove('live');
     }
 
-    function formatTime(s) {
-        if (!isFinite(s)) return '';
-        const m = Math.floor(s / 60).toString().padStart(2, '0');
-        const sec = Math.floor(s % 60).toString().padStart(2, '0');
-        return `${m}:${sec}`;
+    function updateVolumeUI(value) {
+        const percent = value * 100;
+        vol.style.background = `linear-gradient(
+        to right,
+        var(--accent) 0%,
+        var(--accent) ${percent}%,
+        white ${percent}%,
+        white 100%
+    )`;
     }
 
     if (btnPlay) {
@@ -109,9 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     vol.addEventListener('input', (e) => {
         audio.volume = parseFloat(e.target.value);
+        updateVolumeUI(audio.volume);
     });
 
     // init
     load(0);
-    audio.volume = parseFloat(vol.value || 0.7);
+    audio.volume = parseFloat(vol.value || 0.5);
+    updateVolumeUI(audio.volume);
 });

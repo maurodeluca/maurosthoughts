@@ -20,6 +20,7 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
+  
   /* browser never scrolls */
 }
 
@@ -97,7 +98,7 @@ section {
   max-width: 100%;
   background: transparent;
   margin-bottom: 3rem;
-  font-size: 1.1rem;
+  font-size: 0.8rem;
   text-align: left;
   overflow: hidden;
   z-index: 20;
@@ -110,11 +111,11 @@ section {
 /* Container to keep skip + share aware of each other and laid out horizontally */
 .control-buttons {
   position: absolute;
-  top: -0.5rem;
-  right: 0; /* align to right edge of .content */
+  top: 0.0rem;
+  right: 1rem; /* align to right edge of .content */
   display: flex;
   gap: 0.6rem;
-  align-items: center;
+  align-items: right;
   z-index: 20;
 }
 
@@ -461,46 +462,60 @@ nav a:hover {
    Responsive
 ========================= */
 
-@media (max-width: 768px) {
+@media (max-width: 450px) {
+  .radio-player {
+    position: static;          /* remove fixed positioning */
+    margin: 2rem auto 0;       /* space from terminal and center horizontally */
+    display: flex;
+    justify-content: center;   /* center contents inside the player */
+    max-width: 90%;            /* avoid overflowing */
+    width: auto;               /* let it size naturally */
+  }
+  .terminal {
+    margin-top: 2rem; /* space from content and center horizontally */
+    margin-bottom: 1cm;
+  }
+  .control-buttons {
+    margin-top: 2rem; /* space from content and center horizontally */
+  }
+}
+
+@media (max-width: 970px) {
   h1 {
-    margin-top: 3rem;
+    margin-top: 5rem;
     font-size: 2.1rem;
     line-height: 1.15;
     text-align: center;
     overflow-wrap: anywhere;
   }
-
-  h1 span.accent {
+    h1 span.accent {
     display: inline-block;
   }
+}
 
-  .terminal {
-    font-size: 0.95rem;
-    padding: 0.8rem 1rem;
-    max-width: 320px;
-    margin: 0 auto 1.5rem;
-    margin-bottom: 3rem;
-  }
-  
-  .typing-toggle {
-    font-size: 0.5rem;
-    padding: 0.8rem 1rem;
-    max-width: calc(100% - 200px);
-    margin: 0 auto 1.5rem;
-    margin-bottom: 3rem;
-  }
-  /* On small screens stack buttons and center them */
+@media (max-width: 330px) {
+  /* Stack buttons under the terminal and center them */
   .control-buttons {
-    position: static;
+    position: static;          /* remove absolute positioning */
     display: flex;
-    justify-content: right;
-    gap: 0.6rem;
-    margin-bottom: 1rem;
-  }
-  .control-buttons .typing-toggle {
-    display: inline-block;
+    flex-direction: column;    /* stack vertically */
+    align-items: center;       /* center horizontally */
+    justify-content: center;   /* optional: center along main axis */
+    gap: 0.5rem;
+    margin-top: 5.5rem;          /* space under terminal */
+    margin-bottom: -4rem;       /* space above footer */
+    width: 100%;               /* optional: fill container */
   }
 
+  .control-buttons .typing-toggle {
+    flex-shrink: 0;            /* prevent shrinking */
+    min-width: 100px;          /* optional: ensures buttons stay usable */
+    text-align: center;        /* center text inside button */
+  }
+}
+
+
+@media (max-width: 768px) {  ß
   .cursor-line {
     white-space: nowrap;
     overflow: hidden;
@@ -634,14 +649,14 @@ footer.copyright {
   text-align: center;
   background: rgba(13, 13, 13, 0.95);
   border-top: 1px solid var(--accent);
-  padding: 4px 10vw;
+  padding: 0px 10vw;
   color: var(--muted);
   z-index: 999;
 }
 
 footer.copyright p {
   margin: 0;
-  font-size: 0.5rem;
+  font-size: 0.7rem;
 }
 
 #shape-container {
@@ -653,7 +668,7 @@ footer.copyright p {
 
 /* Radio player */
 .radio-player {
-  position: fixed;
+  position: absolute;
   right: 25px;
   top: 20px; 
   background: rgba(8,8,8,0.9);
@@ -732,8 +747,7 @@ footer.copyright p {
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
-  background: rgba(177,18,18,0.12);
-  border-radius: 6px;
+   border-radius: 6px;
   outline: none;
   padding: 0;
 }
@@ -790,10 +804,4 @@ footer.copyright p {
 @keyframes pulse {
   0%, 100% { transform: scale(1); opacity: 0.8; }
   50% { transform: scale(1.2); opacity: 1; }
-}
-
-
-@media (max-width: 720px) {
-  .radio-player { max-width: calc(100% - 130px); /* leave space for nav on left */ }
-  .radio-title { max-width: 140px; }
 }
