@@ -1,13 +1,10 @@
-// shape.js
 import * as THREE from 'https://unpkg.com/three@0.161.0/build/three.module.js';
 
-const container = document.getElementById('shape-container');
+function initShape() {
+  const container = document.getElementById('shape-container');
+  if (!container) return;
 
-if (container) {
-  // --- Scene ---
   const scene = new THREE.Scene();
-
-  // --- Camera ---
   const camera = new THREE.PerspectiveCamera(
     45,
     container.clientWidth / container.clientHeight,
@@ -16,11 +13,9 @@ if (container) {
   );
   camera.position.z = 4;
 
-  // --- Renderer ---
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
 
-  // Safari/iOS detection
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
   renderer.setPixelRatio(isSafari ? 1.5 : Math.min(window.devicePixelRatio, 2));
 
@@ -35,11 +30,10 @@ if (container) {
   renderer.domElement.style.touchAction = 'none';
   renderer.domElement.style.pointerEvents = 'auto';
 
-  // --- Geometry / Material (brighter) ---
-  const sizeFactor = isSafari ? 0.7 : 1; // smaller on mobile Safari
+  const sizeFactor = isSafari ? 0.7 : 1;
   const geometry = new THREE.IcosahedronGeometry(1.2 * sizeFactor, 0);
   const material = new THREE.MeshStandardMaterial({
-    color: 0xff5555,        // brighter red
+    color: 0xff5555,
     wireframe: true,
     metalness: 0.4,
     roughness: 0.3,
@@ -49,7 +43,6 @@ if (container) {
   const mesh = new THREE.Mesh(geometry, material);
   scene.add(mesh);
 
-  // --- Lights (stronger) ---
   const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
   dirLight.position.set(3, 3, 3);
   scene.add(dirLight);
@@ -57,15 +50,22 @@ if (container) {
   const ambLight = new THREE.AmbientLight(0xffffff, 0.8);
   scene.add(ambLight);
 
-  // --- Spin variables ---
   let t = 0;
-  let spinSpeedX = 0.003;
-  let spinSpeedY = 0.004;
+  let lastTimestamp = 0;
+  let lastMoveTime = 0;
+  let lastMoveDelta = { x: 0, y: 0 };
+  // spin speeds are in radians/second now (approximation of previous defaults)
+  let spinSpeedX = 0.18;
+  let spinSpeedY = 0.24;
   let isDragging = false;
   let lastPointer = { x: 0, y: 0 };
   let pointerDelta = { x: 0, y: 0 };
 
-  // --- Pointer / touch handling ---
+  // Tunable constants
+  const rotationScale = 1.5; // multiplies normalized delta to rotation units
+  const spinMultiplier = 0.05;
+  const minSpin = 0.02; // minimum spin in radians/second on release
+
   const onPointerDown = (e) => {
     isDragging = true;
     renderer.domElement.style.cursor = 'grabbing';
@@ -78,12 +78,24 @@ if (container) {
     const x = e.clientX || e.touches?.[0].clientX;
     const y = e.clientY || e.touches?.[0].clientY;
 
-    const factor = e.touches ? 0.05 : 0.01; // scale touch delta bigger
-    pointerDelta.x = (x - lastPointer.x) * factor;
-    pointerDelta.y = (y - lastPointer.y) * factor;
+    const now = performance.now();
+    const dt = lastMoveTime ? Math.max((now - lastMoveTime) / 1000, 1 / 120) : (1 / 60);
 
+    // Normalize movement to container size so touch and mouse match
+    const deltaX = (x - lastPointer.x) / container.clientWidth;
+    const deltaY = (y - lastPointer.y) / container.clientHeight;
+
+    pointerDelta.x = deltaX * rotationScale;
+    pointerDelta.y = deltaY * rotationScale;
+
+    // Immediate rotation during drag (keeps feeling responsive)
     mesh.rotation.y += pointerDelta.x;
     mesh.rotation.x += pointerDelta.y;
+
+    // Convert the last movement into a velocity (radians/second)
+    lastMoveDelta.x = pointerDelta.x / dt;
+    lastMoveDelta.y = pointerDelta.y / dt;
+    lastMoveTime = now;
 
     lastPointer.x = x;
     lastPointer.y = y;
@@ -93,55 +105,50 @@ if (container) {
     isDragging = false;
     renderer.domElement.style.cursor = 'grab';
 
-    // Minimum spin speed to keep momentum
-    const minSpeed = e.type.includes('touch') ? 0.002 : 0.001;
+    // Use the last measured velocity (radians/second) as initial spin speed,
+    // scaled down by `spinMultiplier` to slow flicks
+    spinSpeedX = (lastMoveDelta.y || 0) * spinMultiplier;
+    spinSpeedY = (lastMoveDelta.x || 0) * spinMultiplier;
 
-    spinSpeedX = pointerDelta.y * 2;
-    spinSpeedY = pointerDelta.x * 2;
-
-    if (Math.abs(spinSpeedX) < minSpeed) spinSpeedX = minSpeed * Math.sign(spinSpeedX || 1);
-    if (Math.abs(spinSpeedY) < minSpeed) spinSpeedY = minSpeed * Math.sign(spinSpeedY || 1);
+    // Ensure minimum spin momentum
+    if (Math.abs(spinSpeedX) < minSpin) spinSpeedX = minSpin * Math.sign(spinSpeedX || 1);
+    if (Math.abs(spinSpeedY) < minSpin) spinSpeedY = minSpin * Math.sign(spinSpeedY || 1);
   };
 
   renderer.domElement.addEventListener('pointerdown', onPointerDown);
-  renderer.domElement.addEventListener('pointermove', onPointerMove);
-  window.addEventListener('pointerup', onPointerUp);
+  document.addEventListener('pointermove', onPointerMove);
+  document.addEventListener('pointerup', onPointerUp);
 
-  renderer.domElement.addEventListener('touchstart', onPointerDown, { passive: false });
-  renderer.domElement.addEventListener('touchmove', onPointerMove, { passive: false });
-  window.addEventListener('touchend', onPointerUp);
+  // Use pointer events only to avoid duplicate touch+pointer handling
+  // (modern browsers support pointer events on both desktop and mobile)
 
-  // --- Animate loop with optional throttling for Safari ---
-  let lastRender = 0;
   function animate(timestamp = 0) {
-    if (!isSafari || timestamp - lastRender > 16) { // ~60fps
-      t += 0.01;
+    const deltaTime = Math.min((timestamp - lastTimestamp) / 1000, 0.016); // Cap at ~60fps
+    lastTimestamp = timestamp;
+    
+    t += deltaTime;
 
-      if (!isDragging) {
-        mesh.rotation.x += spinSpeedX;
-        mesh.rotation.y += spinSpeedY;
+    if (!isDragging) {
+      mesh.rotation.x += spinSpeedX;
+      mesh.rotation.y += spinSpeedY;
 
-        // Decay differently for touch vs desktop
-        const decay = isSafari ? 0.97 : 0.95;
-        spinSpeedX *= decay;
-        spinSpeedY *= decay;
+      const decay = 0.95;
 
-        if (Math.abs(spinSpeedX) < 0.001) spinSpeedX = 0.003;
-        if (Math.abs(spinSpeedY) < 0.001) spinSpeedY = 0.004;
-      }
+      spinSpeedX *= decay;
+      spinSpeedY *= decay;
 
-      mesh.position.y = Math.sin(t) * 0.15;
-      renderer.render(scene, camera);
-
-      lastRender = timestamp;
+      if (Math.abs(spinSpeedX) < 0.001) spinSpeedX = 0.003;
+      if (Math.abs(spinSpeedY) < 0.001) spinSpeedY = 0.004;
     }
+
+    mesh.position.y = Math.sin(t) * 0.15;
+    renderer.render(scene, camera);
 
     requestAnimationFrame(animate);
   }
 
   animate();
 
-  // --- Responsive resize ---
   window.addEventListener('resize', () => {
     const w = container.clientWidth;
     const h = container.clientHeight;
@@ -150,3 +157,5 @@ if (container) {
     camera.updateProjectionMatrix();
   });
 }
+
+export { initShape };
