@@ -38,7 +38,10 @@
   <!-- MANIFESTO -->
   <section data-lock>
     <div class="content">
-      <button id="skipTyping" class="typing-toggle">skip typing</button>
+      <div class="control-buttons">
+        <button id="skipTyping" class="typing-toggle">skip typing</button>
+        <button id="shareBtn" class="typing-toggle share-btn" aria-label="Share this page">share</button>
+      </div>
       <div class="terminal">
         <div class="cursor-line">
           thought.<span class="cursor"></span>
@@ -60,6 +63,7 @@
   <footer class="copyright">
     <p>&copy; 2026 maurosthoughts. all rights reserved.</p>
   </footer>
+  <script type="module" src="../../js/share.js"></script>
   <script type="module" src="../../js/main.js"></script>
 </body>
 

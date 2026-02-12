@@ -93,17 +93,48 @@ section {
   padding: 6px 10px;
   cursor: pointer;
   opacity: 0.6;
-  top: -1rem;
+  top: 0.5rem;
   max-width: 100%;
   background: transparent;
   margin-bottom: 3rem;
   font-size: 1.1rem;
   text-align: left;
   overflow: hidden;
+  z-index: 20;
 }
 
 .typing-toggle:hover {
   opacity: 1;
+}
+
+/* Container to keep skip + share aware of each other and laid out horizontally */
+.control-buttons {
+  position: absolute;
+  top: -0.5rem;
+  right: 0; /* align to right edge of .content */
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  z-index: 20;
+}
+
+.control-buttons .typing-toggle {
+  position: static; /* let flex layout manage placement */
+  top: auto;
+  right: auto;
+  left: auto;
+  margin: 0;
+}
+
+/* When there's a second typing-toggle (share button) place it to the right of the first */
+/* Place skip/share buttons to the right side of the content; skip sits at the edge */
+.typing-toggle.share-btn {
+  right: 8rem; /* sits to the left of the skip button (wider gap to avoid overlap) */
+}
+
+/* Ensure skip button is anchored to the right edge of the content */
+#skipTyping.typing-toggle {
+  right: 0;
 }
 
 /* =========================
@@ -458,6 +489,17 @@ nav a:hover {
     margin: 0 auto 1.5rem;
     margin-bottom: 3rem;
   }
+  /* On small screens stack buttons and center them */
+  .control-buttons {
+    position: static;
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+  .control-buttons .typing-toggle {
+    display: inline-block;
+  }
 
   .cursor-line {
     white-space: nowrap;
@@ -542,7 +584,7 @@ nav a:hover {
 
 .github-corner {
   position: fixed;
-  bottom: 24px;
+  bottom: 32px;
   right: 24px;
   color: var(--muted);
   opacity: 0.5;
@@ -554,6 +596,30 @@ nav a:hover {
   opacity: 1;
   color: var(--accent);
   transform: translateY(-2px);
+}
+
+/* Buy Me a Coffee corner (placed left of GitHub corner) */
+.coffee-corner {
+  position: fixed;
+  bottom: 27px;
+  right: 60px; /* placed to the left of the github corner */
+  color: var(--muted);
+  opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s;
+  z-index: 1000;
+}
+
+.coffee-corner:hover {
+  opacity: 1;
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.coffee-corner svg,
+.github-corner svg {
+  display: block;
+  width: 22px;
+  height: 22px;
 }
 
 /* =========================
