@@ -26,22 +26,52 @@ document.querySelectorAll('.content').forEach(el => {
 ============================ */
 let typingSkipped = false;
 
+// Parse Markdown to HTML
+function markdownToHtml(text) {
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')  // **bold**
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')              // *italic*
+    .replace(/_(.+?)_/g, '<em>$1</em>')                // _italic_
+    .replace(/\n/g, '<br>');
+}
+
 function typeText(text, element, speed = 40, callback) {
   if (typingSkipped) return;
   if (!element) return;
-  let i = 0;
-  element.textContent = "";
+  
+  // Convert Markdown to HTML
+  const htmlText = markdownToHtml(text);
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(`<div>${htmlText}</div>`, 'text/html');
+  const nodes = Array.from(doc.body.firstChild.childNodes);
+  
+  let nodeIndex = 0;
+  let charIndex = 0;
+  element.innerHTML = '';
 
   function type() {
     if (typingSkipped) {
-      element.textContent = text; // immediately fill text
+      element.innerHTML = htmlText;
       if (callback) callback();
       return;
     }
     
-    if (i < text.length) {
-      element.textContent += text.charAt(i);
-      i++;
+    if (nodeIndex < nodes.length) {
+      const currentNode = nodes[nodeIndex];
+      
+      if (currentNode.nodeType === 3) { // Text node
+        if (charIndex < currentNode.length) {
+          element.appendChild(document.createTextNode(currentNode.data[charIndex]));
+          charIndex++;
+        } else {
+          nodeIndex++;
+          charIndex = 0;
+        }
+      } else { // Element node
+        element.appendChild(currentNode.cloneNode(true));
+        nodeIndex++;
+        charIndex = 0;
+      }
       setTimeout(type, speed);
     } else if (callback) {
       callback();
@@ -105,7 +135,7 @@ if (document.getElementById('manifesto')) {
     introText: "I wrote this to remember what mattered before metrics.",
     introElementId: "intro",
     contentElementId: "manifesto",
-    filePath: "../../content/writings/manifesto.txt"
+    filePath: "../../content/writings/manifesto.md"
   });
 } 
 
@@ -114,7 +144,7 @@ if (document.getElementById('existence')) {
     introText: "On being here, briefly.",
     introElementId: "intro",
     contentElementId: "existence",
-    filePath: "../../content/writings/existence.txt"
+    filePath: "../../content/writings/existence.md"
   });
 }
 function skipTyping(target, text) {

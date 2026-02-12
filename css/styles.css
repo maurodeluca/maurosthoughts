@@ -131,6 +131,16 @@ p {
   color: var(--muted);
 }
 
+em {
+  color: var(--accent);
+  font-style: italic;
+}
+
+strong {
+  color: var(--text);
+  font-weight: bold;
+}
+
 .divider {
   bottom: 1rem;
   left: 50%;
