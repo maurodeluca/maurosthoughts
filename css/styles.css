@@ -680,7 +680,7 @@ footer.copyright p {
 .radio-player {
   position: fixed;
   bottom: 25px;
-  left: 10px;       /* fix to the left side */
+  left: 5px;       /* fix to the left side */
   transform: none;  /* remove the translateX centering */
   align-items: center;
   width: fit-content;
