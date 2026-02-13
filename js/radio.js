@@ -14,6 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressFill = root.querySelector('.radio-progress-fill');
     const vol = root.querySelector('.radio-volume');
     const minimizeBtn = document.getElementById('radio-minimize');
+    // SVG icons
+    const expandIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 9h12v2H6V9zm0 4h12v2H6v-2z"/></svg>`;
+
+    const collapseIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M18 12H6v-2h12v2z"/></svg>`;
 
     // Playlist: replace or add stream URLs. Using provided live MP3 stream as default.
     const playlist = [
@@ -141,11 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
     minimizeBtn.addEventListener('click', () => {
         root.classList.toggle('minimized');
 
-        // optionally change the button symbol
+        // swap the icon
         if (root.classList.contains('minimized')) {
-            minimizeBtn.textContent = '+';
+            minimizeBtn.innerHTML = expandIcon; // show expand icon
         } else {
-            minimizeBtn.textContent = '-';
+            minimizeBtn.innerHTML = collapseIcon; // show collapse icon
         }
     });
 
