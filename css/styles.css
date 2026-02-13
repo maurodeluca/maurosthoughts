@@ -43,7 +43,8 @@ html {
 ========================= */
 
 section {
-  padding: 0 10vw;
+  padding-right: 0rem;
+  padding-left: 1rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -147,6 +148,15 @@ section {
 h1 {
   max-width: 100%;
   font-size: 3.2rem;
+  margin-top: 5rem;
+  font-size: 2.1rem;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.h1 span.accent {
+  display: inline-block;
 }
 
 h1 .space {
@@ -242,6 +252,7 @@ strong {
   line-height: 1.6;
   margin-top: 2rem;
   margin-bottom: 3rem;
+  margin-right: 0rem;
   min-height: 2rem;
   white-space: pre-wrap;
 }
@@ -472,20 +483,6 @@ nav a:hover {
    Responsive
 ========================= */
 
-@media (max-width: 970px) {
-  h1 {
-    margin-top: 5rem;
-    font-size: 2.1rem;
-    line-height: 1.15;
-    text-align: center;
-    overflow-wrap: anywhere;
-  }
-
-  .h1 span.accent {
-    display: inline-block;
-  }
-}
-
 @media (max-width: 330px) {
 
   /* Stack buttons under the terminal and center them */
@@ -517,7 +514,6 @@ nav a:hover {
     /* center text inside button */
   }
 }
-
 
 @media (max-width: 768px) {
   .radio-player {
@@ -554,19 +550,14 @@ nav a:hover {
     right: 18px;
     opacity: 0.7;
   }
-
-  section {
-    padding-left: 5vw;
-    padding-right: 5vw;
-  }
 }
 
-@media (max-width: 480px) {
+/* @media (max-width: 900px) {
   section {
-    padding-left: 7vw;
-    padding-right: 7vw;
+    padding-left: 3vw;
+    padding-right: 1px;
   }
-}
+} */
 
 @supports (-webkit-touch-callout: none) {
   .manifesto-page .content {
