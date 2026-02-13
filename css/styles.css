@@ -97,7 +97,6 @@ section {
   top: 0.5rem;
   max-width: 100%;
   background: transparent;
-  margin-bottom: 3rem;
   font-size: 0.8rem;
   text-align: left;
   overflow: hidden;
@@ -148,6 +147,10 @@ section {
 h1 {
   max-width: 100%;
   font-size: 3.2rem;
+}
+
+h1 .space {
+  font-size: 0; /* space exists for wrapping, but invisible */
 }
 
 h2 {
@@ -355,7 +358,7 @@ nav a:hover {
 
 .section-arrow {
   position: fixed;
-  bottom: 30px;
+  bottom: 35px;
   left: calc(50% + 15px);
   font-size: 2rem;
   color: var(--accent);
