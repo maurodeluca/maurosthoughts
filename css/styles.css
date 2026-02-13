@@ -551,6 +551,18 @@ nav a:hover {
     right: 18px;
     opacity: 0.7;
   }
+
+  section {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+@media (max-width: 480px) {
+  section {
+    padding-left: 7vw;
+    padding-right: 7vw;
+  }
 }
 
 @supports (-webkit-touch-callout: none) {
