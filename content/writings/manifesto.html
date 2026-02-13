@@ -77,6 +77,26 @@
   <footer class="copyright">
     <p>&copy; 2026 maurosthoughts. all rights reserved.</p>
   </footer>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const nav = document.querySelector('nav');
+      const radio = document.querySelector('.radio-player');
+  
+      function toggleTopVisibility() {
+        if (window.scrollY === 0) {
+          nav.classList.add('visible-nav');
+          radio.classList.add('visible-nav');
+        } else {
+          nav.classList.remove('visible-nav');
+          radio.classList.remove('visible-nav');
+        }
+      }
+  
+      window.addEventListener('scroll', toggleTopVisibility);
+  
+      toggleTopVisibility();
+    });
+  </script>
   <script type="module" src="../../js/share.js"></script>
   <script type="module" src="../../js/main.js"></script>
 </body>
