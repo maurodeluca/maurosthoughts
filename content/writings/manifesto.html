@@ -32,7 +32,6 @@
     "description": "A manifesto critiquing modern hiring practices — an essay from maurosthoughts."
   }
   </script>
-  <script type="module" src="../../js/radio.js" defer></script>
 </head>
 
 <body class="manifesto-page">
@@ -53,7 +52,13 @@
       <h1>manifesto<span class="accent"><span class="space"> </span>against</span><span class="space"> </span>modern<span class="accent"><span class="space"> </span>hiring</span></h1>
       <div class="typed" id="intro"></div>
       <div class="divider"></div>
-
+      <div id="read-text" class="audio-icon" data-target="/content/writings/manifesto.txt">
+        <svg viewBox="0 0 24 24" width="28" height="28">
+          <path d="M3 9v6h4l5 4V5L7 9H3z" />
+          <path d="M16 8c1.5 1.5 1.5 6.5 0 8" class="wave"/>
+          <path d="M18.5 5.5c3 3 3 10 0 13" class="wave"/>
+        </svg>
+      </div>
       <div class="typed" id="manifesto"></div>
     </div>
   </section>
@@ -83,6 +88,8 @@
     <p>&copy; 2026 maurosthoughts. all rights reserved.</p>
   </footer>
   </script>
+  <script type="module" src="../../js/radio.js" defer></script>
+  <script type="module" src="../../js/read.js"></script>
   <script type="module" src="../../js/share.js"></script>
   <script type="module" src="../../js/main.js"></script>
 </body>

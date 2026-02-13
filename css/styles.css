@@ -916,7 +916,19 @@ footer.copyright p {
   display: inline-block; /* keep minimize button visible */
 }
 
+.audio-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  fill: white;
+  transition: transform 0.3s ease, fill 0.3s ease;
+}
 
+.audio-icon.playing svg {
+  fill: var(--accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
 
 @keyframes pulse {
 
