@@ -20,7 +20,7 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
-  
+
   /* browser never scrolls */
 }
 
@@ -112,7 +112,8 @@ section {
 .control-buttons {
   position: absolute;
   top: 0.0rem;
-  right: 1rem; /* align to right edge of .content */
+  right: 1rem;
+  /* align to right edge of .content */
   display: flex;
   gap: 0.6rem;
   align-items: right;
@@ -120,7 +121,8 @@ section {
 }
 
 .control-buttons .typing-toggle {
-  position: static; /* let flex layout manage placement */
+  position: static;
+  /* let flex layout manage placement */
   top: auto;
   right: auto;
   left: auto;
@@ -130,7 +132,8 @@ section {
 /* When there's a second typing-toggle (share button) place it to the right of the first */
 /* Place skip/share buttons to the right side of the content; skip sits at the edge */
 .typing-toggle.share-btn {
-  right: 8rem; /* sits to the left of the skip button (wider gap to avoid overlap) */
+  right: 8rem;
+  /* sits to the left of the skip button (wider gap to avoid overlap) */
 }
 
 /* Ensure skip button is anchored to the right edge of the content */
@@ -313,7 +316,8 @@ strong {
   width: 120px;
   height: 120px;
   margin-bottom: 1.5rem;
-  pointer-events: none; /* doesn't block scroll */
+  pointer-events: none;
+  /* doesn't block scroll */
 }
 
 /* =========================
@@ -423,6 +427,7 @@ nav a:hover {
   min-height: auto;
   height: auto;
   align-items: flex-start;
+  margin-bottom: 2rem;
 }
 
 .manifesto-page .section-arrow {
@@ -446,6 +451,7 @@ nav a:hover {
   min-height: auto;
   height: auto;
   align-items: flex-start;
+  margin-bottom: 2rem;
 }
 
 .existence-page .section-arrow {
@@ -463,24 +469,6 @@ nav a:hover {
    Responsive
 ========================= */
 
-@media (max-width: 450px) {
-  .radio-player {
-    position: static;          /* remove fixed positioning */
-    margin: 2rem auto 0;       /* space from terminal and center horizontally */
-    display: flex;
-    justify-content: center;   /* center contents inside the player */
-    max-width: 90%;            /* avoid overflowing */
-    width: auto;               /* let it size naturally */
-  }
-  .terminal {
-    margin-top: 2rem; /* space from content and center horizontally */
-    margin-bottom: 1cm;
-  }
-  .control-buttons {
-    margin-top: 2rem; /* space from content and center horizontally */
-  }
-}
-
 @media (max-width: 970px) {
   h1 {
     margin-top: 5rem;
@@ -489,34 +477,46 @@ nav a:hover {
     text-align: center;
     overflow-wrap: anywhere;
   }
-    h1 span.accent {
+
+  .h1 span.accent {
     display: inline-block;
   }
 }
 
 @media (max-width: 330px) {
+
   /* Stack buttons under the terminal and center them */
   .control-buttons {
-    position: static;          /* remove absolute positioning */
+    position: static;
+    /* remove absolute positioning */
     display: flex;
-    flex-direction: column;    /* stack vertically */
-    align-items: center;       /* center horizontally */
-    justify-content: center;   /* optional: center along main axis */
+    flex-direction: column;
+    /* stack vertically */
+    align-items: center;
+    /* center horizontally */
+    justify-content: center;
+    /* optional: center along main axis */
     gap: 0.5rem;
-    margin-top: 5.5rem;          /* space under terminal */
-    margin-bottom: -4rem;       /* space above footer */
-    width: 100%;               /* optional: fill container */
+    margin-top: 5.5rem;
+    /* space under terminal */
+    margin-bottom: -4rem;
+    /* space above footer */
+    width: 100%;
+    /* optional: fill container */
   }
 
   .control-buttons .typing-toggle {
-    flex-shrink: 0;            /* prevent shrinking */
-    min-width: 100px;          /* optional: ensures buttons stay usable */
-    text-align: center;        /* center text inside button */
+    flex-shrink: 0;
+    /* prevent shrinking */
+    min-width: 100px;
+    /* optional: ensures buttons stay usable */
+    text-align: center;
+    /* center text inside button */
   }
 }
 
 
-@media (max-width: 768px) {  ß
+@media (max-width: 768px) {
   .cursor-line {
     white-space: nowrap;
     overflow: hidden;
@@ -526,7 +526,7 @@ nav a:hover {
   .typed#manifesto {
     min-height: auto;
   }
-  
+
   .typed#existence {
     min-height: auto;
   }
@@ -547,6 +547,7 @@ nav a:hover {
   .manifesto-page .content {
     margin-top: 7rem;
   }
+
   .existence-page .content {
     margin-top: 7rem;
   }
@@ -618,7 +619,8 @@ nav a:hover {
 .coffee-corner {
   position: fixed;
   bottom: 27px;
-  right: 60px; /* placed to the left of the github corner */
+  right: 60px;
+  /* placed to the left of the github corner */
   color: var(--muted);
   opacity: 0.5;
   transition: opacity 0.3s ease, transform 0.3s ease, color 0.15s;
@@ -664,23 +666,27 @@ footer.copyright p {
   width: 120px;
   height: 120px;
   margin: 0 auto 1.5rem;
-  pointer-events: none; /* never blocks scroll / clicks */
+  pointer-events: none;
+  /* never blocks scroll / clicks */
 }
 
 /* Radio player */
 .radio-player {
-  position: absolute;
-  right: 25px;
-  top: 20px; 
-  background: rgba(8,8,8,0.9);
-  border: 1px solid rgba(177,18,18,0.12);
+  position: fixed;
+  bottom: 20px;
+  left: 38.5%;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  background: rgba(8, 8, 8, 0.9);
+  border: 1px solid rgba(177, 18, 18, 0.12);
   color: var(--text);
-  padding: 8px 12px;
+  padding: 4px 12px;
   border-radius: 8px;
   display: flex;
   gap: 10px;
   align-items: center;
-  z-index: 1000;
+  z-index: 999;
   backdrop-filter: blur(6px);
 }
 
@@ -702,7 +708,7 @@ footer.copyright p {
   flex-direction: column;
   gap: 8px;
   align-items: center;
-  border: 1px solid rgba(255,255,255,0.06);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   color: var(--text);
   padding: 6px 8px;
   margin-right: 4px;
@@ -710,17 +716,55 @@ footer.copyright p {
   cursor: pointer;
 }
 
-.radio-controls button:hover { opacity: 0.95; }
+.radio-controls button:hover {
+  opacity: 0.95;
+}
 
 /* compact controls used in the minimal UI */
-.radio-controls-compact { display:flex; gap:6px; align-items:center; }
-.radio-controls-compact button { background: transparent; border: 1px solid rgba(255,255,255,0.06); color: var(--text); padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.radio-controls-compact {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
 
-.radio-right { display:flex; flex-direction: column; gap:6px; align-items: flex-end; }
-.radio-progress { width: 160px; height: 6px; background: rgba(255,255,255,0.04); border-radius: 6px; cursor: pointer; overflow: hidden; }
-.radio-progress-fill { width: 0%; height: 100%; background: var(--accent); }
-.radio-progress.live { cursor: default; }
-.radio-progress.live .radio-progress-fill { animation: pulse 1.6s infinite; }
+.radio-controls-compact button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.radio-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.radio-progress {
+  width: 160px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.radio-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: var(--accent);
+}
+
+.radio-progress.live {
+  cursor: default;
+}
+
+.radio-progress.live .radio-progress-fill {
+  animation: pulse 1.6s infinite;
+}
 
 /* default live state (paused) */
 .radio-progress.live .radio-progress-fill {
@@ -735,28 +779,55 @@ footer.copyright p {
 }
 
 @keyframes pulse {
-  0% { transform: scaleX(1); opacity: 0.9; }
-  50% { transform: scaleX(0.96); opacity: 0.6; }
-  100% { transform: scaleX(1); opacity: 0.9; }
+  0% {
+    transform: scaleX(1);
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: scaleX(0.96);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scaleX(1);
+    opacity: 0.9;
+  }
 }
-.radio-meta { display:flex; gap:8px; align-items:center; }
-.radio-time { font-size: 0.75rem; color: var(--muted); min-width: 72px; text-align:right; }
-.radio-volume { width: 80px; }
+
+.radio-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.radio-time {
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-width: 72px;
+  text-align: right;
+}
+
+.radio-volume {
+  width: 80px;
+}
 
 /* Volume slider: red track and thumb */
 .radio-volume {
   -webkit-appearance: none;
   appearance: none;
   height: 6px;
-   border-radius: 6px;
+  border-radius: 6px;
   outline: none;
   padding: 0;
 }
+
 .radio-volume::-webkit-slider-runnable-track {
   height: 6px;
-  background: rgba(177,18,18,0.25);
+  background: rgba(177, 18, 18, 0.25);
   border-radius: 6px;
 }
+
 .radio-volume::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -765,14 +836,16 @@ footer.copyright p {
   background: var(--accent);
   border-radius: 50%;
   margin-top: -4px;
-  box-shadow: 0 0 0 4px rgba(177,18,18,0.12);
+  box-shadow: 0 0 0 4px rgba(177, 18, 18, 0.12);
   cursor: pointer;
 }
+
 .radio-volume::-moz-range-track {
   height: 6px;
-  background: rgba(177,18,18,0.25);
+  background: rgba(177, 18, 18, 0.25);
   border-radius: 6px;
 }
+
 .radio-volume::-moz-range-thumb {
   width: 14px;
   height: 14px;
@@ -794,7 +867,8 @@ footer.copyright p {
 /* pulsing while playing */
 .radio-player.playing .music-icon {
   animation: pulse 1.6s infinite;
-  fill: var(--accent); /* red while playing */
+  fill: var(--accent);
+  /* red while playing */
 }
 
 /* white when paused */
@@ -803,6 +877,15 @@ footer.copyright p {
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.2); opacity: 1; }
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
 }
