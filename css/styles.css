@@ -497,7 +497,7 @@ nav a:hover {
     justify-content: center;
     /* optional: center along main axis */
     gap: 0.5rem;
-    margin-top: 5.5rem;
+    margin-top: 3.5rem;
     /* space under terminal */
     margin-bottom: -4rem;
     /* space above footer */
@@ -674,9 +674,9 @@ footer.copyright p {
 .radio-player {
   position: fixed;
   bottom: 20px;
-  left: 38.5%;
+  left: 50%;
+  transform: translateX(-50%);
   align-items: center;
-  justify-content: center;
   width: fit-content;
   background: rgba(8, 8, 8, 0.9);
   border: 1px solid rgba(177, 18, 18, 0.12);
@@ -685,10 +685,10 @@ footer.copyright p {
   border-radius: 8px;
   display: flex;
   gap: 10px;
-  align-items: center;
   z-index: 999;
   backdrop-filter: blur(6px);
 }
+
 
 .radio-player .radio-left {
   display: flex;
