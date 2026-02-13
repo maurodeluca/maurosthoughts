@@ -345,19 +345,6 @@ nav a:hover {
   opacity: 1;
 }
 
-/* initially hidden */
-nav, .radio-player {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-/* when visible, we’ll add a class via JS */
-.visible-nav {
-  opacity: 1;
-  pointer-events: auto;
-}
-
 /* =========================
    Section navigation arrows
 ========================= */
