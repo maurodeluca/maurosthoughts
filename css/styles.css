@@ -688,6 +688,7 @@ footer.copyright p {
   border: 1px solid rgba(177, 18, 18, 0.12);
   color: var(--text);
   padding: 4px 12px;
+  padding-right: 1.5rem;
   border-radius: 8px;
   display: flex;
   gap: 10px;
