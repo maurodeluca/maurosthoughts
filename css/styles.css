@@ -238,7 +238,7 @@ strong {
   font-size: 1.15rem;
   line-height: 1.6;
   margin-top: 2rem;
-  margin-bottom: 1rem;
+  margin-bottom: 3rem;
   min-height: 2rem;
   white-space: pre-wrap;
 }
@@ -673,9 +673,9 @@ footer.copyright p {
 /* Radio player */
 .radio-player {
   position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  bottom: 25px;
+  left: 20px;       /* fix to the left side */
+  transform: none;  /* remove the translateX centering */
   align-items: center;
   width: fit-content;
   background: rgba(8, 8, 8, 0.9);
@@ -875,6 +875,27 @@ footer.copyright p {
 .radio-player:not(.playing) .music-icon {
   fill: white;
 }
+
+/* Minimized radio */
+.radio-player.minimized {
+  padding: 4px 8px;
+  gap: 6px;
+  width: auto;
+  height: auto;
+}
+
+.radio-player.minimized .radio-title,
+.radio-player.minimized .radio-progress,
+.radio-player.minimized .radio-volume,
+.radio-player.minimized .radio-right {
+  display: none; /* hide everything except controls */
+}
+
+.radio-player.minimized .radio-controls-compact button#radio-minimize {
+  display: inline-block; /* keep minimize button visible */
+}
+
+
 
 @keyframes pulse {
 

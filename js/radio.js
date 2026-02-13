@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const progress = root.querySelector('.radio-progress');
     const progressFill = root.querySelector('.radio-progress-fill');
     const vol = root.querySelector('.radio-volume');
+    const minimizeBtn = document.getElementById('radio-minimize');
 
     // Playlist: replace or add stream URLs. Using provided live MP3 stream as default.
     const playlist = [
@@ -26,6 +27,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const audio = new Audio();
     audio.preload = 'metadata';
     audio.crossOrigin = 'anonymous';
+    const mediaQuery = window.matchMedia('(max-width: 850px)'); // change width as needed
+
+    // Function to toggle minimized based on media query
+    function handleResize(e) {
+        if (e.matches) {
+            // viewport is <= 850px
+            root.classList.add('minimized');
+        } else {
+            // viewport is > 850px
+            root.classList.remove('minimized');
+        }
+    }
+
+    // Initial check
+    handleResize(mediaQuery);
+
+    // Listen for changes
+    mediaQuery.addEventListener('change', handleResize);
 
     function load(i) {
         index = (i + playlist.length) % playlist.length;
@@ -117,6 +136,17 @@ document.addEventListener('DOMContentLoaded', () => {
     vol.addEventListener('input', (e) => {
         audio.volume = parseFloat(e.target.value);
         updateVolumeUI(audio.volume);
+    });
+    
+    minimizeBtn.addEventListener('click', () => {
+        root.classList.toggle('minimized');
+
+        // optionally change the button symbol
+        if (root.classList.contains('minimized')) {
+            minimizeBtn.textContent = '+';
+        } else {
+            minimizeBtn.textContent = '-';
+        }
     });
 
     // init
