@@ -523,6 +523,10 @@ nav a:hover {
     max-width: 100%;
   }
 
+  .radio-player .radio-volume {
+    display: none;
+  }
+
   .cursor-line {
     white-space: nowrap;
     overflow: hidden;
@@ -753,16 +757,18 @@ footer.copyright p {
 .radio-progress {
   width: 160px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(177, 18, 18, 0.001);
   border-radius: 6px;
   cursor: pointer;
   overflow: hidden;
+  transition: transform 0.3s ease, fill 0.3s ease;
 }
 
 .radio-progress-fill {
   width: 0%;
   height: 100%;
-  background: var(--accent);
+  background: rgba(177, 18, 18, 0.001);
+  transition: transform 0.3s ease, fill 0.3s ease;
 }
 
 .radio-progress.live {
@@ -770,6 +776,7 @@ footer.copyright p {
 }
 
 .radio-progress.live .radio-progress-fill {
+  transition: transform 0.3s ease, fill 0.3s ease;
   animation: pulse 1.6s infinite;
 }
 
@@ -781,6 +788,7 @@ footer.copyright p {
 
 /* only pulse when actively playing */
 .radio-player.playing .radio-progress.live .radio-progress-fill {
+  transition: transform 0.3s ease, fill 0.3s ease;
   background: var(--accent);
   animation: pulse 1.6s infinite;
 }
