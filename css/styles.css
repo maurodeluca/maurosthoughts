@@ -517,6 +517,12 @@ nav a:hover {
 
 
 @media (max-width: 768px) {
+  .radio-player {
+    display: flex;
+    width: auto;
+    max-width: 100%;
+  }
+
   .cursor-line {
     white-space: nowrap;
     overflow: hidden;
@@ -674,7 +680,7 @@ footer.copyright p {
 .radio-player {
   position: fixed;
   bottom: 25px;
-  left: 20px;       /* fix to the left side */
+  left: 10px;       /* fix to the left side */
   transform: none;  /* remove the translateX centering */
   align-items: center;
   width: fit-content;
