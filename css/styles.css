@@ -520,6 +520,7 @@ nav a:hover {
     display: flex;
     width: auto;
     max-width: 100%;
+    z-index: 1;
   }
 
   .radio-player .radio-volume {
