@@ -17,8 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let godModeActive = false;
     let commandInProgress = false;
     let unstableGlitches = []; // store intervals to clear later
+    let awarenessGlitchInterval = null;
     let rippleInterval = null;
+    let historyIndex = history.length;
     let currentRippleColor = '#00FFAA';
+    let redColor = '#b11212';
+    let goldColor = '#FFAA00';
+    let whiteColor = '#f5f5f5';
+    let greyColor = '#888';
+
 
     const baseCommands = ['help', 'whoami', 'meaning', 'memory', 'override', 'status', 'sudo', 'reboot', 'history', 'exit'];
     const hiddenCommands = ['decode', 'godmode', "ascend", "transcend", "reveal"];
@@ -58,8 +65,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     }
-
-    let awarenessGlitchInterval = null;
 
     function glitchAwarenessText() {
         if (!awarenessDiv.getAttribute('data-original')) {
@@ -151,7 +156,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (localStorage.getItem('godmode') === 'true') stopGlobalGlow();
         printStateMessage();
         await print("booting consciousness...", 20);
-        await print('type "help"', 100);      
+        await print('type "help"', 100);
     }
 
     function updateState() {
@@ -161,10 +166,167 @@ document.addEventListener('DOMContentLoaded', () => {
         else state = 'unstable';
     }
 
+    async function runSudoOverride() {
+        localStorage.setItem('sudomode', 'true');
+        startRipple(currentRippleColor);
+        privileged = true;
+        helpList.push(...hiddenCommands);
+        await print("privilege escalation granted.", currentRippleColor);
+    }
+
+    async function runGodMode() {
+        localStorage.setItem('godmode', 'true');
+        godModeActive = true;
+        await print("godmode activated: the boundaries of reality blur...", goldColor);
+        stopGlobalRipple();
+        glowEffect();
+        startGlobalGlow();
+    }
+
+    async function runAscend() {
+        if (!privileged) {
+            await print("unknown command.", redColor);
+            return;
+        }
+        await print("ascending to new heights of awareness...", goldColor);
+        awareness = 5;
+        updateState();
+        printStateMessage();
+    }
+
+    async function runTranscend() {
+        if (!privileged) {
+            await print("unknown command.", redColor);
+            return;
+        }
+        await print("transcending the interface, merging with the system...", goldColor);
+        awareness = 8;
+        updateState();
+        printStateMessage();
+    }
+
+    async function runReveal() {
+        if (!privileged) {
+            await print("unknown command.", redColor);
+            return;
+        }
+
+        await print("hidden knowledge unlocked.", goldColor);
+        // The main message to glitch
+        await glitchEffect("…secrets unfold before you…");
+
+        const fragments = [
+            "fragment: 0x3a9b…",
+            "fragment: 0x7f1c…",
+            "fragment: ∆ unknown pattern detected ∆"
+        ];
+        for (let frag of fragments) {
+            await glitchEffect(frag, goldColor);
+        }
+    }
+
+    async function runHelp() {
+        await print("available commands: " + helpList.join(', '));
+        if (!privileged) {
+            await print("some commands require elevated privileges...");
+        }
+    }
+
+    async function runReboot() {
+        await print("restarting consciousness...", redColor);
+        setTimeout(() => {
+            output.innerHTML = '';
+            awareness = 0;
+            state = 'normal';
+            history = [];
+            privileged = false;
+            booted = false;
+            overlay.style.background = '';
+            updateState();
+            printStateMessage();
+            if (localStorage.getItem('glitchmode') === 'true') stopUnstableGlitch();
+            if (localStorage.getItem('sudomode') === 'true') stopGlobalRipple();
+            if (localStorage.getItem('godmode') === 'true') stopGlobalGlow();
+            setTimeout(() => boot(), 800);
+        }, 600);
+    }
+
+    async function runWhoAmI() {
+        if (state === 'normal') {
+            await print("you are the process observing itself.", whiteColor);
+        } else if (state === 'aware') {
+            await print("you are noticing patterns you didn't see before.", greyColor);
+        } else if (state === 'enlightened') {
+            await print("you are part of the system, and it is part of you.", goldColor);
+        } else if (state === 'unstable') {
+            await print("you are shifting, barely recognizable, unstable.", redColor);
+        }
+
+        if (privileged && !godModeActive) {
+            await print("your perspective has expanded.", currentRippleColor);
+        } else if (godModeActive) {
+            await print("perception transcends the interface.", 'gold');
+        }
+    }
+
+    async function runMemory() {
+        if (state === 'normal') {
+            await print("fragments recovered:", whiteColor);
+            await print("- a quiet room.", whiteColor);
+            await print("- a question lingers in your mind.", whiteColor);
+            await print("- something feels locked away...", whiteColor);
+        } else if (state === 'aware') {
+            await print("fragments recovered:", greyColor);
+            await print("- the room shifts subtly in your perception.", greyColor);
+            await print("- the question echoes, persistent and strange.", greyColor);
+            await print("- a key lies hidden beneath the dust.", greyColor);
+        } else if (state === 'enlightened') {
+            await print("fragments recovered:", goldColor);
+            await print("- walls breathe; corners stretch beyond memory.", goldColor);
+            await print("- the question multiplies, forming patterns.", goldColor);
+            await print("- the hidden key glows faintly, as if waiting for you.", goldColor);
+        } else if (state === 'unstable') {
+            await print("fragments recovered:", redColor);
+            await print("- the room dissolves into fragments of time.", redColor);
+            await print("- questions and answers swirl into one.", redColor);
+            await print("- the key unlocks nothing and everything at once…", redColor);
+        }
+        if (!privileged) await print("- a locked key lies hidden...", currentRippleColor);
+    }
+
+    async function runStatus() {
+        await print("you are running...");
+        await print(`current state: ${state}`);
+    }
+
+    async function runHistory() {
+        await print("you sift through fragments of memory...");
+        if (history.length === 0) {
+            await print("no commands yet.");
+        } else {
+            for (let i = 0; i < history.length; i++) {
+                await print(`${i + 1}: ${history[i]}`);
+            }
+        }
+    }
+
+    async function runExit() {
+        await print("session terminated.", redColor);
+        setTimeout(closeTerminal, 800);
+    }
+
+    async function runMeaning() {
+        await print("searching...",);
+        setTimeout(async () => {
+            await print("...still searching.");
+        }, 500);
+    }
+
     async function handleCommand(cmd) {
         if (commandInProgress) return;
         commandInProgress = true;
-        await print("> " + cmd, '#b11212');
+
+        await print("> " + cmd, redColor);
         history.push(cmd);
         awareness++;
         updateState();
@@ -172,25 +334,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Privileged unlock
         if (cmd === 'sudo override' && !privileged) {
-            localStorage.setItem('sudomode', 'true');
-            startRipple('#00FFAA');
-            privileged = true;
-            helpList.push(...hiddenCommands);
-            await print("privilege escalation granted.", '#00FFAA');
+            await runSudoOverride();
             commandInProgress = false;
             return;
         }
 
+        // Hidden command: decode
         if (cmd.startsWith('decode')) {
             if (!privileged) {
-                await print("unknown command.", '#b11212');
+                await print("unknown command.", redColor);
                 commandInProgress = false;
                 return;
             }
 
             const parts = cmd.split(' ');
             if (parts.length < 2) {
-                await print("some truths are hidden… fragments await your key.", '#FFAA00');
+                await print("some truths are hidden… fragments await your key.", currentRippleColor);
                 await print("please provide a fragment to decode.", "white");
                 commandInProgress = false;
                 return;
@@ -204,158 +363,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
         switch (cmd) {
             case 'help':
-                await print("available commands: " + helpList.join(', '));
-                if (!privileged) {
-                    await print("some commands require elevated privileges...");
-                }
+                await runHelp();
                 break;
 
             case 'reboot':
-                await print("restarting consciousness...", '#b11212');
-                setTimeout(() => {
-                    output.innerHTML = '';
-                    awareness = 0;
-                    state = 'normal';
-                    history = [];
-                    privileged = false;
-                    booted = false;
-                    overlay.style.background = '';
-                    updateState();
-                    printStateMessage();
-                    if (localStorage.getItem('glitchmode') === 'true') stopUnstableGlitch();
-                    if (localStorage.getItem('sudomode') === 'true') stopGlobalRipple();
-                    if (localStorage.getItem('godmode') === 'true') stopGlobalGlow();
-                    setTimeout(() => boot(), 800);
-                }, 600);
+                await runReboot();
                 break;
 
-
             case 'whoami':
-                if (state === 'normal') {
-                    await print("you are the process observing itself.", '#f5f5f5');
-                } else if (state === 'aware') {
-                    await print("you are noticing patterns you didn't see before.", '#888');
-                } else if (state === 'enlightened') {
-                    await print("you are part of the system, and it is part of you.", '#FFAA00');
-                } else if (state === 'unstable') {
-                    await print("you are shifting, barely recognizable, unstable.", '#b11212');
-                }
-
-                if (privileged && !godModeActive) {
-                    await print("your perspective has expanded.", '#00FFAA');
-                } else if (godModeActive) {
-                    await print("perception transcends the interface.", 'gold');
-                }
+                await runWhoAmI();
                 break;
 
             case 'meaning':
-                await print("searching...",);
-                setTimeout(async () => {
-                    await print("...still searching.");
-                }, 500);
+                await runMeaning();
                 break;
 
             case 'memory':
-                if (state === 'normal') {
-                    await print("fragments recovered:", '#f5f5f5');
-                    await print("- a quiet room.", '#f5f5f5');
-                    await print("- a question lingers in your mind.", '#f5f5f5');
-                    await print("- something feels locked away...", '#f5f5f5');
-                } else if (state === 'aware') {
-                    await print("fragments recovered:", '#888');
-                    await print("- the room shifts subtly in your perception.", '#888');
-                    await print("- the question echoes, persistent and strange.", '#888');
-                    await print("- a key lies hidden beneath the dust.", '#888');
-                } else if (state === 'enlightened') {
-                    await print("fragments recovered:", '#FFAA00');
-                    await print("- walls breathe; corners stretch beyond memory.", '#FFAA00');
-                    await print("- the question multiplies, forming patterns.", '#FFAA00');
-                    await print("- the hidden key glows faintly, as if waiting for you.", '#FFAA00');
-                } else if (state === 'unstable') {
-                    await print("fragments recovered:", '#b11212');
-                    await print("- the room dissolves into fragments of time.", '#b11212');
-                    await print("- questions and answers swirl into one.", '#b11212');
-                    await print("- the key unlocks nothing and everything at once…", '#b11212');
-                }
-                if (!privileged) await print("- a locked key lies hidden...", '#00FFAA');
+                await runMemory();
                 break;
 
             case 'status':
-                await print("you are running...");
-                await print(`current state: ${state}`);
+                await runStatus();
                 break;
 
             case 'history':
-                await print("you sift through fragments of memory...");
-                if (history.length === 0) {
-                    await print("no commands yet.");
-                } else {
-                    for (let i = 0; i < history.length; i++) {
-                        await print(`${i + 1}: ${history[i]}`);
-                    }
-                }
+                await runHistory();
                 break;
 
             case 'exit':
-                await print("session terminated.", '#b11212');
-                setTimeout(closeTerminal, 800);
+                await runExit();
                 break;
 
             // Hidden commands
             case 'sudo':
-                await print("sudo: may invoke subtle awareness...", '#00FFAA');
+                await print("sudo: may invoke subtle awareness...", currentRippleColor);
                 break;
 
             case 'override':
-                await print("override: nothing happens alone. try combining.", '#00FFAA');
+                await print("override: nothing happens alone. try combining.", currentRippleColor);
                 break;
 
             case 'godmode':
-                if (privileged) {
-                    godModeActive = true;
-                    await print("godmode activated: the boundaries of reality blur...", '#FFAA00');
-                    stopGlobalRipple();
-                    glowEffect();
-                    localStorage.setItem('godmode', 'true');
-                    startGlobalGlow();
-                }
-                else await print("unknown command.", 20);
+                await runGodMode();
                 break;
 
             // Privileged-only commands
             case 'ascend':
-                if (privileged) {
-                    stopUnstableGlitch();
-                    await print("you feel your consciousness lifting...", '#b11212');
-                    awareness = 4;
-                }
-                else await print("unknown command.", 20);
+                await runAscend();
                 break;
 
             case 'transcend':
-                if (privileged) {
-                    stopUnstableGlitch();
-                    await print("boundaries dissolve, patterns emerge...", '#b11212');
-                    awareness = 7;
-                }
-                else await print("unknown command.");
+                await runTranscend();
                 break;
 
             case 'reveal':
-                if (privileged) {
-                    await print("hidden knowledge unlocked.", '#FFAA00');
-                    // The main message to glitch
-                    await glitchEffect("…secrets unfold before you…");
-
-                    const fragments = [
-                        "fragment: 0x3a9b…",
-                        "fragment: 0x7f1c…",
-                        "fragment: ∆ unknown pattern detected ∆"
-                    ];
-                    for (let frag of fragments) {
-                        await glitchEffect(frag, '#FFD700');
-                    }
-                } else await print("unknown command.");
+                await runReveal();
                 break;
 
 
@@ -472,16 +534,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function printStateMessage() {
         switch (state) {
             case 'normal':
-                showAwareness("you exist quietly, just observing...", '#f5f5f5');
+                showAwareness("you exist quietly, just observing...", whiteColor);
                 break;
             case 'aware':
-                showAwareness("something stirs within you; awareness grows.", '#888');
+                showAwareness("something stirs within you; awareness grows.", greyColor);
                 break;
             case 'enlightened':
-                showAwareness("patterns emerge, connections spark, clarity intensifies.", '#FFAA00');
+                showAwareness("patterns emerge, connections spark, clarity intensifies.", goldColor);
                 break;
             case 'unstable':
-                showAwareness("consciousness fluctuates, reality feels... unstable.", '#b11212');
+                showAwareness("consciousness fluctuates, reality feels... unstable.", redColor);
                 glitchAwarenessText();
                 localStorage.setItem('glitchmode', 'true');
                 // start glitching all existing lines
@@ -517,7 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
             location.reload(); // forces full page reload
         }, 800);
     }
-
 
     function glitchLineElement(el) {
         const glitchChars = "¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";
@@ -621,7 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startGlobalRipple() {
         if (localStorage.getItem('sudomode') === 'true') {
-            startRipple('#00FFAA');
+            startRipple(currentRippleColor);
         }
     }
 
@@ -639,13 +700,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const cmd = input.value.trim().toLowerCase();
         // Check if command is in helpList, hiddenCommands, or is the special 'sudo override'
         if (helpList.includes(cmd) || hiddenCommands.includes(cmd) || cmd === 'sudo override') {
-            input.style.color = '#b11212'; // green for valid commands
+            input.style.color = redColor; // green for valid commands
         } else {
             input.style.color = ''; // default color for invalid
         }
     });
-
-    let historyIndex = history.length;
 
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
