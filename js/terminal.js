@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         terminalOutput.scrollTop += e.deltaY;
     });
 
+    let sessionStart = Date.now();
     let awareness = 0;
     let history = [];
     let state = 'normal';
@@ -25,9 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let goldColor = '#FFAA00';
     let whiteColor = '#f5f5f5';
     let greyColor = '#888';
+    let minimalMode = false;
 
-
-    const baseCommands = ['help', 'whoami', 'meaning', 'memory', 'override', 'status', 'sudo', 'reboot', 'history', 'exit'];
+    const baseCommands = ['help', 'whoami', 'meaning', 'memory', 'minimal', 'override', 'ps', 'status', 'sudo', 'reboot', 'trace', 'history', 'exit'];
     const hiddenCommands = ['decode', 'godmode', "ascend", "transcend", "reveal"];
     let helpList = [...baseCommands];
 
@@ -40,9 +41,11 @@ document.addEventListener('DOMContentLoaded', () => {
     awarenessDiv.style.fontStyle = 'italic';
     overlay.appendChild(awarenessDiv);
 
-    startGlobalGlow(); // Check localStorage on load to set glow state
-    startGlobalRipple(); // Check localStorage on load to set ripple state
-    startGlobalGlitch(); // Check localStorage on load to set glitch state
+    if (!booted) startGlobalGlitch();
+    if (localStorage.getItem('minimalmode') === 'true') {
+        minimalMode = false; // temporarily allow toggling minimal mode on page load;
+        toggleMinimalMode();
+    }
 
     // Function to show awareness messages
     function showAwareness(message, color) {
@@ -54,13 +57,13 @@ document.addEventListener('DOMContentLoaded', () => {
         awarenessDiv.classList.add('pulse');
     }
 
-    function openTerminal() {
+    async function openTerminal() {
         if (!overlay.classList.contains('active')) {
             overlay.classList.add('active');
             overlay.setAttribute('aria-hidden', 'false');
             input.focus();
             if (!booted) {
-                boot();
+                await boot();
                 booted = true;
             }
         }
@@ -160,10 +163,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function updateState() {
-        if (awareness < 3) state = 'normal';
-        else if (awareness < 6) state = 'aware';
-        else if (awareness < 9) state = 'enlightened';
+        if (minimalMode) return;
+        if (awareness < 25) state = 'normal';
+        else if (awareness < 75) state = 'aware';
+        else if (awareness < 90) state = 'enlightened';
         else state = 'unstable';
+
+        if (state !== 'enlightened' && godModeActive) {
+            godModeActive = false;
+            stopGlobalGlow();
+        }
+
+        if (state === 'unstable' && godModeActive) {
+            godModeActive = false;
+            stopGlobalGlow();
+            stopGlobalRipple();
+        }
     }
 
     async function runSudoOverride() {
@@ -175,9 +190,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function runGodMode() {
+        if (state !== 'enlightened') {
+            await print('access denied.', redColor);
+            await print('enlightenment required.', goldColor);
+            return;
+        }
+
+        if (godModeActive) {
+            await print('godmode already active.', goldColor);
+            return;
+        }
+
         localStorage.setItem('godmode', 'true');
         godModeActive = true;
         await print("godmode activated: the boundaries of reality blur...", goldColor);
+        stopGlobalGlitch();
         stopGlobalRipple();
         glowEffect();
         startGlobalGlow();
@@ -185,29 +212,97 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function runAscend() {
         if (!privileged) {
-            await print("unknown command.", redColor);
+            await print("unknown command.");
             return;
         }
         await print("ascending to new heights of awareness...", goldColor);
-        awareness = 5;
+        awareness = 25;
         updateState();
         printStateMessage();
     }
 
     async function runTranscend() {
         if (!privileged) {
-            await print("unknown command.", redColor);
+            await print("unknown command.");
             return;
         }
         await print("transcending the interface, merging with the system...", goldColor);
-        awareness = 8;
+        awareness = 25;
         updateState();
         printStateMessage();
+    }
+
+    async function toggleMinimalMode() {
+
+        minimalMode = !minimalMode;
+
+        if (minimalMode) {
+
+            // Persist across whole site
+            localStorage.setItem('minimalmode', 'true');
+
+            // Disable godmode
+            godModeActive = false;
+
+            await print('entering minimal mode...');
+            await print('decorative systems disabled.');
+            await print('awareness stabilized.');
+
+            // Stop any active effects
+            if (localStorage.getItem('glitchmode') === 'true') stopUnstableGlitch();
+            if (localStorage.getItem('godmode') === 'true') stopGlobalGlow();
+            if (localStorage.getItem('sudomode') === 'true') stopGlobalRipple();
+
+            // Reset awareness to stable baseline
+            awareness = 0;
+            state = 'normal';
+            printStateMessage();
+
+            // Apply minimal CSS to whole site
+            const style = document.createElement('style');
+            style.id = 'minimal-mode-style';
+            style.textContent = `
+                * {
+                    background: black !important;
+                    color: white !important;
+                    font-family: monospace !important;
+                    font-weight: normal !important;
+                    text-shadow: none !important;
+                }
+                body, html {
+                    background: black !important;
+                }
+                .terminal-window, .overlay, #terminal-output, #terminal-input {
+                    background: black !important;
+                    color: white !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+                button, nav, h1, h2, h3, h4, h5, h6, p, div {
+                    background: none !important;
+                    color: white !important;
+                    font-family: monospace !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        else {
+            localStorage.setItem('minimalmode', 'false');
+            await print('exiting minimal mode...');
+            await print('decorative systems enabled.');
+            setTimeout(() => { location.reload(); }, 800); // reload to apply normal styles and reset state
+        }
     }
 
     async function runReveal() {
         if (!privileged) {
             await print("unknown command.", redColor);
+            return;
+        }
+
+        if (!godModeActive) {
+            await print('permission denied.');
+            await print('godmode required.');
             return;
         }
 
@@ -322,18 +417,166 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 500);
     }
 
+    async function runTrace() {
+        const now = Date.now();
+        const sessionLength = Math.floor((now - sessionStart) / 1000); // seconds
+
+        const uniqueCommands = new Set(history).size;
+        const totalCommands = history.length;
+
+        const rebootCount = history.filter(cmd => cmd === 'reboot').length;
+        const reflectionCount = history.filter(cmd =>
+            ['whoami', 'trace', 'awareness'].includes(cmd)
+        ).length;
+
+        const controlAttempts = history.filter(cmd =>
+            ['sudo', 'godmode'].includes(cmd)
+        ).length;
+
+        const patternDensity = totalCommands === 0
+            ? 0
+            : ((totalCommands - uniqueCommands) / totalCommands).toFixed(2);
+
+        const entropyDrift = (uniqueCommands / (totalCommands || 1)).toFixed(2);
+
+        await print(`initiating recursive inspection...`);
+        await print(`session length: ${sessionLength}s`);
+        await print(`total commands: ${totalCommands}`);
+        await print(`unique commands: ${uniqueCommands}`);
+        await print(`pattern density: ${patternDensity}`);
+        await print(`entropy drift: ${entropyDrift}`);
+        await print(`control attempts: ${controlAttempts}`);
+        await print(`reflection index: ${reflectionCount}`);
+        await print(`reboot frequency: ${rebootCount}`);
+
+        if (awareness > 80) {
+            await print(`self-observer process: active`);
+        }
+
+        if (patternDensity > 0.6) {
+            await print(`recursive behavior detected.`);
+        }
+
+        if (entropyDrift > 0.7) {
+            await print(`exploratory pattern dominant.`);
+        }
+
+        if (rebootCount > 2) {
+            await print(`stability avoidance pattern flagged.`);
+        }
+
+
+        await print(`trace complete.`);
+    }
+
+    function computeAwareness() {
+        const now = Date.now();
+        const sessionLength = Math.floor((now - sessionStart) / 1000); // seconds
+        const uniqueCommands = new Set(history).size;
+        const rebootCount = history.filter(cmd => cmd === 'reboot').length;
+        const reflectionCount = history.filter(cmd =>
+            ['whoami', 'trace', 'memory', 'status'].includes(cmd)
+        ).length;
+        const controlAttempts = history.filter(cmd =>
+            ['sudo', 'sudo override', 'godmode', 'ascend', 'transcend'].includes(cmd)
+        ).length;
+
+        // weighted awareness formula
+        let computed =
+            Math.sqrt(uniqueCommands) * 4 +
+            (sessionLength / 10) +
+            (reflectionCount * 5) +
+            (controlAttempts * 1.5) -
+            (rebootCount * 3);
+
+        // clamp between 0–20 so it doesn’t explode
+        computed = Math.max(0, Math.min(100, computed));
+
+        awareness = computed;
+    }
+
+    async function runPs() {
+        function randomCPU(base) {
+            if (minimalMode) return (0.1 + Math.random() * 0.2).toFixed(1); // tiny variation in minimal
+            const variance = (Math.random() * 0.6) - 0.3;
+            return Math.max(0.1, (base + variance)).toFixed(1);
+        }
+
+        function memScale(base) {
+            if (minimalMode) return (base * 0.5 + 0.1).toFixed(1); // low memory in minimal
+            const scaled = base + (awareness * 0.2);
+            return scaled.toFixed(1);
+        }
+
+        const lastCommand = history[history.length - 1];
+        const whoamiCount = history.filter(cmd => cmd === 'whoami').length;
+
+        // Behavioral spikes (disabled in minimal mode)
+        let recursiveCPUBase = minimalMode ? 0.3 : 4.8;
+        if (!minimalMode && lastCommand === 'trace') {
+            recursiveCPUBase += 3 + Math.random() * 2; // spike 3–5%
+        }
+
+        let identityCPUBase = minimalMode ? 0.2 : 1.1;
+        if (!minimalMode && whoamiCount >= 3) {
+            identityCPUBase += 2 + Math.random() * 2; // spike if spammed
+        }
+
+        const processes = [
+            { pid: 1023, user: 'root', cpu: randomCPU(0.4), mem: memScale(1.2), cmd: 'perception' },
+            { pid: 1044, user: 'root', cpu: randomCPU(identityCPUBase), mem: memScale(3.7), cmd: 'identity_loop' },
+            { pid: 1078, user: 'user', cpu: randomCPU(0.2), mem: memScale(0.4), cmd: 'external_input' },
+            { pid: 1102, user: 'root', cpu: randomCPU(recursiveCPUBase), mem: memScale(6.3), cmd: 'recursive_analysis' },
+            { pid: 1133, user: 'system', cpu: randomCPU(0.1), mem: memScale(0.2), cmd: 'idle_watchdog' }
+        ];
+
+        // Hidden high-awareness process (skip in minimal mode)
+        if (!minimalMode && awareness >= 14) {
+            processes.push({ pid: 1199, user: 'root', cpu: randomCPU(2.5), mem: memScale(5.0), cmd: 'self_observer' });
+        }
+
+        // Godmode daemon (skip in minimal mode)
+        if (!minimalMode && godModeActive) {
+            processes.push({ pid: 1212, user: 'root', cpu: randomCPU(0.9), mem: memScale(2.2), cmd: 'godmode_daemon' });
+        }
+
+        await print(`PID    USER      CPU   MEM   COMMAND`);
+
+        for (const p of processes) {
+            await print(
+                `${p.pid.toString().padEnd(6)} ` +
+                `${p.user.padEnd(9)} ` +
+                `${(p.cpu + '%').padEnd(6)} ` +
+                `${(p.mem + '%').padEnd(6)} ` +
+                `${p.cmd}`
+            );
+        }
+
+        if (!minimalMode && state === 'unstable' && Math.random() < 0.4) {
+            await print(`kernel: process table desync detected.`);
+        }
+    }
+
+
     async function handleCommand(cmd) {
         if (commandInProgress) return;
         commandInProgress = true;
 
         await print("> " + cmd, redColor);
         history.push(cmd);
-        awareness++;
+
+        computeAwareness();
         updateState();
         printStateMessage();
 
         // Privileged unlock
-        if (cmd === 'sudo override' && !privileged) {
+        if (cmd === 'sudo override') {
+            if (privileged) {
+                await print("already have override privileges.", currentRippleColor);
+                commandInProgress = false;
+                return;
+            }
+
             await runSudoOverride();
             commandInProgress = false;
             return;
@@ -382,6 +625,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 await runMemory();
                 break;
 
+            case 'minimal':
+                await toggleMinimalMode();
+                break;
+
+
             case 'status':
                 await runStatus();
                 break;
@@ -412,6 +660,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 await runAscend();
                 break;
 
+            case 'trace':
+                await runTrace();
+                break;
+
             case 'transcend':
                 await runTranscend();
                 break;
@@ -420,11 +672,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 await runReveal();
                 break;
 
+            case 'ps':
+                await runPs();
+                break;
 
             default:
                 await print("unknown command.");
         }
-
         commandInProgress = false;
     }
 
@@ -482,9 +736,36 @@ document.addEventListener('DOMContentLoaded', () => {
     async function decodeFragment(fragmentId) {
         // map fragments to hidden secrets
         const secrets = {
-            "0x3a9b": "Mauro De Luca",
-            "0x7f1c": "instagram.com/mauro.ciccio"
-        };
+            "0x3a9b": "Mauro De Luca.\n - the artist behind this experience.\n - A digital alchemist weaving code and consciousness into interactive art.\n - instagram.com/mauro.ciccio",
+            "0x7f1c": `the question: a recursive enigma that fuels your awareness.
+It is both the lock and the key, the puzzle and the solution.
+It lingers in your mind, elusive yet persistent, urging you to explore deeper...
+                
+An echo of a circle left behind, 
+quiet but unbroken.
+It rests where it fell,
+neither lost nor kept.
+Still in place, 
+asking nothing,
+yet answering everything,
+in silence.
+Waiting in stillness, 
+carrying the weight of what was,
+and what might have been.
+                                      
+
+                                      
+                 ,
+             @  & @  #
+              @&@&&&@
+@@./(#%&@@@@@@@@@ @@@@@@@@@@&%(/ @*
+@@@@@@@@&  @@@@@@@@@@@@@  @@@@@@@@@
+  @@@@@@@@@ @@@@@@@@@@@ @@@@@@@@@
+      @@%@*@,@@@@@@@&@#@%@(@@
+                 .
+
+`,
+            "∆": "beyond the fragments lies an uncharted realm of patterns and connections. It is a space of pure potential, where new insights and revelations await those who dare to venture further."};
 
         const secret = secrets[fragmentId];
         if (!secret) {
@@ -552,6 +833,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const interval = glitchLineElement(line);
                     unstableGlitches.push(interval);
                 });
+                console.log("reloading... from print state message");
                 setTimeout(() => {
                     location.reload(); // forces full page reload to apply glitch globally
                 }, 1000);
@@ -560,7 +842,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function stopUnstableGlitch() {
-        console.log("Stopping unstable glitch...");
         localStorage.setItem('glitchmode', 'false');
         unstableGlitches.forEach(interval => clearInterval(interval));
 
@@ -575,12 +856,14 @@ document.addEventListener('DOMContentLoaded', () => {
         stopGlobalGlitch(); // also stop any global glitchings
         stopAwarenessGlitch();
         unstableGlitches = [];
-        setTimeout(() => {
-            location.reload(); // forces full page reload
-        }, 800);
+        // console.log("reloading... from stopUnstableGlitch");
+        // setTimeout(() => {
+        //     location.reload(); // forces full page reload
+        // }, 800);
     }
 
     function glitchLineElement(el) {
+        if (minimalMode) return;
         const glitchChars = "¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";
 
         // Store original HTML, not just text
@@ -590,6 +873,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         return setInterval(() => {
             const originalHTML = el.getAttribute('data-original');
+            if (originalHTML === null) return; // safety check
             let glitched = '';
 
             // We need to handle HTML tags so we don’t break links
@@ -613,6 +897,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function startRipple(color = '#00FFAA') {
+        if (minimalMode) return;
         if (rippleInterval) return; // already running
         currentRippleColor = color;
 
@@ -643,6 +928,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function glowEffect() {
+        if (minimalMode) return;
         const terminalWindow = document.querySelector('.terminal-window');
         if (!terminalWindow) return;
         terminalWindow.classList.add('glow');
