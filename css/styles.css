@@ -943,3 +943,134 @@ footer.copyright p {
     opacity: 1;
   }
 }
+
+/* Help icon */
+
+.help-corner {
+  position: fixed;
+  bottom: 27px;
+  right: 96px;
+  color: var(--muted);
+  opacity: 0.5;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 1000;
+}
+
+.help-corner:hover {
+  opacity: 1;
+  color: var(--accent);
+  transform: translateY(-2px);
+}
+
+/* Terminal overlay */
+
+.terminal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.96);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.terminal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.terminal-window {
+  width: 90%;
+  max-width: 800px;
+  height: 70vh;
+  background: #000;
+  border-left: 4px solid var(--accent);
+  padding: 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+#terminal-output {
+  flex: 1;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  margin-bottom: 1rem;
+}
+
+.terminal-input-line {
+  display: flex;
+  align-items: center;
+}
+
+.prompt {
+  color: var(--accent);
+  margin-right: 6px;
+}
+
+#terminal-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: inherit;
+  width: 100%;
+}
+
+.terminal-window.glow {
+    box-shadow: 0 0 20px 5px rgba(255, 255, 0, 0.7);
+    transition: box-shadow 0.5s ease-in-out;
+    animation: pulseGlow 2s infinite alternate;
+}
+
+@keyframes pulseGlow {
+    from { box-shadow: 0 0 10px 2px rgba(255, 255, 0, 0.5); }
+    to { box-shadow: 0 0 30px 10px rgba(255, 255, 0, 0.9); }
+}
+
+/* Global glow effect */
+body.godmode-glow {
+  animation: pulseGlow 2s infinite alternate;
+}
+
+body.godmode, body.unstable {
+  color: gold;
+}
+
+body.godmode * , body.unstable * {
+  color: gold;
+  text-shadow: 0 0 5px gold;
+  animation: glowPulse 1.5s infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% {
+    text-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
+  50% {
+    text-shadow: 0 0 15px gold, 0 0 25px gold;
+  }
+  100% {
+    text-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
+}
+
+body.sudomode-glow {
+  animation: pulseGlow 2s infinite alternate;
+}
+
+body.sudomode, body.unstable {
+  color: gold;
+}
+
+body.sudomode * , body.unstable * {
+  color: gold;
+  text-shadow: 0 0 5px gold;
+  animation: glowPulse 1.5s infinite alternate;
+}

@@ -49,14 +49,15 @@
         </div>
       </div>
 
-      <h1>manifesto<span class="accent"><span class="space"> </span>against</span><span class="space"> </span>modern<span class="accent"><span class="space"> </span>hiring</span></h1>
+      <h1>manifesto<span class="accent"><span class="space"> </span>against</span><span class="space">
+        </span>modern<span class="accent"><span class="space"> </span>hiring</span></h1>
       <div class="typed" id="intro"></div>
       <div class="divider"></div>
       <div id="read-text" class="audio-icon" data-target="/content/writings/manifesto.txt">
         <svg viewBox="0 0 24 24" width="28" height="28">
           <path d="M3 9v6h4l5 4V5L7 9H3z" />
-          <path d="M16 8c1.5 1.5 1.5 6.5 0 8" class="wave"/>
-          <path d="M18.5 5.5c3 3 3 10 0 13" class="wave"/>
+          <path d="M16 8c1.5 1.5 1.5 6.5 0 8" class="wave" />
+          <path d="M18.5 5.5c3 3 3 10 0 13" class="wave" />
         </svg>
       </div>
       <div class="typed" id="manifesto"></div>
@@ -69,7 +70,7 @@
         <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z" />
       </svg>
       <button class="radio-play" aria-label="Play/Pause" data-playing="false">▶</button>
-            <button id="radio-minimize" aria-label="Toggle Radio">
+      <button id="radio-minimize" aria-label="Toggle Radio">
         <!-- Minimize: horizontal bar -->
         <svg class="radio-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
           <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" />
@@ -84,10 +85,30 @@
   <nav id="nav" class="visible">
     <a href="../../index.html">home</a>
   </nav>
+
+  <a href="#" id="help-terminal" class="help-corner" aria-label="Help" style="display:none;">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.5 9a2.5 2.5 0 1 1 4.5 1.5c-.5.7-1.5 1.2-1.5 2.5" />
+      <circle cx="12" cy="17" r="1" />
+    </svg>
+  </a>
+
+  <!-- Hidden terminal overlay -->
+  <div id="terminal-overlay" class="terminal-overlay" aria-hidden="true" style="display:none;">
+    <div class="terminal-window">
+      <div id="terminal-output"></div>
+      <div class="terminal-input-line">
+        <span class="prompt">></span>
+        <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+  </div>
   <footer class="copyright">
     <p>&copy; 2026 maurosthoughts. all rights reserved.</p>
   </footer>
-  </script>
+  <script type="module" src="../../js/terminal.js" defer></script>
   <script type="module" src="../../js/radio.js" defer></script>
   <script type="module" src="../../js/read.js"></script>
   <script type="module" src="../../js/share.js"></script>
