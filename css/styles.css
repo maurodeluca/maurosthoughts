@@ -515,6 +515,19 @@ nav a:hover {
   }
 }
 
+@media (max-width: 480px) {
+    .terminal-window,
+    #terminal-output,
+    #terminal-input {
+        font-size: 11px;
+    }
+    
+    #terminal-output {
+        white-space: pre;
+        overflow-x: auto;
+    }
+}
+
 @media (max-width: 768px) {
   .radio-player {
     display: flex;
@@ -551,14 +564,23 @@ nav a:hover {
     right: 18px;
     opacity: 0.7;
   }
-}
+  
+  .terminal-window {
+        font-size: 13px;
+    }
 
-/* @media (max-width: 900px) {
-  section {
-    padding-left: 3vw;
-    padding-right: 1px;
-  }
-} */
+    #terminal-output {
+        font-size: 13px;
+    }
+
+    #terminal-input {
+        font-size: 13px;
+    
+    #terminal-output {
+        white-space: pre;
+        overflow-x: auto;
+    }
+}
 
 @supports (-webkit-touch-callout: none) {
   .manifesto-page .content {
