@@ -118,9 +118,6 @@ document.addEventListener('DOMContentLoaded', () => {
         godModeActive = false;
         commandInProgress = false;
         overlay.style.background = '';
-        if (localStorage.getItem('glitchmode') === 'true') stopGlobalGlitch();
-        const terminalWindow = document.querySelector('.terminal-window');
-        if (terminalWindow) terminalWindow.classList.remove('glow');
     }
 
     function print(text, color = '') {
@@ -149,12 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function boot() {
-        await print("booting consciousness...", 20);
-        await print('type "help"', 100);
-        printStateMessage();
         if (localStorage.getItem('glitchmode') === 'true') stopUnstableGlitch();
         if (localStorage.getItem('sudomode') === 'true') stopGlobalRipple();
         if (localStorage.getItem('godmode') === 'true') stopGlobalGlow();
+        printStateMessage();
+        await print("booting consciousness...", 20);
+        await print('type "help"', 100);      
     }
 
     function updateState() {
@@ -317,8 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (privileged) {
                     godModeActive = true;
                     await print("godmode activated: the boundaries of reality blur...", '#FFAA00');
-                    stopRipple();
-                    startRipple('gold');
+                    stopGlobalRipple();
                     glowEffect();
                     localStorage.setItem('godmode', 'true');
                     startGlobalGlow();
@@ -600,6 +596,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function stopGlobalGlow() {
         localStorage.setItem('godmode', 'false');
+        const terminalWindow = document.querySelector('.terminal-window');
+        if (terminalWindow) terminalWindow.classList.remove('glow');
         document.body.classList.remove('godmode-glow');
         document.body.classList.remove('godmode');
     }
