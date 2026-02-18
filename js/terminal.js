@@ -503,9 +503,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // weighted awareness formula
         if (!isAscended && !isTranscended) {
             awareness =
-                Math.sqrt(uniqueCommands) * 4 +
+                Math.sqrt(uniqueCommands) * 1.5 +
                 (sessionLength / 60) +
-                (reflectionCount * 5) +
+                (reflectionCount * 2.5) +
                 (controlAttempts * 1.5) -
                 (rebootCount * 3);
 
