@@ -978,7 +978,7 @@ and what might have been.
             await print('exiting minimal mode...');
             await print('decorative systems enabled.');
             setTimeout(() => { location.reload(); }, 800); // reload to apply normal styles and reset state
-        }ß
+        }
 
         await print('entering minimal mode...');
         await print('decorative systems disabled.');
