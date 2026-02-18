@@ -345,8 +345,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function runStatus() {
-        await print("you are running...");
-        await print(`current state: ${state}`);
+        await print(`you are {state}... {awareness}%`);
     }
 
     async function runHistory() {
@@ -543,7 +542,6 @@ document.addEventListener('DOMContentLoaded', () => {
             else if (privileged) awareness = Math.max(0, Math.min(100, awareness));
             else awareness = Math.max(0, Math.min(50, awareness));
         }
-        console.log(awareness);
     }
 
     async function handleCommand(cmd) {
