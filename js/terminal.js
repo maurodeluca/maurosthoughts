@@ -880,7 +880,7 @@ and what might have been.
 
         stopAwarenessGlitch();
         unstableGlitches = [];
-        awarenessGlitchInterval;
+        awarenessGlitchInterval = null;
     }
 
     function stopGlobalRipple() {
@@ -1033,9 +1033,9 @@ and what might have been.
         const cmd = input.value.trim().toLowerCase();
         // Check if command is in helpList, hiddenCommands, or is the special 'sudo override'
         if (helpList.includes(cmd) || hiddenCommands.includes(cmd) || cmd === 'sudo override') {
-            input.style.color = redColor; // green for valid commands
+            input.style.color = redColor;
         } else {
-            input.style.color = ''; // default color for invalid
+            input.style.color = ''; 
         }
     });
 
