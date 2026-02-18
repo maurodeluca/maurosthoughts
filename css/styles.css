@@ -1167,3 +1167,21 @@ body.sudomode::before {
     box-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
   }
 }
+
+body.minimal-mode * {
+    background: black !important;
+    color: white !important;
+    font-family: monospace !important;
+    font-weight: normal !important;
+    text-shadow: none !important;
+}
+
+body.minimal-mode .terminal-window,
+body.minimal-mode .overlay,
+body.minimal-mode #terminal-output,
+body.minimal-mode #terminal-input {
+    background: black !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: none !important;
+}

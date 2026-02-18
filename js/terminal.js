@@ -45,26 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
     awarenessDiv.textContent = "";
     overlay.appendChild(awarenessDiv);
 
-    if (localStorage.getItem('minimalmode') === 'true') {
-        minimalMode = false; // temporarily allow toggling minimal mode on page load;
-        toggleMinimalMode();
-    }
-
-    if (localStorage.getItem('sudomode') === 'true') {
-        sudoMode = false; // temporarily allow toggling sudo mode on page load;
-        toggleSudoMode();
-    }
-
-    if (localStorage.getItem('godmode') === 'true') {
-        godMode = false; // temporarily allow toggling sudo mode on page load;
-        toggleGodMode();
-    }
-
-    if (localStorage.getItem('unstablemode') === 'true') {
-        unstableMode = false; // temporarily allow toggling sudo mode on page load;
-        toggleUnstableMode();
-    }
-
     // Function to show awareness messages
     function showAwareness(message, color) {
         awarenessDiv.style.display = 'none';
@@ -150,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // If unstable, start glitching this line
                         const interval = glitchLineElement(line);
                         unstableGlitches.push(interval);
-                        if (localStorage.getItem('unstablemode') === 'false') 
+                        if (localStorage.getItem('unstablemode') === 'false')
                             toggleUnstableMode();
                     }
                     resolve(); // resolve the promise when done
@@ -161,13 +141,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function boot() {
+        if (localStorage.getItem('minimalmode') === 'true') {
+            minimalMode = false; // temporarily allow toggling minimal mode on page load;
+            await toggleMinimalMode();
+        }
+
+        if (localStorage.getItem('sudomode') === 'true') {
+            sudoMode = false; // temporarily allow toggling sudo mode on page load;
+            toggleSudoMode();
+        }
+
+        if (localStorage.getItem('godmode') === 'true') {
+            godMode = false; // temporarily allow toggling sudo mode on page load;
+            toggleGodMode();
+        }
+
+        if (localStorage.getItem('unstablemode') === 'true') {
+            unstableMode = false; // temporarily allow toggling sudo mode on page load;
+            toggleUnstableMode();
+        }
         printStateMessage();
         await print("booting consciousness...", 20);
         await print('type "help"', 100);
     }
 
     function updateState() {
-        if (minimalMode) return;
         if (awareness < 25) state = 'normal';
         else if (awareness < 75) state = 'aware';
         else if (awareness < 90) state = 'enlightened';
@@ -224,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await print("you are unstable...", redColor)
             return;
         }
-        
+
         if (isTranscended) {
             await print("already transcended...")
             return;
@@ -271,6 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function runReboot() {
         await print("restarting consciousness...", redColor);
+        if (localStorage.getItem('minimalmode') === 'true') {
+            minimalMode = true;
+            await toggleMinimalMode();
+        }
         setTimeout(() => {
             if (localStorage.getItem('unstablemode') === 'true') {
                 unstableMode = true;
@@ -283,10 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (localStorage.getItem('godmode') === 'true') {
                 godMode = true;
                 toggleGodMode();
-            }
-            if (localStorage.getItem('minimalmode') === 'true') {
-                minimalMode = true;
-                toggleMinimalMode();
             }
             awareness = 0;
             state = 'normal';
@@ -509,13 +507,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 (controlAttempts * 1.5) -
                 (rebootCount * 3);
 
-            if (privileged) awareness = Math.max(0, Math.min(100, awareness));
-            else awareness = Math.max(0, Math.min(50, awareness));;
+            if (minimalMode) awareness = Math.max(0, Math.min(75, awareness));
+            else if (privileged) awareness = Math.max(0, Math.min(100, awareness));
+            else awareness = Math.max(0, Math.min(50, awareness));
         }
 
         if (isAscended && !isTranscended) {
             if (awareness < 25)
-                awareness = Math.max(awareness, awareness += 25);
+                awareness = Math.max(awareness, awareness + 25);
             else {
                 awareness =
                     Math.sqrt(uniqueCommands) * 4 +
@@ -524,8 +523,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     (controlAttempts * 1.5) -
                     (rebootCount * 3) + 25;
             }
-            if (privileged) awareness = Math.max(0, Math.min(100, awareness));
-            else awareness = Math.max(0, Math.min(50, awareness));;
+            if (minimalMode) awareness = Math.max(0, Math.min(75, awareness));
+            else if (privileged) awareness = Math.max(0, Math.min(100, awareness));
+            else awareness = Math.max(0, Math.min(50, awareness));
         }
         if (isTranscended) {
             if (awareness < 75)
@@ -539,9 +539,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     (rebootCount * 3);
                 awareness += 75;
             }
-            if (privileged) awareness = Math.max(0, Math.min(100, awareness));
-            else awareness = Math.max(0, Math.min(50, awareness));;
+            if (minimalMode) awareness = Math.max(0, Math.min(75, awareness));
+            else if (privileged) awareness = Math.max(0, Math.min(100, awareness));
+            else awareness = Math.max(0, Math.min(50, awareness));
         }
+        console.log(awareness);
     }
 
     async function handleCommand(cmd) {
@@ -553,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         computeAwareness();
         updateState();
-        
+
         if (cmd !== "reboot") {
             printStateMessage();
         }
@@ -917,10 +919,11 @@ and what might have been.
     }
 
     function toggleGodMode() {
-        if (minimalMode) return;
         if (sudoMode) toggleSudoMode();
 
         godMode = !godMode
+
+        if (minimalMode) return;
 
         if (!godMode) {
             stopGlobalGlow();
@@ -970,6 +973,8 @@ and what might have been.
     }
 
     async function toggleMinimalMode() {
+        if (unstableMode)
+            await print("minimal mode not available... try reboot...")
 
         minimalMode = !minimalMode;
 
@@ -977,50 +982,19 @@ and what might have been.
             localStorage.setItem('minimalmode', 'false');
             await print('exiting minimal mode...');
             await print('decorative systems enabled.');
-            setTimeout(() => { location.reload(); }, 800); // reload to apply normal styles and reset state
+
+            document.body.classList.remove('minimal-mode');
+            return;
         }
 
         await print('entering minimal mode...');
         await print('decorative systems disabled.');
         await print('awareness stabilized.');
 
-        // Stop any active effects
-        if (localStorage.getItem('unstablemode') === 'true') toggleUnstableMode();
         if (localStorage.getItem('godmode') === 'true') toggleGodMode();
         if (localStorage.getItem('sudomode') === 'true') toggleSudoMode();
 
-        // Reset awareness to stable baseline
-        awareness = 0;
-        state = 'normal';
-        printStateMessage();
-
-        // Apply minimal CSS to whole site
-        const style = document.createElement('style');
-        style.id = 'minimal-mode-style';
-        style.textContent = `
-                * {
-                    background: black !important;
-                    color: white !important;
-                    font-family: monospace !important;
-                    font-weight: normal !important;
-                    text-shadow: none !important;
-                }
-                body, html {
-                    background: black !important;
-                }
-                .terminal-window, .overlay, #terminal-output, #terminal-input {
-                    background: black !important;
-                    color: white !important;
-                    border: none !important;
-                    box-shadow: none !important;
-                }
-                button, nav, h1, h2, h3, h4, h5, h6, p, div {
-                    background: none !important;
-                    color: white !important;
-                    font-family: monospace !important;
-                }
-            `;
-        document.head.appendChild(style);
+        document.body.classList.add('minimal-mode');
         localStorage.setItem('minimalmode', 'true');
     }
 
@@ -1035,7 +1009,7 @@ and what might have been.
         if (helpList.includes(cmd) || hiddenCommands.includes(cmd) || cmd === 'sudo override') {
             input.style.color = redColor;
         } else {
-            input.style.color = ''; 
+            input.style.color = '';
         }
     });
 
