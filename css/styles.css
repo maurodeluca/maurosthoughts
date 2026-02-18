@@ -1024,33 +1024,86 @@ footer.copyright p {
   width: 100%;
 }
 
-.terminal-window.glow {
+.terminal-window.godmode-glow {
     box-shadow: 0 0 20px 5px rgba(255, 255, 0, 0.7);
     transition: box-shadow 0.5s ease-in-out;
-    animation: pulseGlow 2s infinite alternate;
+    animation: pulseGoldBox 2s infinite alternate;
 }
 
-@keyframes pulseGlow {
-    from { box-shadow: 0 0 10px 2px rgba(255, 255, 0, 0.5); }
-    to { box-shadow: 0 0 30px 10px rgba(255, 255, 0, 0.9); }
+.terminal-window.sudomode-glow {
+    box-shadow: 0 0 20px 5px rgba(0, 255, 9, 0.7);
+    transition: box-shadow 0.5s ease-in-out;
+    animation: pulseGreenBox 2s infinite alternate;
 }
 
 /* Global glow effect */
 body.godmode-glow {
-  animation: pulseGlow 2s infinite alternate;
+  animation: pulseGold 2s infinite alternate;
 }
 
-body.godmode, body.unstable {
+body.sudomode-glow {
+  animation: pulseGreen 2s infinite alternate;
+}
+
+body.godmode {
+  background-color: rgb(29, 22, 0);
+  color: gold;
+  position: relative;
+  overflow: hidden;
+}
+
+body.sudomode {
+  background-color: #001a12;
+  color: #00FFAA;
+  position: relative;
+  overflow: hidden;
+}
+
+body.godmode *  {
   color: gold;
 }
 
-body.godmode * , body.unstable * {
-  color: gold;
-  text-shadow: 0 0 5px gold;
-  animation: glowPulse 1.5s infinite alternate;
+body.sudomode * {
+  color: #00FFAA;
 }
 
-@keyframes glowPulse {
+body.godmode::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+
+  background: radial-gradient(
+    circle at center,
+    rgba(255, 255, 0, 0.35) 0%,
+    rgba(255, 255, 0, 0.15) 20%,
+    rgba(255, 255, 0, 0.05) 40%,
+    transparent 100%
+  );
+
+  animation: sudoGlow 2s ease-in-out infinite alternate;
+}
+
+body.sudomode::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 255, 120, 0.35) 0%,
+    rgba(0, 255, 120, 0.15) 20%,
+    rgba(0, 255, 120, 0.05) 40%,
+    transparent 100%
+  );
+
+  animation: sudoGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseGold {
   0% {
     text-shadow: 0 0 5px gold, 0 0 10px gold;
   }
@@ -1062,16 +1115,49 @@ body.godmode * , body.unstable * {
   }
 }
 
-body.sudomode-glow {
-  animation: pulseGlow 2s infinite alternate;
+@keyframes pulseGoldBox {
+  0% {
+    box-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
+  50% {
+    box-shadow: 0 0 15px gold, 0 0 25px gold;
+  }
+  100% {
+    box-shadow: 0 0 5px gold, 0 0 10px gold;
+  }
 }
 
-body.sudomode, body.unstable {
-  color: gold;
+@keyframes sudoGlow {
+  from {
+    opacity: 0.6;
+    filter: blur(20px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(40px);
+  }
 }
 
-body.sudomode * , body.unstable * {
-  color: gold;
-  text-shadow: 0 0 5px gold;
-  animation: glowPulse 1.5s infinite alternate;
+@keyframes pulseGreen {
+  0% {
+    text-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(0, 255, 9), 0 0 25px rgba(0, 255, 9);
+  }
+  100% {
+    text-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
+  }
+}
+
+@keyframes pulseGreenBox {
+  0% {
+    box-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 255, 9), 0 0 25px rgba(0, 255, 9);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
+  }
 }

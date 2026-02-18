@@ -15,21 +15,23 @@ document.addEventListener('DOMContentLoaded', () => {
     let state = 'normal';
     let booted = false;
     let privileged = false;
-    let godModeActive = false;
     let commandInProgress = false;
+    let isAscended = false;
+    let isTranscended = false;
+    let minimalMode = false;
+    let sudoMode = false;
+    let godMode = false;
+    let unstableMode = false;
     let unstableGlitches = []; // store intervals to clear later
     let awarenessGlitchInterval = null;
-    let rippleInterval = null;
     let historyIndex = history.length;
-    let currentRippleColor = '#00FFAA';
+    let sudoColor = '#00FFAA';
     let redColor = '#b11212';
     let goldColor = '#FFAA00';
     let whiteColor = '#f5f5f5';
-    let greyColor = '#888';
-    let minimalMode = false;
 
-    const baseCommands = ['help', 'whoami', 'meaning', 'memory', 'minimal', 'override', 'ps', 'status', 'sudo', 'reboot', 'trace', 'history', 'exit'];
-    const hiddenCommands = ['decode', 'godmode', "ascend", "transcend", "reveal"];
+    const baseCommands = ['ascend', 'exit', 'help', 'history', 'meaning', 'memory', 'minimal', 'override', 'ps', 'reboot', 'status', 'sudo', 'trace', 'whoami',];
+    const hiddenCommands = ['decode', 'godmode', "reveal", "transcend"];
     let helpList = [...baseCommands];
 
     // Create awareness overlay (once)
@@ -39,17 +41,35 @@ document.addEventListener('DOMContentLoaded', () => {
     awarenessDiv.style.width = '100%';
     awarenessDiv.style.textAlign = 'center';
     awarenessDiv.style.fontStyle = 'italic';
+    awarenessDiv.style.display = 'none';
+    awarenessDiv.textContent = "";
     overlay.appendChild(awarenessDiv);
 
-    if (!booted) startGlobalGlitch();
     if (localStorage.getItem('minimalmode') === 'true') {
         minimalMode = false; // temporarily allow toggling minimal mode on page load;
         toggleMinimalMode();
     }
 
+    if (localStorage.getItem('sudomode') === 'true') {
+        sudoMode = false; // temporarily allow toggling sudo mode on page load;
+        toggleSudoMode();
+    }
+
+    if (localStorage.getItem('godmode') === 'true') {
+        godMode = false; // temporarily allow toggling sudo mode on page load;
+        toggleGodMode();
+    }
+
+    if (localStorage.getItem('unstablemode') === 'true') {
+        unstableMode = false; // temporarily allow toggling sudo mode on page load;
+        toggleUnstableMode();
+    }
+
     // Function to show awareness messages
     function showAwareness(message, color) {
+        awarenessDiv.style.display = 'none';
         awarenessDiv.textContent = message;
+        awarenessDiv.setAttribute('data-original', message);
         awarenessDiv.style.color = color;
         awarenessDiv.style.display = 'block';
         awarenessDiv.classList.remove('pulse'); // reset
@@ -78,9 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (awarenessGlitchInterval) clearInterval(awarenessGlitchInterval);
 
         const glitchChars = "¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";
-
         awarenessGlitchInterval = setInterval(() => {
             const originalText = awarenessDiv.getAttribute('data-original');
+            if (originalText == null) return;
             let glitched = '';
             for (let c of originalText) {
                 if (c !== ' ' && Math.random() < 0.3) { // 30% chance to glitch
@@ -91,6 +111,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             awarenessDiv.textContent = glitched;
         }, 100);
+
+        printStateMessage();
     }
 
     function stopAwarenessGlitch() {
@@ -102,28 +124,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function stopGlobalGlitch() {
-        const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, button, nav, .typed, .cursor-line, .nav');
-        textElements.forEach(el => {
-            if (el.getAttribute('data-original')) {
-                el.innerHTML = el.getAttribute('data-original'); // restore HTML
-                el.removeAttribute('data-original');
-            }
-        });
-    }
-
     function closeTerminal() {
         input.blur();
         overlay.classList.remove('active');
         overlay.setAttribute('aria-hidden', 'true');
         output.innerHTML = '';
-        awareness = 0;
-        history = [];
-        state = 'normal';
-        privileged = false;
-        helpList = [...baseCommands];
-        booted = false;
-        godModeActive = false;
         commandInProgress = false;
         overlay.style.background = '';
     }
@@ -131,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function print(text, color = '') {
         return new Promise(resolve => { // return a Promise
             const line = document.createElement('div');
-            if (godModeActive) color = 'gold'; // override any color in godmode
+            if (godMode) color = 'gold'; // override any color in godmode
             if (color) line.style.color = color;
             output.appendChild(line);
 
@@ -141,10 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 i++;
                 if (i >= text.length) {
                     clearInterval(interval);
-                    // If unstable, start glitching this line
                     if (state === 'unstable') {
+                        // If unstable, start glitching this line
                         const interval = glitchLineElement(line);
                         unstableGlitches.push(interval);
+                        if (localStorage.getItem('unstablemode') === 'false') 
+                            toggleUnstableMode();
                     }
                     resolve(); // resolve the promise when done
                 }
@@ -154,9 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function boot() {
-        if (localStorage.getItem('glitchmode') === 'true') stopUnstableGlitch();
-        if (localStorage.getItem('sudomode') === 'true') stopGlobalRipple();
-        if (localStorage.getItem('godmode') === 'true') stopGlobalGlow();
         printStateMessage();
         await print("booting consciousness...", 20);
         await print('type "help"', 100);
@@ -169,24 +173,16 @@ document.addEventListener('DOMContentLoaded', () => {
         else if (awareness < 90) state = 'enlightened';
         else state = 'unstable';
 
-        if (state !== 'enlightened' && godModeActive) {
-            godModeActive = false;
-            stopGlobalGlow();
-        }
-
-        if (state === 'unstable' && godModeActive) {
-            godModeActive = false;
-            stopGlobalGlow();
-            stopGlobalRipple();
+        if (state !== 'enlightened' && godMode) {
+            toggleGodMode();
         }
     }
 
     async function runSudoOverride() {
-        localStorage.setItem('sudomode', 'true');
-        startRipple(currentRippleColor);
+        toggleSudoMode(sudoColor);
         privileged = true;
         helpList.push(...hiddenCommands);
-        await print("privilege escalation granted.", currentRippleColor);
+        await print("privilege escalation granted.", sudoColor);
     }
 
     async function runGodMode() {
@@ -196,27 +192,24 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (godModeActive) {
+        if (godMode) {
             await print('godmode already active.', goldColor);
             return;
         }
 
-        localStorage.setItem('godmode', 'true');
-        godModeActive = true;
         await print("godmode activated: the boundaries of reality blur...", goldColor);
-        stopGlobalGlitch();
-        stopGlobalRipple();
-        glowEffect();
-        startGlobalGlow();
+        toggleGodMode();
     }
 
     async function runAscend() {
-        if (!privileged) {
-            await print("unknown command.");
+        if (isAscended) {
+            await print("already ascended...")
             return;
         }
-        await print("ascending to new heights of awareness...", goldColor);
-        awareness = 25;
+
+        await print("ascending to new heights of awareness...", sudoColor);
+        isAscended = true;
+        computeAwareness();
         updateState();
         printStateMessage();
     }
@@ -226,72 +219,21 @@ document.addEventListener('DOMContentLoaded', () => {
             await print("unknown command.");
             return;
         }
+
+        if (state === "unstable") {
+            await print("you are unstable...", redColor)
+            return;
+        }
+        
+        if (isTranscended) {
+            await print("already transcended...")
+            return;
+        }
         await print("transcending the interface, merging with the system...", goldColor);
-        awareness = 25;
+        isTranscended = true;
+        computeAwareness();
         updateState();
         printStateMessage();
-    }
-
-    async function toggleMinimalMode() {
-
-        minimalMode = !minimalMode;
-
-        if (minimalMode) {
-
-            // Persist across whole site
-            localStorage.setItem('minimalmode', 'true');
-
-            // Disable godmode
-            godModeActive = false;
-
-            await print('entering minimal mode...');
-            await print('decorative systems disabled.');
-            await print('awareness stabilized.');
-
-            // Stop any active effects
-            if (localStorage.getItem('glitchmode') === 'true') stopUnstableGlitch();
-            if (localStorage.getItem('godmode') === 'true') stopGlobalGlow();
-            if (localStorage.getItem('sudomode') === 'true') stopGlobalRipple();
-
-            // Reset awareness to stable baseline
-            awareness = 0;
-            state = 'normal';
-            printStateMessage();
-
-            // Apply minimal CSS to whole site
-            const style = document.createElement('style');
-            style.id = 'minimal-mode-style';
-            style.textContent = `
-                * {
-                    background: black !important;
-                    color: white !important;
-                    font-family: monospace !important;
-                    font-weight: normal !important;
-                    text-shadow: none !important;
-                }
-                body, html {
-                    background: black !important;
-                }
-                .terminal-window, .overlay, #terminal-output, #terminal-input {
-                    background: black !important;
-                    color: white !important;
-                    border: none !important;
-                    box-shadow: none !important;
-                }
-                button, nav, h1, h2, h3, h4, h5, h6, p, div {
-                    background: none !important;
-                    color: white !important;
-                    font-family: monospace !important;
-                }
-            `;
-            document.head.appendChild(style);
-        }
-        else {
-            localStorage.setItem('minimalmode', 'false');
-            await print('exiting minimal mode...');
-            await print('decorative systems enabled.');
-            setTimeout(() => { location.reload(); }, 800); // reload to apply normal styles and reset state
-        }
     }
 
     async function runReveal() {
@@ -300,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        if (!godModeActive) {
+        if (!godMode) {
             await print('permission denied.');
             await print('godmode required.');
             return;
@@ -316,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "fragment: ∆ unknown pattern detected ∆"
         ];
         for (let frag of fragments) {
-            await glitchEffect(frag, goldColor);
+            await glitchEffect(frag);
         }
     }
 
@@ -330,18 +272,33 @@ document.addEventListener('DOMContentLoaded', () => {
     async function runReboot() {
         await print("restarting consciousness...", redColor);
         setTimeout(() => {
-            output.innerHTML = '';
+            if (localStorage.getItem('unstablemode') === 'true') {
+                unstableMode = true;
+                toggleUnstableMode();
+            }
+            if (localStorage.getItem('sudomode') === 'true') {
+                sudoMode = true;
+                toggleSudoMode();
+            }
+            if (localStorage.getItem('godmode') === 'true') {
+                godMode = true;
+                toggleGodMode();
+            }
+            if (localStorage.getItem('minimalmode') === 'true') {
+                minimalMode = true;
+                toggleMinimalMode();
+            }
             awareness = 0;
             state = 'normal';
+            sessionStart = Date.now();
+            commandInProgress = false;
+            isAscended = false;
+            isTranscended = false;
             history = [];
             privileged = false;
             booted = false;
-            overlay.style.background = '';
-            updateState();
             printStateMessage();
-            if (localStorage.getItem('glitchmode') === 'true') stopUnstableGlitch();
-            if (localStorage.getItem('sudomode') === 'true') stopGlobalRipple();
-            if (localStorage.getItem('godmode') === 'true') stopGlobalGlow();
+            output.innerHTML = '';
             setTimeout(() => boot(), 800);
         }, 600);
     }
@@ -350,16 +307,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (state === 'normal') {
             await print("you are the process observing itself.", whiteColor);
         } else if (state === 'aware') {
-            await print("you are noticing patterns you didn't see before.", greyColor);
+            await print("you are noticing patterns you didn't see before.", sudoColor);
         } else if (state === 'enlightened') {
             await print("you are part of the system, and it is part of you.", goldColor);
         } else if (state === 'unstable') {
             await print("you are shifting, barely recognizable, unstable.", redColor);
         }
 
-        if (privileged && !godModeActive) {
-            await print("your perspective has expanded.", currentRippleColor);
-        } else if (godModeActive) {
+        if (privileged && !godMode) {
+            await print("your perspective has expanded.", sudoColor);
+        } else if (godMode) {
             await print("perception transcends the interface.", 'gold');
         }
     }
@@ -371,10 +328,10 @@ document.addEventListener('DOMContentLoaded', () => {
             await print("- a question lingers in your mind.", whiteColor);
             await print("- something feels locked away...", whiteColor);
         } else if (state === 'aware') {
-            await print("fragments recovered:", greyColor);
-            await print("- the room shifts subtly in your perception.", greyColor);
-            await print("- the question echoes, persistent and strange.", greyColor);
-            await print("- a key lies hidden beneath the dust.", greyColor);
+            await print("fragments recovered:", sudoColor);
+            await print("- the room shifts subtly in your perception.", sudoColor);
+            await print("- the question echoes, persistent and strange.", sudoColor);
+            await print("- a key lies hidden beneath the dust.", sudoColor);
         } else if (state === 'enlightened') {
             await print("fragments recovered:", goldColor);
             await print("- walls breathe; corners stretch beyond memory.", goldColor);
@@ -386,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await print("- questions and answers swirl into one.", redColor);
             await print("- the key unlocks nothing and everything at once…", redColor);
         }
-        if (!privileged) await print("- a locked key lies hidden...", currentRippleColor);
+        if (!privileged) await print("- a locked key lies hidden...", sudoColor);
     }
 
     async function runStatus() {
@@ -469,32 +426,6 @@ document.addEventListener('DOMContentLoaded', () => {
         await print(`trace complete.`);
     }
 
-    function computeAwareness() {
-        const now = Date.now();
-        const sessionLength = Math.floor((now - sessionStart) / 1000); // seconds
-        const uniqueCommands = new Set(history).size;
-        const rebootCount = history.filter(cmd => cmd === 'reboot').length;
-        const reflectionCount = history.filter(cmd =>
-            ['whoami', 'trace', 'memory', 'status'].includes(cmd)
-        ).length;
-        const controlAttempts = history.filter(cmd =>
-            ['sudo', 'sudo override', 'godmode', 'ascend', 'transcend'].includes(cmd)
-        ).length;
-
-        // weighted awareness formula
-        let computed =
-            Math.sqrt(uniqueCommands) * 4 +
-            (sessionLength / 10) +
-            (reflectionCount * 5) +
-            (controlAttempts * 1.5) -
-            (rebootCount * 3);
-
-        // clamp between 0–20 so it doesn’t explode
-        computed = Math.max(0, Math.min(100, computed));
-
-        awareness = computed;
-    }
-
     async function runPs() {
         function randomCPU(base) {
             if (minimalMode) return (0.1 + Math.random() * 0.2).toFixed(1); // tiny variation in minimal
@@ -536,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Godmode daemon (skip in minimal mode)
-        if (!minimalMode && godModeActive) {
+        if (!minimalMode && godMode) {
             processes.push({ pid: 1212, user: 'root', cpu: randomCPU(0.9), mem: memScale(2.2), cmd: 'godmode_daemon' });
         }
 
@@ -557,6 +488,61 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function computeAwareness() {
+        const now = Date.now();
+        const sessionLength = Math.floor((now - sessionStart) / 1000); // seconds
+        const uniqueCommands = new Set(history).size;
+        const rebootCount = history.filter(cmd => cmd === 'reboot').length;
+        const reflectionCount = history.filter(cmd =>
+            ['whoami', 'trace', 'memory', 'status'].includes(cmd)
+        ).length;
+        const controlAttempts = history.filter(cmd =>
+            ['sudo', 'sudo override', 'godmode', 'ascend', 'transcend'].includes(cmd)
+        ).length;
+
+        // weighted awareness formula
+        if (!isAscended && !isTranscended) {
+            awareness =
+                Math.sqrt(uniqueCommands) * 4 +
+                (sessionLength / 60) +
+                (reflectionCount * 5) +
+                (controlAttempts * 1.5) -
+                (rebootCount * 3);
+
+            if (privileged) awareness = Math.max(0, Math.min(100, awareness));
+            else awareness = Math.max(0, Math.min(50, awareness));;
+        }
+
+        if (isAscended && !isTranscended) {
+            if (awareness < 25)
+                awareness = Math.max(awareness, awareness += 25);
+            else {
+                awareness =
+                    Math.sqrt(uniqueCommands) * 4 +
+                    (sessionLength / 60) +
+                    (reflectionCount * 5) +
+                    (controlAttempts * 1.5) -
+                    (rebootCount * 3) + 25;
+            }
+            if (privileged) awareness = Math.max(0, Math.min(100, awareness));
+            else awareness = Math.max(0, Math.min(50, awareness));;
+        }
+        if (isTranscended) {
+            if (awareness < 75)
+                awareness = Math.max(awareness, awareness + Math.abs(75 - awareness));
+            else {
+                awareness =
+                    Math.sqrt(uniqueCommands) * 4 +
+                    (sessionLength / 60) +
+                    (reflectionCount * 5) +
+                    (controlAttempts * 1.5) -
+                    (rebootCount * 3);
+                awareness += 75;
+            }
+            if (privileged) awareness = Math.max(0, Math.min(100, awareness));
+            else awareness = Math.max(0, Math.min(50, awareness));;
+        }
+    }
 
     async function handleCommand(cmd) {
         if (commandInProgress) return;
@@ -567,16 +553,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         computeAwareness();
         updateState();
-        printStateMessage();
+        
+        if (cmd !== "reboot") {
+            printStateMessage();
+        }
 
         // Privileged unlock
         if (cmd === 'sudo override') {
             if (privileged) {
-                await print("already have override privileges.", currentRippleColor);
+                await print("already have override privileges.", sudoColor);
                 commandInProgress = false;
                 return;
             }
 
+            await runAscend();
             await runSudoOverride();
             commandInProgress = false;
             return;
@@ -592,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const parts = cmd.split(' ');
             if (parts.length < 2) {
-                await print("some truths are hidden… fragments await your key.", currentRippleColor);
+                await print("some truths are hidden… fragments await your key.", sudoColor);
                 await print("please provide a fragment to decode.", "white");
                 commandInProgress = false;
                 return;
@@ -629,7 +619,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 await toggleMinimalMode();
                 break;
 
-
             case 'status':
                 await runStatus();
                 break;
@@ -644,18 +633,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Hidden commands
             case 'sudo':
-                await print("sudo: may invoke subtle awareness...", currentRippleColor);
+                await print("sudo: may invoke subtle awareness...", sudoColor);
                 break;
 
             case 'override':
-                await print("override: nothing happens alone. try combining.", currentRippleColor);
+                await print("override: nothing happens alone. try combining.", sudoColor);
                 break;
 
             case 'godmode':
                 await runGodMode();
                 break;
 
-            // Privileged-only commands
             case 'ascend':
                 await runAscend();
                 break;
@@ -680,6 +668,137 @@ document.addEventListener('DOMContentLoaded', () => {
                 await print("unknown command.");
         }
         commandInProgress = false;
+    }
+
+    async function decodeFragment(fragmentId) {
+        // map fragments to hidden secrets
+        const secrets = {
+            "0x3a9b": "Mauro De Luca.\n - the artist behind this experience.\n - A digital alchemist weaving code and consciousness into interactive art.\n - instagram.com/mauro.ciccio",
+            "0x7f1c": `the question: a recursive enigma that fuels your awareness.
+It is both the lock and the key, the puzzle and the solution.
+It lingers in your mind, elusive yet persistent, urging you to explore deeper...
+                
+An echo of a circle left behind, 
+quiet but unbroken.
+It rests where it fell,
+neither lost nor kept.
+Still in place, 
+asking nothing,
+yet answering everything,
+in silence.
+Waiting in stillness, 
+carrying the weight of what was,
+and what might have been.
+                                      
+
+                                      
+                 ,
+             @  & @  #
+              @&@&&&@
+@@./(#%&@@@@@@@@@ @@@@@@@@@@&%(/ @*
+@@@@@@@@&  @@@@@@@@@@@@@  @@@@@@@@@
+  @@@@@@@@@ @@@@@@@@@@@ @@@@@@@@@
+      @@%@*@,@@@@@@@&@#@%@(@@
+                 .
+
+`,
+            "∆": "beyond the fragments lies an uncharted realm of patterns and connections. It is a space of pure potential, where new insights and revelations await those who dare to venture further."
+        };
+
+        const secret = secrets[fragmentId];
+        if (!secret) {
+            await print("unknown fragment.");
+            return;
+        }
+
+        // show initial message
+        const message = `fragment ${fragmentId} → ` + secret;
+        await print(message, '#FFD700');
+
+        // delay before glitch starts
+        await new Promise(r => setTimeout(r, 600));
+
+        // glitch effect: replace chars randomly for a short duration
+        const glitchDuration = 2000; // milliseconds
+        const glitchInterval = 100;
+        const chars = '¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";';
+        let startTime = Date.now();
+
+        return new Promise(resolve => {
+            const line = output.lastChild; // last printed line
+            const originalText = message;
+            const interval = setInterval(() => {
+                let now = Date.now();
+                if (now - startTime >= glitchDuration) {
+                    clearInterval(interval);
+                    line.textContent = originalText; // restore final text
+                    resolve();
+                    return;
+                }
+
+                // glitch each character randomly
+                let glitched = '';
+                for (let c of originalText) {
+                    if (Math.random() < 0.2) { // 20% chance to glitch
+                        glitched += chars[Math.floor(Math.random() * chars.length)];
+                    } else {
+                        glitched += c;
+                    }
+                }
+                line.textContent = glitched;
+            }, glitchInterval);
+        });
+    }
+
+    function printStateMessage() {
+        switch (state) {
+            case 'normal':
+                showAwareness("you exist quietly, just observing...", whiteColor);
+                break;
+            case 'aware':
+                showAwareness("something stirs within you; awareness grows.", sudoColor);
+                break;
+            case 'enlightened':
+                showAwareness("patterns emerge, connections spark, clarity intensifies.", goldColor);
+                break;
+            case 'unstable':
+                showAwareness("consciousness fluctuates, reality feels... unstable.", redColor);
+                break;
+        }
+    }
+
+    function glitchLineElement(el) {
+        if (minimalMode) return;
+        const glitchChars = "¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";
+
+        // Store original HTML, not just text
+        if (!el.getAttribute('data-original')) {
+            el.setAttribute('data-original', el.innerHTML);
+        }
+
+        return setInterval(() => {
+            const originalHTML = el.getAttribute('data-original');
+            if (originalHTML === null) return; // safety check
+            let glitched = '';
+
+            // We need to handle HTML tags so we don’t break links
+            let insideTag = false;
+            for (let char of originalHTML) {
+                if (char === '<') insideTag = true;
+                if (insideTag) {
+                    glitched += char; // leave tags intact
+                    if (char === '>') insideTag = false;
+                } else {
+                    if (char !== ' ' && Math.random() < 0.3) {
+                        glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
+                    } else {
+                        glitched += char;
+                    }
+                }
+            }
+
+            el.innerHTML = glitched;
+        }, 100);
     }
 
     async function glitchEffect(message) {
@@ -733,116 +852,22 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function decodeFragment(fragmentId) {
-        // map fragments to hidden secrets
-        const secrets = {
-            "0x3a9b": "Mauro De Luca.\n - the artist behind this experience.\n - A digital alchemist weaving code and consciousness into interactive art.\n - instagram.com/mauro.ciccio",
-            "0x7f1c": `the question: a recursive enigma that fuels your awareness.
-It is both the lock and the key, the puzzle and the solution.
-It lingers in your mind, elusive yet persistent, urging you to explore deeper...
-                
-An echo of a circle left behind, 
-quiet but unbroken.
-It rests where it fell,
-neither lost nor kept.
-Still in place, 
-asking nothing,
-yet answering everything,
-in silence.
-Waiting in stillness, 
-carrying the weight of what was,
-and what might have been.
-                                      
+    function glowEffect() {
+        const terminalWindow = document.querySelector('.terminal-window');
+        if (!terminalWindow) return;
+        terminalWindow.classList.add('godmode-glow');
+        document.body.classList.add('godmode');
+    }
 
-                                      
-                 ,
-             @  & @  #
-              @&@&&&@
-@@./(#%&@@@@@@@@@ @@@@@@@@@@&%(/ @*
-@@@@@@@@&  @@@@@@@@@@@@@  @@@@@@@@@
-  @@@@@@@@@ @@@@@@@@@@@ @@@@@@@@@
-      @@%@*@,@@@@@@@&@#@%@(@@
-                 .
-
-`,
-            "∆": "beyond the fragments lies an uncharted realm of patterns and connections. It is a space of pure potential, where new insights and revelations await those who dare to venture further."};
-
-        const secret = secrets[fragmentId];
-        if (!secret) {
-            await print("unknown fragment.");
-            return;
-        }
-
-        // show initial message
-        const message = `fragment ${fragmentId} → ` + secret;
-        await print(message, '#FFD700');
-
-        // delay before glitch starts
-        await new Promise(r => setTimeout(r, 600));
-
-        // glitch effect: replace chars randomly for a short duration
-        const glitchDuration = 2000; // milliseconds
-        const glitchInterval = 100;
-        const chars = '¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";';
-        let startTime = Date.now();
-
-        return new Promise(resolve => {
-            const line = output.lastChild; // last printed line
-            const originalText = message;
-            const interval = setInterval(() => {
-                let now = Date.now();
-                if (now - startTime >= glitchDuration) {
-                    clearInterval(interval);
-                    line.textContent = originalText; // restore final text
-                    resolve();
-                    return;
-                }
-
-                // glitch each character randomly
-                let glitched = '';
-                for (let c of originalText) {
-                    if (Math.random() < 0.2) { // 20% chance to glitch
-                        glitched += chars[Math.floor(Math.random() * chars.length)];
-                    } else {
-                        glitched += c;
-                    }
-                }
-                line.textContent = glitched;
-            }, glitchInterval);
+    function stopGlobalGlitch() {
+        const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, button, nav, .typed, .cursor-line, .nav');
+        textElements.forEach(el => {
+            if (el.getAttribute('data-original')) {
+                el.innerHTML = el.getAttribute('data-original'); // restore HTML
+                el.removeAttribute('data-original');
+            }
         });
-    }
 
-    function printStateMessage() {
-        switch (state) {
-            case 'normal':
-                showAwareness("you exist quietly, just observing...", whiteColor);
-                break;
-            case 'aware':
-                showAwareness("something stirs within you; awareness grows.", greyColor);
-                break;
-            case 'enlightened':
-                showAwareness("patterns emerge, connections spark, clarity intensifies.", goldColor);
-                break;
-            case 'unstable':
-                showAwareness("consciousness fluctuates, reality feels... unstable.", redColor);
-                glitchAwarenessText();
-                localStorage.setItem('glitchmode', 'true');
-                // start glitching all existing lines
-                const lines = output.querySelectorAll('div');
-                lines.forEach(line => {
-                    const interval = glitchLineElement(line);
-                    unstableGlitches.push(interval);
-                });
-                console.log("reloading... from print state message");
-                setTimeout(() => {
-                    location.reload(); // forces full page reload to apply glitch globally
-                }, 1000);
-                break;
-        }
-    }
-
-    function stopUnstableGlitch() {
-        localStorage.setItem('glitchmode', 'false');
         unstableGlitches.forEach(interval => clearInterval(interval));
 
         // restore original text
@@ -853,133 +878,158 @@ and what might have been.
             }
         });
 
-        stopGlobalGlitch(); // also stop any global glitchings
         stopAwarenessGlitch();
         unstableGlitches = [];
-        // console.log("reloading... from stopUnstableGlitch");
-        // setTimeout(() => {
-        //     location.reload(); // forces full page reload
-        // }, 800);
+        awarenessGlitchInterval;
     }
 
-    function glitchLineElement(el) {
-        if (minimalMode) return;
-        const glitchChars = "¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";
-
-        // Store original HTML, not just text
-        if (!el.getAttribute('data-original')) {
-            el.setAttribute('data-original', el.innerHTML);
-        }
-
-        return setInterval(() => {
-            const originalHTML = el.getAttribute('data-original');
-            if (originalHTML === null) return; // safety check
-            let glitched = '';
-
-            // We need to handle HTML tags so we don’t break links
-            let insideTag = false;
-            for (let char of originalHTML) {
-                if (char === '<') insideTag = true;
-                if (insideTag) {
-                    glitched += char; // leave tags intact
-                    if (char === '>') insideTag = false;
-                } else {
-                    if (char !== ' ' && Math.random() < 0.3) {
-                        glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
-                    } else {
-                        glitched += char;
-                    }
-                }
-            }
-
-            el.innerHTML = glitched;
-        }, 100);
-    }
-
-    function startRipple(color = '#00FFAA') {
-        if (minimalMode) return;
-        if (rippleInterval) return; // already running
-        currentRippleColor = color;
-
-        let intensity = 0;
-        let increasing = true; // track whether intensity is going up or down
-
-        rippleInterval = setInterval(() => {
-            // adjust intensity
-            if (increasing) {
-                intensity += 2;
-                if (intensity >= 100) increasing = false;
-            } else {
-                intensity -= 2;
-                if (intensity <= 0) increasing = true;
-            }
-
-            // set body background
-            document.body.style.background = `radial-gradient(circle at 50% 50%, rgba(${currentRippleColor === 'gold' ? '255,215,0' : '0,255,255'},${intensity / 200}) 0%, rgba(0,0,0,0.9) 100%)`;
-            overlay.style.background = `radial-gradient(circle at 50% 50%, rgba(${currentRippleColor === 'gold' ? '255,215,0' : '0,255,255'},${intensity / 200}) 0%, rgba(0,0,0,0.9) 100%)`;
-        }, 40);
-    }
-
-    function stopRipple() {
-        clearInterval(rippleInterval);
-        rippleInterval = null;
-        document.body.style.background = '';
-        overlay.style.background = '';
-    }
-
-    function glowEffect() {
-        if (minimalMode) return;
+    function stopGlobalRipple() {
         const terminalWindow = document.querySelector('.terminal-window');
-        if (!terminalWindow) return;
-        terminalWindow.classList.add('glow');
-    }
-
-    function startGlobalGlow() {
-        if (localStorage.getItem('godmode') === 'true') {
-            document.body.classList.add('godmode-glow');
-            document.body.classList.add('godmode');
-        }
+        if (terminalWindow) terminalWindow.classList.remove('sudomode-glow');
+        document.body.classList.remove('sudomode-glow');
+        document.body.classList.remove('sudomode');
     }
 
     function stopGlobalGlow() {
-        localStorage.setItem('godmode', 'false');
         const terminalWindow = document.querySelector('.terminal-window');
-        if (terminalWindow) terminalWindow.classList.remove('glow');
+        if (terminalWindow) terminalWindow.classList.remove('godmode-glow');
         document.body.classList.remove('godmode-glow');
         document.body.classList.remove('godmode');
     }
 
-    function startGlobalGlitch() {
-        if (localStorage.getItem('glitchmode') === 'true') {
-            const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, button, nav');
+    function toggleSudoMode() {
+        if (minimalMode) return;
+        if (godMode) toggleGodMode();
 
-            textElements.forEach(el => {
-                // only start glitch if not already running
-                const interval = glitchLineElement(el);
-                unstableGlitches.push(interval);
-            });
+        sudoMode = !sudoMode;
 
-            const typedDivs = document.querySelectorAll('.typed, .cursor-line'); // returns NodeList
-            typedDivs.forEach(div => {
-                glitchLineElement(div);
-            });
+        if (!sudoMode) {
+            stopGlobalRipple();
+            localStorage.setItem('sudomode', 'false');
+            return;
         }
+
+        const terminalWindow = document.querySelector('.terminal-window');
+        if (!terminalWindow) return;
+        terminalWindow.classList.add('sudomode-glow');
+        document.body.classList.add('sudomode');
+        localStorage.setItem('sudomode', 'true');
     }
 
-    function startGlobalRipple() {
-        if (localStorage.getItem('sudomode') === 'true') {
-            startRipple(currentRippleColor);
+    function toggleGodMode() {
+        if (minimalMode) return;
+        if (sudoMode) toggleSudoMode();
+
+        godMode = !godMode
+
+        if (!godMode) {
+            stopGlobalGlow();
+            localStorage.setItem('godmode', 'false');
+            return;
         }
+
+        glowEffect();
+        localStorage.setItem('godmode', 'true');
     }
 
-    function stopGlobalRipple() {
-        localStorage.setItem('sudomode', 'false');
-        stopRipple();
+    function toggleUnstableMode() {
+        if (minimalMode) return;
+        if (sudoMode) toggleSudoMode();
+
+        unstableMode = !unstableMode;
+
+        if (!unstableMode) {
+            stopGlobalGlitch();
+            localStorage.setItem('unstablemode', 'false');
+            return;
+        }
+
+        printStateMessage();
+        glitchAwarenessText();
+
+        // start glitching all existing lines
+        const lines = output.querySelectorAll('div');
+        lines.forEach(line => {
+            const interval = glitchLineElement(line);
+            unstableGlitches.push(interval);
+        });
+        const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, button, nav');
+
+        textElements.forEach(el => {
+            // only start glitch if not already running
+            const interval = glitchLineElement(el);
+            unstableGlitches.push(interval);
+        });
+
+        const typedDivs = document.querySelectorAll('.typed, .cursor-line'); // returns NodeList
+        typedDivs.forEach(div => {
+            glitchLineElement(div);
+        });
+
+        localStorage.setItem('unstablemode', 'true');
     }
 
-    helpBtn.addEventListener('click', (e) => {
+    async function toggleMinimalMode() {
+
+        minimalMode = !minimalMode;
+
+        if (!minimalMode) {
+            localStorage.setItem('minimalmode', 'false');
+            await print('exiting minimal mode...');
+            await print('decorative systems enabled.');
+            setTimeout(() => { location.reload(); }, 800); // reload to apply normal styles and reset state
+        }
+
+        // Disable godmode
+        godMode = false;
+
+        await print('entering minimal mode...');
+        await print('decorative systems disabled.');
+        await print('awareness stabilized.');
+
+        // Stop any active effects
+        if (localStorage.getItem('unstablemode') === 'true') toggleUnstableMode();
+        if (localStorage.getItem('godmode') === 'true') toggleGodMode();
+        if (localStorage.getItem('sudomode') === 'true') toggleSudoMode();
+
+        // Reset awareness to stable baseline
+        awareness = 0;
+        state = 'normal';
+        printStateMessage();
+
+        // Apply minimal CSS to whole site
+        const style = document.createElement('style');
+        style.id = 'minimal-mode-style';
+        style.textContent = `
+                * {
+                    background: black !important;
+                    color: white !important;
+                    font-family: monospace !important;
+                    font-weight: normal !important;
+                    text-shadow: none !important;
+                }
+                body, html {
+                    background: black !important;
+                }
+                .terminal-window, .overlay, #terminal-output, #terminal-input {
+                    background: black !important;
+                    color: white !important;
+                    border: none !important;
+                    box-shadow: none !important;
+                }
+                button, nav, h1, h2, h3, h4, h5, h6, p, div {
+                    background: none !important;
+                    color: white !important;
+                    font-family: monospace !important;
+                }
+            `;
+        document.head.appendChild(style);
+        localStorage.setItem('minimalmode', 'true');
+    }
+
+    helpBtn.addEventListener('click', async (e) => {
         e.preventDefault();
-        openTerminal();
+        await openTerminal();
     });
 
     input.addEventListener('input', () => {
