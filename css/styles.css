@@ -147,7 +147,6 @@ section {
 
 h1 {
   max-width: 100%;
-  font-size: 3.2rem;
   margin-top: 5rem;
   font-size: 2.1rem;
   line-height: 1.15;
@@ -743,8 +742,6 @@ footer.copyright p {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding: 8px 12px;
-  border-radius: 8px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -952,20 +949,6 @@ footer.copyright p {
 .audio-icon.playing svg {
   fill: var(--accent);
   animation: pulse 1.6s ease-in-out infinite;
-}
-
-@keyframes pulse {
-
-  0%,
-  100% {
-    transform: scale(1);
-    opacity: 0.8;
-  }
-
-  50% {
-    transform: scale(1.2);
-    opacity: 1;
-  }
 }
 
 /* Help icon */
