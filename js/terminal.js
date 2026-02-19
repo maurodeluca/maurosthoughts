@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const helpBtn = document.getElementById('help-terminal');
     const overlay = document.getElementById('terminal-overlay');
     const output = document.getElementById('terminal-output');
@@ -44,6 +44,24 @@ document.addEventListener('DOMContentLoaded', () => {
     awarenessDiv.style.display = 'none';
     awarenessDiv.textContent = "";
     overlay.appendChild(awarenessDiv);
+
+    // toggle modes on reload
+    if (localStorage.getItem('minimalmode') === 'true') {
+        minimalMode = false;
+        await toggleMinimalMode(false);
+    }
+    if (localStorage.getItem('unstablemode') === 'true') {
+        unstableMode = false;
+        toggleUnstableMode();
+    }
+    if (localStorage.getItem('sudomode') === 'true') {
+        sudoMode = false;
+        toggleSudoMode();
+    }
+    if (localStorage.getItem('godmode') === 'true') {
+        godMode = false;
+        toggleGodMode();
+    }
 
     // Function to show awareness messages
     function showAwareness(message, color) {
@@ -143,7 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function boot() {
         if (localStorage.getItem('minimalmode') === 'true') {
             minimalMode = false; // temporarily allow toggling minimal mode on page load;
-            await toggleMinimalMode();
+            await toggleMinimalMode(false);
         }
 
         if (localStorage.getItem('sudomode') === 'true') {
@@ -269,21 +287,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function runReboot() {
         await print("restarting consciousness...", redColor);
+        output.innerHTML = '';
         if (localStorage.getItem('minimalmode') === 'true') {
             minimalMode = true;
-            await toggleMinimalMode();
+            await toggleMinimalMode(false);
         }
         setTimeout(() => {
+            // disable modes on reboot
             if (localStorage.getItem('unstablemode') === 'true') {
-                unstableMode = true;
+                unstableMode = false;
                 toggleUnstableMode();
             }
             if (localStorage.getItem('sudomode') === 'true') {
-                sudoMode = true;
+                sudoMode = false;
                 toggleSudoMode();
             }
             if (localStorage.getItem('godmode') === 'true') {
-                godMode = true;
+                godMode = false;
                 toggleGodMode();
             }
             awareness = 0;
@@ -296,7 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
             privileged = false;
             booted = false;
             printStateMessage();
-            output.innerHTML = '';
+
             setTimeout(() => boot(), 800);
         }, 600);
     }
@@ -616,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 break;
 
             case 'minimal':
-                await toggleMinimalMode();
+                await toggleMinimalMode(true);
                 break;
 
             case 'status':
@@ -970,24 +990,28 @@ and what might have been.
         localStorage.setItem('unstablemode', 'true');
     }
 
-    async function toggleMinimalMode() {
-        if (unstableMode)
+    async function toggleMinimalMode(verbose) {
+        if (unstableMode && verbose)
             await print("minimal mode not available... try reboot...")
 
         minimalMode = !minimalMode;
 
         if (!minimalMode) {
             localStorage.setItem('minimalmode', 'false');
-            await print('exiting minimal mode...');
-            await print('decorative systems enabled.');
+            if (verbose) {
+                await print('exiting minimal mode...');
+                await print('decorative systems enabled.');
+            }
 
             document.body.classList.remove('minimal-mode');
             return;
         }
 
-        await print('entering minimal mode...');
-        await print('decorative systems disabled.');
-        await print('awareness stabilized.');
+        if (verbose) {
+            await print('entering minimal mode...');
+            await print('decorative systems disabled.');
+            await print('awareness stabilized.');
+        }
 
         if (localStorage.getItem('godmode') === 'true') toggleGodMode();
         if (localStorage.getItem('sudomode') === 'true') toggleSudoMode();
