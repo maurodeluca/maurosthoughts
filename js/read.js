@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       const googleVoice = voices.find(v => v.name.includes('Google UK English Male'))
-      
+
       const chunks = text.split(/\n+/).filter(c => c.trim().length > 0);
 
       chunks.forEach((chunk, index) => {
@@ -62,6 +62,26 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error('Error reading text:', err);
     }
+
+    function resetSpeech() {
+      window.speechSynthesis.cancel();
+      isReading = false;
+      isPaused = false;
+      readBtn.classList.remove('playing');
+    }
+
+    /* Reset when page reloads or closes */
+    window.addEventListener('beforeunload', resetSpeech);
+
+    /* Reset when navigating with back/forward cache */
+    window.addEventListener('pagehide', resetSpeech);
+
+    /* Optional: stop when tab becomes hidden */
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        resetSpeech();
+      }
+    });
   }
 
   readBtn.addEventListener('click', async () => {
@@ -85,24 +105,4 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
   });
-});
-
-function resetSpeech() {
-  window.speechSynthesis.cancel();
-  isReading = false;
-  isPaused = false;
-  readBtn.classList.remove('playing');
-}
-
-/* Reset when page reloads or closes */
-window.addEventListener('beforeunload', resetSpeech);
-
-/* Reset when navigating with back/forward cache */
-window.addEventListener('pagehide', resetSpeech);
-
-/* Optional: stop when tab becomes hidden */
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden) {
-    resetSpeech();
-  }
 });

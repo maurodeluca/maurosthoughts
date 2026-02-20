@@ -295,15 +295,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         setTimeout(() => {
             // disable modes on reboot
             if (localStorage.getItem('unstablemode') === 'true') {
-                unstableMode = false;
+                unstableMode = true;
                 toggleUnstableMode();
             }
             if (localStorage.getItem('sudomode') === 'true') {
-                sudoMode = false;
+                sudoMode = true;
                 toggleSudoMode();
             }
             if (localStorage.getItem('godmode') === 'true') {
-                godMode = false;
+                godMode = fatruelse;
                 toggleGodMode();
             }
             awareness = 0;
