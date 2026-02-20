@@ -29,8 +29,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let redColor = '#b11212';
     let goldColor = '#FFAA00';
     let whiteColor = '#f5f5f5';
+    let snakeActive = false;
+    let snakeDir = { r: 0, c: 1 }; // initial right
 
-    const baseCommands = ['ascend', 'exit', 'help', 'history', 'meaning', 'memory', 'minimal', 'override', 'ps', 'reboot', 'status', 'sudo', 'trace', 'whoami',];
+    const baseCommands = ['ascend', 'exit', 'help', 'history', 'meaning', 'memory', 'minimal', 'override', 'ps', 'reboot', 'snake', 'status', 'sudo', 'trace', 'whoami',];
     const hiddenCommands = ['decode', 'godmode', "reveal", "transcend"];
     let helpList = [...baseCommands];
 
@@ -680,6 +682,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await runReveal();
                 break;
 
+            case 'snake':
+                await runSnake();
+                break;
+
             case 'ps':
                 await runPs();
                 break;
@@ -1020,6 +1026,78 @@ and what might have been.
         localStorage.setItem('minimalmode', 'true');
     }
 
+    function scrollTerminalToBottom() {
+        const terminal = document.getElementById('terminal-output');
+        terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    async function runSnake() {
+        snakeActive = true;
+        const rows = 10;
+        const cols = 20;
+        let snake = [{ r: 5, c: 10 }];
+        let apple = { r: Math.floor(Math.random() * rows), c: Math.floor(Math.random() * cols) };
+        let alive = true;
+        let startTime = Date.now();
+
+        // Create a single div for the game
+        const gameLine = document.createElement('div');
+        output.appendChild(gameLine);
+
+        function drawGrid() {
+            let grid = '';
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (snake.some(s => s.r === r && s.c === c)) {
+                        grid += '■'; // snake
+                    } else if (apple.r === r && apple.c === c) {
+                        grid += '●'; // apple
+                    } else {
+                        grid += '·';
+                    }
+                }
+                grid += '\n';
+            }
+            return grid;
+        }
+
+        function moveSnake() {
+            const head = { r: snake[0].r + snakeDir.r, c: snake[0].c + snakeDir.c };
+            // collisions
+            if (
+                head.r < 0 || head.r >= rows ||
+                head.c < 0 || head.c >= cols ||
+                snake.some(s => s.r === head.r && s.c === head.c)
+            ) {
+                alive = false;
+                return;
+            }
+
+            snake.unshift(head);
+
+            if (head.r === apple.r && head.c === apple.c) {
+                apple = { r: Math.floor(Math.random() * rows), c: Math.floor(Math.random() * cols) };
+            } else {
+                snake.pop();
+            }
+        }
+
+        function render() {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            gameLine.textContent = drawGrid() + `\nTime: ${elapsed}s`;
+            scrollTerminalToBottom();
+        }
+
+        while (snakeActive && alive) {
+            moveSnake();
+            render();
+            await new Promise(r => setTimeout(r, 300));
+        }
+
+        snakeActive = false;
+        gameLine.textContent += `\nYou lasted ${Math.floor((Date.now() - startTime) / 1000)} seconds.`;
+    }
+
     helpBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         await openTerminal();
@@ -1036,6 +1114,21 @@ and what might have been.
     });
 
     input.addEventListener('keydown', (e) => {
+        if (snakeActive) {
+            console.log(1);
+            // handle snake controls
+            switch (e.key) {
+                case 'w': if (snakeDir.r !== 1) snakeDir = { r: -1, c: 0 }; break; // up
+                case 'a': if (snakeDir.c !== 1) snakeDir = { r: 0, c: -1 }; break; // left
+                case 's': if (snakeDir.r !== -1) snakeDir = { r: 1, c: 0 }; break; // down
+                case 'd': if (snakeDir.c !== -1) snakeDir = { r: 0, c: 1 }; break; // right
+                case 'Escape':
+                    snakeActive = false;
+                    break;
+            }
+            e.preventDefault(); // prevent cursor movement while playing
+            return; // skip normal input handling
+        }
         if (e.key === 'Enter') {
             e.preventDefault();
             const cmd = input.value.trim();
