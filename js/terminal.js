@@ -367,7 +367,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function runStatus() {
-        await print(f"you are {state}... {awareness}%");
+        await print(`you are ${state}... {awareness}%`);
     }
 
     async function runHistory() {
