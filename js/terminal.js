@@ -588,7 +588,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            await runAscend();
             await runSudoOverride();
             commandInProgress = false;
             return;
