@@ -996,9 +996,11 @@ and what might have been.
     }
 
     async function toggleMinimalMode(verbose) {
-        if (unstableMode && verbose)
-            await print("minimal mode not available... try reboot...")
-
+        if (unstableMode) {
+            if (verbose) await print("minimal mode not available... try reboot...")
+            return;
+        }
+            
         minimalMode = !minimalMode;
 
         if (!minimalMode) {
