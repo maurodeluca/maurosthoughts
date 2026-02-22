@@ -305,7 +305,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 toggleSudoMode();
             }
             if (localStorage.getItem('godmode') === 'true') {
-                godMode = fatruelse;
+                godMode = false;
                 toggleGodMode();
             }
             awareness = 0;
@@ -588,6 +588,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
+            if (!isAscended) await runAscend();
             await runSudoOverride();
             commandInProgress = false;
             return;
