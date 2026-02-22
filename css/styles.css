@@ -1185,3 +1185,22 @@ body.minimal-mode #terminal-input {
     border: none !important;
     box-shadow: none !important;
 }
+
+
+.snake-grid {
+    white-space: pre;
+    line-height: 1;
+}
+
+.snake-grid .empty {
+    opacity: 0.2;
+}
+
+.snake-grid .snake {
+    opacity: 1;
+}
+
+.snake-grid .apple {
+    opacity: 1;
+    color: var(--accent);
+}

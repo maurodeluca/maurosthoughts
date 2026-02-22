@@ -133,28 +133,42 @@ document.addEventListener('DOMContentLoaded', async () => {
         overlay.style.background = '';
     }
 
-    function print(text, color = '') {
-        return new Promise(resolve => { // return a Promise
+    function print(text = '', color = '') {
+        return new Promise(resolve => {
+
             const line = document.createElement('div');
-            if (godMode) color = 'gold'; // override any color in godmode
+            if (godMode) color = 'gold';
             if (color) line.style.color = color;
+
+            // If text is empty, set a non-breaking space
+            line.textContent = text.length === 0 ? '\u00A0' : '';
+
             output.appendChild(line);
+
+            if (text.length === 0) {
+                output.scrollTop = output.scrollHeight;
+                resolve();
+                return;
+            }
 
             let i = 0;
             const interval = setInterval(() => {
                 line.textContent += text[i];
                 i++;
+
                 if (i >= text.length) {
                     clearInterval(interval);
+
                     if (state === 'unstable') {
-                        // If unstable, start glitching this line
-                        const interval = glitchLineElement(line);
-                        unstableGlitches.push(interval);
+                        const glitchInterval = glitchLineElement(line);
+                        unstableGlitches.push(glitchInterval);
                         if (localStorage.getItem('unstablemode') === 'false')
                             toggleUnstableMode();
                     }
-                    resolve(); // resolve the promise when done
+
+                    resolve();
                 }
+
                 output.scrollTop = output.scrollHeight;
             }, 20);
         });
@@ -367,7 +381,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function runStatus() {
-        await print(`you are ${state}... ${awareness}%`);
+        const formattedAwareness = parseFloat(awareness.toFixed(5));
+        await print(`you are ${state}... ${formattedAwareness}%`);
     }
 
     async function runHistory() {
@@ -682,6 +697,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await runReveal();
                 break;
 
+            case 'life':
+                await runLife();
+                break;
             case 'snake':
                 await runSnake();
                 break;
@@ -1001,7 +1019,7 @@ and what might have been.
             if (verbose) await print("minimal mode not available... try reboot...")
             return;
         }
-            
+
         minimalMode = !minimalMode;
 
         if (!minimalMode) {
@@ -1035,7 +1053,18 @@ and what might have been.
 
     async function runSnake() {
         snakeActive = true;
-        const rows = 10;
+        await print("The serpent stirs in the shadows…", goldColor);
+        await print("Its hunger awaits… will you guide it?", goldColor);
+        await print("");
+        await print("Controls:");
+        await print("W = Up");
+        await print("A = Left");
+        await print("S = Down");
+        await print("D = Right");
+        await print("");
+        await new Promise(r => setTimeout(r, 500)); // short pause
+
+        const rows = 20;
         const cols = 20;
         let snake = [{ r: 5, c: 10 }];
         let apple = { r: Math.floor(Math.random() * rows), c: Math.floor(Math.random() * cols) };
@@ -1044,22 +1073,31 @@ and what might have been.
 
         // Create a single div for the game
         const gameLine = document.createElement('div');
+        gameLine.classList.add('snake-grid');
         output.appendChild(gameLine);
 
         function drawGrid() {
             let grid = '';
+
             for (let r = 0; r < rows; r++) {
                 for (let c = 0; c < cols; c++) {
+
                     if (snake.some(s => s.r === r && s.c === c)) {
-                        grid += '■'; // snake
+                        grid += '<span class="snake">██</span>';
                     } else if (apple.r === r && apple.c === c) {
-                        grid += '●'; // apple
+                        // If column is even → space on left
+                        if (c % 2 === 0) {
+                            grid += '<span class="apple">◉◉</span>';
+                        } else {
+                            grid += '<span class="apple">◉◉</span>';
+                        }
                     } else {
-                        grid += '·';
+                        grid += '<span class="empty">░░</span>';
                     }
                 }
                 grid += '\n';
             }
+
             return grid;
         }
 
@@ -1086,7 +1124,7 @@ and what might have been.
 
         function render() {
             const elapsed = Math.floor((Date.now() - startTime) / 1000);
-            gameLine.textContent = drawGrid() + `\nTime: ${elapsed}s`;
+            gameLine.innerHTML = drawGrid() + `\n\nTime: ${elapsed}s`;
             scrollTerminalToBottom();
         }
 
@@ -1097,8 +1135,104 @@ and what might have been.
         }
 
         snakeActive = false;
-        gameLine.textContent += `\nYou lasted ${Math.floor((Date.now() - startTime) / 1000)} seconds.`;
+        gameLine.innerHTML += `\nYou lasted ${Math.floor((Date.now() - startTime) / 1000)} seconds.`;
+        await print("");
         scrollTerminalToBottom();
+    }
+
+    async function runLife() {
+        await print("The grid awakens… something stirs in the void…", goldColor);
+        await print("Life begins its dance.", goldColor);
+        await print("");
+        await new Promise(r => setTimeout(r, 500)); // brief pause before simulation
+
+        const rows = 20;
+        const cols = 40;
+        let grid = Array.from({ length: rows }, () => Array(cols).fill(0));
+
+        // Random initial state
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                grid[r][c] = Math.random() < 0.3 ? 1 : 0;
+            }
+        }
+
+        const gameLine = document.createElement('div');
+        gameLine.style.fontFamily = 'monospace';
+        gameLine.style.whiteSpace = 'pre';
+        gameLine.style.lineHeight = '0.8em';
+        gameLine.style.letterSpacing = '0.1em';
+        gameLine.style.color = sudoColor;
+        output.appendChild(gameLine);
+
+        function drawGrid() {
+            let display = '';
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    display += grid[r][c] ? '■' : '·';
+                }
+                display += '\n';
+            }
+            return display;
+        }
+
+        function step() {
+            const newGrid = Array.from({ length: rows }, () => Array(cols).fill(0));
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    let neighbors = 0;
+                    for (let dr = -1; dr <= 1; dr++) {
+                        for (let dc = -1; dc <= 1; dc++) {
+                            if (dr === 0 && dc === 0) continue;
+                            const nr = r + dr;
+                            const nc = c + dc;
+                            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                                neighbors += grid[nr][nc];
+                            }
+                        }
+                    }
+                    if (grid[r][c] === 1) {
+                        newGrid[r][c] = neighbors === 2 || neighbors === 3 ? 1 : 0;
+                    } else {
+                        newGrid[r][c] = neighbors === 3 ? 1 : 0;
+                    }
+                }
+            }
+            return newGrid;
+        }
+
+        function gridsEqual(g1, g2) {
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    if (g1[r][c] !== g2[r][c]) return false;
+                }
+            }
+            return true;
+        }
+
+        let running = true;
+        const historyLength = 4; // remember last 4 steps
+        let previousGrids = [JSON.parse(JSON.stringify(grid))];
+
+        while (running) {
+            gameLine.textContent = drawGrid();
+            output.scrollTop = output.scrollHeight;
+
+            const newGrid = step();
+
+            // Check if newGrid matches any previous grid (oscillator detection)
+            if (previousGrids.some(prev => gridsEqual(prev, newGrid))) {
+                await print("\nGame stabilized or entered a short-period oscillator...", goldColor);
+                await print("Simulation terminated.", goldColor);
+                break;
+            }
+
+            previousGrids.push(JSON.parse(JSON.stringify(newGrid)));
+            if (previousGrids.length > historyLength) previousGrids.shift();
+
+            grid = newGrid;
+            await new Promise(r => setTimeout(r, 300));
+        }
     }
 
     helpBtn.addEventListener('click', async (e) => {
