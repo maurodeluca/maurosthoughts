@@ -1,0 +1,69 @@
+February 22nd 2026
+
+Cancer is often seen as a failure of the body, a flaw in our biology that medicine races to fix. But from a systems perspective, cancer is less a mistake and more a natural consequence of how multicellular life works. It reveals both the marvel and the vulnerability of our bodies.
+
+To understand why cancer is so difficult to “solve,” it helps to compare it to a very different kind of complex problem: those studied in physics. Physics problems are usually about incomplete theory. Consider what “defining the problem” means in physics.
+
+For example, with quantum gravity, we have two frameworks, General Relativity and Quantum Mechanics, that both work extremely well but clash in extreme conditions. The problem can be phrased cleanly:
+
+Construct a consistent theory that unifies both and reduces to each in the appropriate limits.
+
+That’s a crisp, formal target.
+
+In cancer biology, however, the process is messy. It is Darwinian evolution happening inside the body. Cancer occurs when the normal rules that govern cell behavior break down, turning cooperation into competition. In other words, it is evolution playing out at the cellular level, with trillions of cells “playing their own Game of Life.” Each cell follows local rules, mutates, divides, and adapts in ways that may benefit itself at the expense of the organism.
+
+Formally, we can describe it as:
+
+Cancer = a disease of somatic evolution driven by genomic instability under selection pressure.
+
+The core problem is therefore not a single defect to fix, but a moving target: how to understand, predict, and control this internal evolutionary competition, which unfolds over time and varies between patients, tissues, and even different regions of the same tumor.
+
+Unlike physics, where laws are universal and elegant, cancer is heterogeneous. Even a single tumor is more like an ecosystem or a miniature city than a broken machine. Cells compete, cooperate, and exploit local resources. You are not solving one equation; you are navigating a shifting cellular battlefield. It’s less like solving Maxwell's equations and more like predicting the future of a rainforest under climate change. Cancer does not aim for elegance. It exploits whatever works locally.
+
+At its core, multicellularity is a massive cooperative project. Cells follow strict rules:
+
+Divide when needed
+
+Specialize for the organism
+
+Die when damaged
+
+These rules are enforced by DNA repair mechanisms, tumor-suppressor genes, and the immune system, which constantly monitors and eliminates abnormal cells. In children, however, the immune system is not fully mature, which can allow cancers to develop more aggressively and grow faster than in adults.
+
+Remarkably, these systems work extraordinarily well. The human body performs roughly 10 to the power of 16 cell divisions over a lifetime, yet most people live decades before cancer arises.
+
+So why does cancer happen at all?
+
+The answer lies in unavoidable trade-offs. DNA replication is imperfect. Even with repair systems, mutations inevitably occur. Some cells cheat the rules, dividing uncontrollably and ignoring death signals. This is what we recognize as cancer.
+
+Scientists have attempted to model cancer mathematically, but the models do not collapse into a single unifying framework like physics.
+
+Population dynamics models treat cancer as evolving populations of cells. Variants of the Lotka–Volterra framework model tumor–immune competition or sensitive vs resistant populations, predicting when drug resistance dominates.
+
+Evolutionary game theory, inspired by John Maynard Smith, models cancer cell types as “strategies” competing under selection pressure. This explains why aggressive phenotypes emerge and how therapy shifts evolutionary incentives.
+
+Branching process and stochastic mutation models estimate the number of mutations required for malignancy and how long tumor development takes, often predicting incidence curves surprisingly well.
+
+But each model captures only one layer of the system. None covers the full stack:
+
+DNA Mutations, Protein Signaling, Cell Behavior, Tissue Structure, Immune Response, Evolutionary Adaptation, Treatment Interaction
+
+Physics problems like quantum gravity aim for a single formalism. Cancer models are modular, layered, and context-dependent.
+
+Data is another limitation. In physics, laws are stable. In cancer, “rules” vary between tumor types, patients, and even regions of a tumor. Cancer evolves during treatment, so predictions can fail as selection pressures change.
+
+Multicellular life is not flawed, but fragile. It is one of evolution’s most sophisticated cooperative systems. Cells follow shared rules for the organism’s benefit. But evolution optimizes for reproductive success, not longevity. Survival until reproduction is strongly favored; what happens at 60, 70, or 80 years old is far less constrained.
+
+Cancer is evolution happening at the wrong level of organization.
+
+There are fundamental constraints to multicellular life.
+
+Mutation can never be zero. DNA replication is governed by chemistry and thermodynamics. Errors are inevitable. Absolute zero mutation would require infinite checking or perfect chemistry. Neither is realistic.
+
+Selection operates at multiple levels. Cells themselves are replicators inside the organism. As long as they divide, somatic evolution occurs. This tension between cellular and organismal selection was formalized by William D. Hamilton. Multicellular systems can minimize instability but cannot eliminate it entirely without stopping cell division. Eliminating division prevents growth, repair, and regeneration, making life impossible. The constraint is structural, arising from replication, variation, selection, and finite error correction — guaranteeing evolutionary drift somewhere.
+
+In systems-engineering terms, cancer is not a bug in the code. It is an emergent property of scalable, self-replicating architecture. The frontier question becomes: could we engineer an artificial multicellular system that drives cancer probability toward zero, or is there a hard lower bound imposed by thermodynamics and evolutionary dynamics?
+
+Mathematically and biologically speaking, cancer is not a design flaw but a structural feature of life: a metastable outcome of the trade-off between replication, repair, and adaptation. By viewing cancer as an inevitable property of multicellular systems, we can design smarter interventions that work with evolution rather than against it.
+
+Multicellular life is extraordinary, capable of astounding complexity yet constrained by fundamental laws of biology and evolution. Cancer is a reminder of the delicate balance required to sustain life over decades and a call to understand the rules that govern it.

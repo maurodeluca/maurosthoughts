@@ -261,25 +261,7 @@ strong {
   text-align-last: center;
 }
 
-.typed#manifesto {
-  font-family: 'Courier New', monospace;
-  font-size: 1rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-  border-left: 2px solid var(--accent);
-  padding: 1rem 1.2rem;
-  min-height: 15rem;
-  text-align: justify;
-  text-align-last: left;
-  hyphens: auto;
-  /* allow words to break */
-  word-spacing: normal;
-  /* reset any extra spacing */
-  overflow-wrap: break-word;
-  /* prevent huge gaps */
-}
-
-.typed#existence {
+.typed#writing {
   font-family: 'Courier New', monospace;
   font-size: 1rem;
   line-height: 1.5;
@@ -426,52 +408,28 @@ nav a:hover {
 }
 
 /* =========================
-   Manifest page overrides
+   Writing page overrides
 ========================= */
 
-.manifesto-page {
+.writing-page {
   overflow-y: auto;
   overflow-x: hidden;
   scroll-snap-type: none;
   scroll-behavior: auto;
 }
 
-.manifesto-page section {
+.writing-page section {
   min-height: auto;
   height: auto;
   align-items: flex-start;
   margin-bottom: 2rem;
 }
 
-.manifesto-page .section-arrow {
+.writing-page .section-arrow {
   display: none;
 }
 
-.manifesto-page .content {
-  max-width: 720px;
-  width: 100%;
-  margin: 6rem auto 0;
-}
-
-.existence-page {
-  overflow-y: auto;
-  overflow-x: hidden;
-  scroll-snap-type: none;
-  scroll-behavior: auto;
-}
-
-.existence-page section {
-  min-height: auto;
-  height: auto;
-  align-items: flex-start;
-  margin-bottom: 2rem;
-}
-
-.existence-page .section-arrow {
-  display: none;
-}
-
-.existence-page .content {
+.writing-page .content {
   max-width: 720px;
   width: 100%;
   margin: 6rem auto 0;
@@ -545,11 +503,7 @@ nav a:hover {
     text-overflow: ellipsis;
   }
 
-  .typed#manifesto {
-    min-height: auto;
-  }
-
-  .typed#existence {
+  .typed#writing {
     min-height: auto;
   }
 
@@ -583,40 +537,32 @@ nav a:hover {
 }
 
 @supports (-webkit-touch-callout: none) {
-  .manifesto-page .content {
-    margin-top: 7rem;
-  }
-
-  .existence-page .content {
+  .writing-page .content {
     margin-top: 7rem;
   }
 }
 
 /* Chrome, Edge, Safari */
 .home-page::-webkit-scrollbar,
-.manifesto-page::-webkit-scrollbar,
-.existence-page::-webkit-scrollbar {
+.writing-page::-webkit-scrollbar {
   display: none;
 }
 
 /* Firefox */
 .home-page,
-.manifesto-page,
-.existence-page {
+.writing-page {
   scrollbar-width: none;
   /* hides scrollbar */
 }
 
 /* IE / old Edge */
 .home-page,
-.manifesto-page,
-.existence-page {
+.writing-page {
   -ms-overflow-style: none;
 }
 
 .home-page,
-.manifesto-page,
-.existence-page {
+.writing-page {
   overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   /* smooth iOS momentum */
@@ -624,14 +570,12 @@ nav a:hover {
 
 /* Hide scrollbar visuals */
 .home-page::-webkit-scrollbar,
-.manifesto-page::-webkit-scrollbar,
-.existence-page::-webkit-scrollbar {
+.writing-page::-webkit-scrollbar {
   display: none;
 }
 
 .home-page,
-.manifesto-page,
-.existence-page {
+.writing-page {
   scrollbar-width: none;
   /* Firefox */
   -ms-overflow-style: none;

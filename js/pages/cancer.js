@@ -1,21 +1,21 @@
 import { typeText } from '../core/typing.js';
 
-async function initManifestoPage() {
-  const manifestoEl = document.getElementById('writing');
-  if (!manifestoEl) return;
+async function initCancerPage() {
+  const cancerEl = document.getElementById('writing');
+  if (!cancerEl) return;
 
   const introTarget = document.getElementById('intro');
   if (!introTarget) return;
 
-  const introText = "I wrote this to remember what mattered before metrics.";
-  const filePath = "../../content/writings/manifesto.md";
+  const introText = "Exploring why cancer is an inevitable feature of multicellular life.";
+  const filePath = "../../content/writings/cancer.md";
 
   try {
     const response = await fetch(filePath);
     const contentText = await response.text();
     typeText(introText, introTarget, 45, () => {
       setTimeout(() => {
-        typeText(contentText, manifestoEl, 20);
+        typeText(contentText, cancerEl, 20);
       }, 400);
     });
   } catch (err) {
@@ -23,4 +23,4 @@ async function initManifestoPage() {
   }
 }
 
-initManifestoPage();
+initCancerPage();

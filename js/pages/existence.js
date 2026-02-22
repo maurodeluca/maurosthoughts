@@ -1,7 +1,7 @@
 import { typeText } from '../core/typing.js';
 
 async function initExistencePage() {
-  const existenceEl = document.getElementById('existence');
+  const existenceEl = document.getElementById('writing');
   if (!existenceEl) return;
 
   const introTarget = document.getElementById('intro');
@@ -23,4 +23,4 @@ async function initExistencePage() {
   }
 }
 
-export { initExistencePage };
+initExistencePage();
