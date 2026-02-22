@@ -1098,6 +1098,7 @@ and what might have been.
 
         snakeActive = false;
         gameLine.textContent += `\nYou lasted ${Math.floor((Date.now() - startTime) / 1000)} seconds.`;
+        scrollTerminalToBottom();
     }
 
     helpBtn.addEventListener('click', async (e) => {
