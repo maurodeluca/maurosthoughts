@@ -7,7 +7,7 @@ async function initCancerPage() {
   const introTarget = document.getElementById('intro');
   if (!introTarget) return;
 
-  const introText = "Exploring why cancer is an inevitable feature of multicellular life.";
+  const introText = "Exploring why cancer is an inevitable feature of multicellular life and medicine's greatest challenge.";
   const filePath = "../../content/writings/cancer.md";
 
   try {
