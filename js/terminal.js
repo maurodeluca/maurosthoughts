@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let snakeActive = false;
     let snakeDir = { r: 0, c: 1 }; // initial right
 
-    const baseCommands = ['ascend', 'exit', 'help', 'history', 'meaning', 'memory', 'minimal', 'override', 'ps', 'reboot', 'snake', 'status', 'sudo', 'trace', 'whoami',];
+    const baseCommands = ['ascend', 'exit', 'help', 'history', 'life', 'meaning', 'memory', 'minimal', 'override', 'ps', 'reboot', 'snake', 'status', 'sudo', 'trace', 'whoami',];
     const hiddenCommands = ['decode', 'godmode', "reveal", "transcend"];
     let helpList = [...baseCommands];
 
