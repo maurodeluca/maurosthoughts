@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     let sudoMode = false;
     let godMode = false;
     let unstableMode = false;
-    let unstableGlitches = []; // store intervals to clear later
     let awarenessGlitchInterval = null;
     let historyIndex = history.length;
     let sudoColor = '#00FFAA';
@@ -161,7 +160,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (state === 'unstable') {
                         const glitchInterval = glitchLineElement(line);
-                        unstableGlitches.push(glitchInterval);
                         if (localStorage.getItem('unstablemode') === 'false')
                             toggleUnstableMode();
                     }
@@ -821,29 +819,27 @@ and what might have been.
             el.setAttribute('data-original', el.innerHTML);
         }
 
-        return setInterval(() => {
-            const originalHTML = el.getAttribute('data-original');
-            if (originalHTML === null) return; // safety check
-            let glitched = '';
+        const originalHTML = el.getAttribute('data-original');
+        if (originalHTML === null) return; // safety check
+        let glitched = '';
 
-            // We need to handle HTML tags so we don’t break links
-            let insideTag = false;
-            for (let char of originalHTML) {
-                if (char === '<') insideTag = true;
-                if (insideTag) {
-                    glitched += char; // leave tags intact
-                    if (char === '>') insideTag = false;
+        // We need to handle HTML tags so we don’t break links
+        let insideTag = false;
+        for (let char of originalHTML) {
+            if (char === '<') insideTag = true;
+            if (insideTag) {
+                glitched += char; // leave tags intact
+                if (char === '>') insideTag = false;
+            } else {
+                if (char !== ' ' && Math.random() < 0.3) {
+                    glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
                 } else {
-                    if (char !== ' ' && Math.random() < 0.3) {
-                        glitched += glitchChars[Math.floor(Math.random() * glitchChars.length)];
-                    } else {
-                        glitched += char;
-                    }
+                    glitched += char;
                 }
             }
+        }
 
-            el.innerHTML = glitched;
-        }, 100);
+        el.innerHTML = glitched;
     }
 
     async function glitchEffect(message) {
@@ -913,8 +909,6 @@ and what might have been.
             }
         });
 
-        unstableGlitches.forEach(interval => clearInterval(interval));
-
         // restore original text
         output.querySelectorAll('div').forEach(line => {
             if (line.getAttribute('data-original')) {
@@ -924,7 +918,6 @@ and what might have been.
         });
 
         stopAwarenessGlitch();
-        unstableGlitches = [];
         awarenessGlitchInterval = null;
     }
 
@@ -996,15 +989,13 @@ and what might have been.
         // start glitching all existing lines
         const lines = output.querySelectorAll('div');
         lines.forEach(line => {
-            const interval = glitchLineElement(line);
-            unstableGlitches.push(interval);
+            glitchLineElement(line);
         });
         const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, button, nav');
 
         textElements.forEach(el => {
             // only start glitch if not already running
-            const interval = glitchLineElement(el);
-            unstableGlitches.push(interval);
+            glitchLineElement(el);
         });
 
         const typedDivs = document.querySelectorAll('.typed, .cursor-line'); // returns NodeList
@@ -1013,6 +1004,7 @@ and what might have been.
         });
 
         localStorage.setItem('unstablemode', 'true');
+        requestAnimationFrame(toggleUnstableMode);
     }
 
     async function toggleMinimalMode(verbose) {
