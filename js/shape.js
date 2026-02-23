@@ -11,7 +11,7 @@ function initShape() {
     0.1,
     100
   );
-  camera.position.z = 4;
+  camera.position.z = 5;
 
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
@@ -41,6 +41,7 @@ function initShape() {
     emissiveIntensity: 0.5
   });
   const mesh = new THREE.Mesh(geometry, material);
+  mesh.scale.set(1.5, 1.5, 1.5); // doubles the size
   scene.add(mesh);
 
   const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
