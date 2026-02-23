@@ -38,7 +38,7 @@ function initShape() {
     metalness: 0.4,
     roughness: 0.3,
     emissive: 0x330000,
-    emissiveIntensity: 0.5
+    emissiveIntensity: 100
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.scale.set(1.5, 1.5, 1.5); // doubles the size
