@@ -41,14 +41,16 @@
   </script>
 </head>
 
-<body class="writing-page">
+<canvas id="lifeCanvas"></canvas>
 
+<body class="writing-page">
   <!-- ===== WRITING SECTION ===== -->
   <section data-lock>
     <div class="content">
 
       <!-- Controls -->
       <div class="control-buttons">
+        <button id="lifeBtn" class="typing-toggle">life</button>
         <button id="skipTyping" class="typing-toggle">skip</button>
         <button id="shareBtn" class="typing-toggle share-btn" aria-label="Share this page">share</button>
       </div>
@@ -81,7 +83,6 @@
 
       <!-- Main Typed Body -->
       <div class="typed" id="writing"></div>
-
     </div>
   </section>
 
@@ -144,6 +145,95 @@
   <script type="module" src="../../js/read.js"></script>
   <script type="module" src="../../js/share.js"></script>
   <script type="module" src="../../js/main.js"></script>
+  <script>
+    const lifeBtn = document.getElementById('lifeBtn');
+    const canvas = document.getElementById('lifeCanvas');
+    const ctx = canvas.getContext('2d');
 
+    let lifeRunning = false;
+    let lifeGrid = [];
+    let lifeCols = 0;
+    let lifeRows = 0;
+    const lifeCellSize = 2;
+
+    // Initialize canvas and grid
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      lifeCols = Math.floor(canvas.width / lifeCellSize);
+      lifeRows = Math.floor(canvas.height / lifeCellSize);
+
+      // Create new grid and randomize
+      lifeGrid = Array.from({ length: lifeRows }, () =>
+        Array.from({ length: lifeCols }, () => Math.random() > 0.3 ? 1 : 0)
+      );
+    }
+
+    // Draw current grid
+    function drawLife() {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00FFAA';
+      for (let r = 0; r < lifeRows; r++) {
+        for (let c = 0; c < lifeCols; c++) {
+          if (lifeGrid[r][c]) {
+            ctx.fillRect(c * lifeCellSize, r * lifeCellSize, lifeCellSize, lifeCellSize);
+          }
+        }
+      }
+    }
+
+    // Compute next generation
+    function updateLife() {
+      const next = lifeGrid.map(arr => [...arr]);
+
+      for (let r = 0; r < lifeRows; r++) {
+        for (let c = 0; c < lifeCols; c++) {
+          let neighbors = 0;
+          for (let dr = -1; dr <= 1; dr++) {
+            for (let dc = -1; dc <= 1; dc++) {
+              if (dr === 0 && dc === 0) continue;
+              const nr = (r + dr + lifeRows) % lifeRows;
+              const nc = (c + dc + lifeCols) % lifeCols;
+              neighbors += lifeGrid[nr][nc];
+            }
+          }
+          next[r][c] = lifeGrid[r][c] ? (neighbors === 2 || neighbors === 3 ? 1 : 0) : (neighbors === 3 ? 1 : 0);
+        }
+      }
+
+      lifeGrid = next;
+    }
+
+    // Main loop
+    function lifeLoop() {
+      if (!lifeRunning) return;
+      drawLife();
+      updateLife();
+      requestAnimationFrame(lifeLoop);
+    }
+
+    // Button to start/stop
+    lifeBtn.addEventListener('click', () => {
+      lifeRunning = !lifeRunning;
+
+      if (lifeRunning) {
+        resizeCanvas();
+        lifeLoop();
+        lifeBtn.textContent = 'stop life';
+      } else {
+        lifeBtn.textContent = 'life';
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    });
+
+    // Resize canvas dynamically
+    window.addEventListener('resize', () => {
+      if (lifeRunning) resizeCanvas();
+    });
+  </script>
 </body>
+
 </html>

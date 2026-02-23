@@ -1148,3 +1148,14 @@ body.minimal-mode #terminal-input {
     opacity: 1;
     color: var(--accent);
 }
+
+#lifeCanvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -9999;       /* behind everything */
+  opacity: 0.5;
+  pointer-events: none; /* let clicks pass through */
+}
