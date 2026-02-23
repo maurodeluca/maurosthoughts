@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     clearInterval(interval);
 
                     if (state === 'unstable') {
-                        const glitchInterval = glitchLineElement(line);
+                        glitchLineElement(line);
                         if (localStorage.getItem('unstablemode') === 'false')
                             toggleUnstableMode();
                     }
@@ -813,6 +813,7 @@ and what might have been.
         if (minimalMode) return;
         const glitchChars = "¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";
         el.style.transform = 'translateZ(0)';
+        el.style.willChange = 'contents';
         
         // Store original HTML, not just text
         if (!el.getAttribute('data-original')) {
