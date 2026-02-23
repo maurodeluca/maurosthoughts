@@ -42,7 +42,7 @@ function initShape() {
   });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.scale.set(1.5, 1.5, 1.5); // doubles the size
-  scene.add(mesh);
+  scene.add(mesh); 
 
   const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
   dirLight.position.set(3, 3, 3);
