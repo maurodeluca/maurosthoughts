@@ -3,10 +3,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const overlay = document.getElementById('terminal-overlay');
     const output = document.getElementById('terminal-output');
     const input = document.getElementById('terminal-input');
-    const terminalOutput = document.getElementById('terminal-output');
 
-    terminalOutput.addEventListener('wheel', (e) => {
-        terminalOutput.scrollTop += e.deltaY;
+    output.addEventListener('wheel', (e) => {
+        output.scrollTop += e.deltaY;
     });
 
     let sessionStart = Date.now();
