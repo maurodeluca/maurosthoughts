@@ -163,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         glitchLineElement(line);
                         if (localStorage.getItem('unstablemode') === 'false') {
                             toggleUnstableMode();
-                             requestAnimationFrame(toggleUnstableMode);
+                            requestAnimationFrame(toggleUnstableMode);
                     }
 
                     resolve();
@@ -314,7 +314,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (localStorage.getItem('unstablemode') === 'true') {
                 unstableMode = true;
                 toggleUnstableMode();
-                 requestAnimationFrame(toggleUnstableMode);
             }
             if (localStorage.getItem('sudomode') === 'true') {
                 sudoMode = true;
