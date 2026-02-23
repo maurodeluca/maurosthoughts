@@ -161,6 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         glitchLineElement(line);
                         if (localStorage.getItem('unstablemode') === 'false') {
                             toggleUnstableMode();
+                        }
                     }
 
                     resolve();
