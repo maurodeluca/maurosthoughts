@@ -814,7 +814,8 @@ and what might have been.
     function glitchLineElement(el) {
         if (minimalMode) return;
         const glitchChars = "¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";
-
+        el.style.transform = 'translateZ(0)';
+        
         // Store original HTML, not just text
         if (!el.getAttribute('data-original')) {
             el.setAttribute('data-original', el.innerHTML);
