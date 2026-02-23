@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     let whiteColor = '#f5f5f5';
     let snakeActive = false;
     let snakeDir = { r: 0, c: 1 }; // initial right
+    let lastGlitchTime = 0;
+    const glitchInterval = 100;
 
     const baseCommands = ['ascend', 'exit', 'help', 'history', 'life', 'meaning', 'memory', 'minimal', 'override', 'ps', 'reboot', 'snake', 'status', 'sudo', 'trace', 'whoami',];
     const hiddenCommands = ['decode', 'godmode', "reveal", "transcend"];
@@ -158,8 +160,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     clearInterval(interval);
 
                     if (state === 'unstable') {
-                        glitchLineElement(line);
-                        if (localStorage.getItem('unstablemode') === 'false') {
+                         setInterval(() => glitchLineElement(line), 100);
+
+                        if (!unstableMode) {
                             toggleUnstableMode();
                         }
                     }
@@ -762,7 +765,6 @@ and what might have been.
 
         // glitch effect: replace chars randomly for a short duration
         const glitchDuration = 2000; // milliseconds
-        const glitchInterval = 100;
         const chars = '¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";';
         let startTime = Date.now();
 
@@ -814,7 +816,7 @@ and what might have been.
         const glitchChars = "¡€#¢§ˆ¶¨ªº–≠áß∂ƒ©µ˝˚π…æ«`≈¸ˇ˘˜˛≤˛≥≥÷œ˙é®√¥úíó‚ÂÊËÇ∑∏∫Ω≈ç√∂ƒ©˘˙∆˚¬…æ≈";
         el.style.transform = 'translateZ(0)';
         el.style.willChange = 'contents';
-        
+
         // Store original HTML, not just text
         if (!el.getAttribute('data-original')) {
             el.setAttribute('data-original', el.innerHTML);
@@ -973,6 +975,7 @@ and what might have been.
     }
 
     function toggleUnstableMode() {
+        console.log(1);
         if (minimalMode) return;
         if (sudoMode) toggleSudoMode();
 
@@ -987,15 +990,21 @@ and what might have been.
         printStateMessage();
         glitchAwarenessText();
         unstableLoop();
-        
+
         localStorage.setItem('unstablemode', 'true');
     }
 
-    function unstableLoop() {
+    function unstableLoop(timestamp) {
+        if (timestamp - lastGlitchTime <= glitchInterval) {
+            requestAnimationFrame(unstableLoop);
+            return;
+        }
+        lastGlitchTime = timestamp;
+
         // start glitching all existing lines
         const lines = output.querySelectorAll('div');
         lines.forEach(line => {
-            glitchLineElement(line);
+                glitchLineElement(line);
         });
         const textElements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, button, nav');
 
@@ -1008,7 +1017,7 @@ and what might have been.
         typedDivs.forEach(div => {
             glitchLineElement(div);
         });
-        
+
         requestAnimationFrame(unstableLoop);
     }
 
@@ -1250,7 +1259,6 @@ and what might have been.
 
     input.addEventListener('keydown', (e) => {
         if (snakeActive) {
-            console.log(1);
             // handle snake controls
             switch (e.key) {
                 case 'w': if (snakeDir.r !== 1) snakeDir = { r: -1, c: 0 }; break; // up
