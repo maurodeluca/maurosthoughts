@@ -54,6 +54,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (localStorage.getItem('unstablemode') === 'true') {
         unstableMode = false;
         toggleUnstableMode();
+        requestAnimationFrame(toggleUnstableMode);
     }
     if (localStorage.getItem('sudomode') === 'true') {
         sudoMode = false;
@@ -160,8 +161,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                     if (state === 'unstable') {
                         glitchLineElement(line);
-                        if (localStorage.getItem('unstablemode') === 'false')
+                        if (localStorage.getItem('unstablemode') === 'false') {
                             toggleUnstableMode();
+                             requestAnimationFrame(toggleUnstableMode);
                     }
 
                     resolve();
@@ -191,6 +193,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (localStorage.getItem('unstablemode') === 'true') {
             unstableMode = false; // temporarily allow toggling sudo mode on page load;
             toggleUnstableMode();
+            requestAnimationFrame(toggleUnstableMode();
         }
         printStateMessage();
         await print("booting consciousness...", 20);
@@ -311,6 +314,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (localStorage.getItem('unstablemode') === 'true') {
                 unstableMode = true;
                 toggleUnstableMode();
+                 requestAnimationFrame(toggleUnstableMode);
             }
             if (localStorage.getItem('sudomode') === 'true') {
                 sudoMode = true;
