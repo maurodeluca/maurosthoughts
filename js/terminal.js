@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     let sudoMode = false;
     let godMode = false;
     let unstableMode = false;
+    let unstableGlitches = [];
     let awarenessGlitchInterval = null;
     let historyIndex = history.length;
     let sudoColor = '#00FFAA';
@@ -160,9 +161,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                     clearInterval(interval);
 
                     if (state === 'unstable') {
-                         setInterval(() => glitchLineElement(line), 100);
-
                         if (!unstableMode) {
+                            unstableGlitches.push(setInterval(() => glitchLineElement(line), glitchInterval));
+                            console.log(unstableGlitches);
                             toggleUnstableMode();
                         }
                     }
@@ -912,6 +913,8 @@ and what might have been.
             }
         });
 
+        unstableGlitches.forEach(interval => clearInterval(interval));
+
         // restore original text
         output.querySelectorAll('div').forEach(line => {
             if (line.getAttribute('data-original')) {
@@ -921,6 +924,7 @@ and what might have been.
         });
 
         stopAwarenessGlitch();
+        unstableGlitches = [];
         awarenessGlitchInterval = null;
     }
 
@@ -975,7 +979,6 @@ and what might have been.
     }
 
     function toggleUnstableMode() {
-        console.log(1);
         if (minimalMode) return;
         if (sudoMode) toggleSudoMode();
 
@@ -989,12 +992,14 @@ and what might have been.
 
         printStateMessage();
         glitchAwarenessText();
-        unstableLoop();
+        requestAnimationFrame(unstableLoop);
 
         localStorage.setItem('unstablemode', 'true');
     }
 
     function unstableLoop(timestamp) {
+        if (!unstableMode) return;
+        
         if (timestamp - lastGlitchTime <= glitchInterval) {
             requestAnimationFrame(unstableLoop);
             return;
