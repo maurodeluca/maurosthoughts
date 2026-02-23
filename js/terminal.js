@@ -54,7 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (localStorage.getItem('unstablemode') === 'true') {
         unstableMode = false;
         toggleUnstableMode();
-        requestAnimationFrame(toggleUnstableMode);
     }
     if (localStorage.getItem('sudomode') === 'true') {
         sudoMode = false;
@@ -163,7 +162,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                         glitchLineElement(line);
                         if (localStorage.getItem('unstablemode') === 'false') {
                             toggleUnstableMode();
-                            requestAnimationFrame(toggleUnstableMode);
                     }
 
                     resolve();
@@ -193,7 +191,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (localStorage.getItem('unstablemode') === 'true') {
             unstableMode = false; // temporarily allow toggling sudo mode on page load;
             toggleUnstableMode();
-            requestAnimationFrame(toggleUnstableMode();
         }
         printStateMessage();
         await print("booting consciousness...", 20);
@@ -989,7 +986,12 @@ and what might have been.
 
         printStateMessage();
         glitchAwarenessText();
+        unstableLoop();
+        
+        localStorage.setItem('unstablemode', 'true');
+    }
 
+    function unstableLoop() {
         // start glitching all existing lines
         const lines = output.querySelectorAll('div');
         lines.forEach(line => {
@@ -1006,9 +1008,8 @@ and what might have been.
         typedDivs.forEach(div => {
             glitchLineElement(div);
         });
-
-        localStorage.setItem('unstablemode', 'true');
-        requestAnimationFrame(toggleUnstableMode);
+        
+        requestAnimationFrame(unstableLoop);
     }
 
     async function toggleMinimalMode(verbose) {
