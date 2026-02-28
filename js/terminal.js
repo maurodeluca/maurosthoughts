@@ -634,9 +634,9 @@ function computeAwareness() {
             awareness = Math.max(awareness, awareness + 25);
         else {
             awareness =
-                Math.sqrt(uniqueCommands) * 4 +
+                Math.sqrt(uniqueCommands) * 1.5 +
                 (sessionLength / 60) +
-                (reflectionCount * 5) +
+                (reflectionCount * 2.5) +
                 (controlAttempts * 1.5);
         }
         if (minimalMode) awareness = Math.max(0, Math.min(75, awareness));
@@ -648,9 +648,9 @@ function computeAwareness() {
             awareness = Math.max(awareness, awareness + Math.abs(75 - awareness));
         else {
             awareness =
-                Math.sqrt(uniqueCommands) * 4 +
+                Math.sqrt(uniqueCommands) * 1.5 +
                 (sessionLength / 60) +
-                (reflectionCount * 5) +
+                (reflectionCount * 2.5) +
                 (controlAttempts * 1.5);
             awareness += 75;
         }
