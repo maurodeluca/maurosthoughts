@@ -3,22 +3,111 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Crab Nebula — M1</title>
+<title>maurosthoughts - crabnebulaM1</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #000; overflow: hidden; width: 100vw; height: 100vh; }
-  canvas { display: block; width: 100%; height: 100%; }
-  #info {
-    position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-    color: rgba(180,220,200,0.4); font-family: 'Courier New', monospace;
-    font-size: 11px; letter-spacing: 0.15em; text-align: center;
-    pointer-events: none; text-transform: uppercase;
-  }
+       :root {
+            --bg: #0a0a0a;
+            --accent: #8f0f1a;
+            --accent-soft: rgba(143, 15, 26, 0.45);
+            --text-muted: #c7b2b5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--bg);
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        #ui {
+            position: fixed;
+            bottom: 22px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.25em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            z-index: 10;
+            pointer-events: none;
+
+            color: var(--text-muted);
+
+            padding: 10px 18px;
+            border: 1px solid var(--accent-soft);
+            border-radius: 4px;
+
+            background: rgba(143, 15, 26, 0.08);
+            box-shadow: 0 0 18px rgba(143, 15, 26, 0.25);
+        }
+
+        #nav {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 20;
+            font-size: 4.0rem;
+            color: var(--text-muted);
+            /* above the canvas */
+            background: rgba(0, 0, 0, 0);
+        }
+
+        #nav a {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 1rem;
+            opacity: 0.6;
+        }
+
+        #nav a::before {
+            content: "↳ ";
+            opacity: 0.4;
+        }
+
+        #nav a:hover {
+            opacity: 1.0;
+        }
+
+        #info {
+            position: fixed;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(180, 200, 255, 0.45);
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            letter-spacing: 0.15em;
+            text-align: center;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
 </style>
 </head>
 <body>
+<nav id="nav" class="visible">
+    <a href="../../index.html">home</a>
+</nav>
 <canvas id="c"></canvas>
-<div id="info">Crab Nebula — M1 · Supernova Remnant · Scroll to zoom · Drag to orbit</div>
+<div id="info">Crab Nebula — M1 · Supernova Remnant</div>
+<div id="ui">· Scroll to zoom · Drag to orbit</div>
 
 <script type="module" src="/js/nebula.js"></script>
 </body>

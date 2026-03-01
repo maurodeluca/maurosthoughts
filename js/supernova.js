@@ -16,73 +16,71 @@ void main() {
 const STAR_FS = `
 precision highp float;
 varying vec2 vUv;
-uniform vec2 uRes;
-
+uniform vec2  uRes;
+uniform float uRadius; // new: radius of circular star field
 #define PI 3.14159265359
 
 float hash1(float n) { return fract(sin(n) * 43758.5453); }
 
-// Diffraction spike helper
 float spike(vec2 uv, float angle, float len, float w) {
-  float c = cos(angle), s = sin(angle);
-  vec2 r = vec2(c*uv.x + s*uv.y, -s*uv.x + c*uv.y);
-  float fade = (1.0 - clamp(r.x/len, 0.0, 1.0));
-  return smoothstep(w, 0.0, abs(r.y)) * fade * fade * step(0.0, r.x);
+    float c = cos(angle), s = sin(angle);
+    vec2 r = vec2(c*uv.x + s*uv.y, -s*uv.x + c*uv.y);
+    float fade = (1.0 - clamp(r.x/len, 0.0, 1.0));
+    return smoothstep(w, 0.0, abs(r.y)) * fade * fade * step(0.0, r.x);
 }
 
 vec3 starColor(float seed) {
-  float t = hash1(seed * 7.3);
-  if (t < 0.3) return vec3(0.9, 0.95, 1.0);   // blue-white
-  if (t < 0.6) return vec3(1.0, 0.97, 0.88);  // warm white
-  if (t < 0.8) return vec3(1.0, 0.7,  0.4);   // orange
-  return vec3(0.9, 0.4, 0.3);                  // red
+    float t = hash1(seed * 7.3);
+    if (t < 0.3) return vec3(0.9, 0.95, 1.0);
+    if (t < 0.6) return vec3(1.0, 0.97, 0.88);
+    if (t < 0.8) return vec3(1.0, 0.7, 0.4);
+    return vec3(0.9, 0.4, 0.3);
 }
 
 void main() {
-  // Map vUv to 2× the normal world space so rotation never hits the edges.
-  // At zoom=1 the screen diagonal reaches radius ≈1.41; covering [-2,2] gives
-  // comfortable margin for any drag angle.
-  vec2 uv = (vUv * 2.0 - 1.0) * 2.0;
-  uv.x *= uRes.x / uRes.y;
+    // Map vUv to [-2,2] space with aspect correction
+    vec2 uv = (vUv * 2.0 - 1.0) * 2.0;
+    uv.x *= uRes.x / uRes.y;
 
-  vec3 stars = vec3(0.0);
+    // Compute distance from center
+    float r = length(uv);
+    float circleMask = smoothstep(uRadius, uRadius - 0.05, r); // 0 outside, 1 inside
 
-  for (int i = 0; i < 10000; i++) {
-    float fi = float(i);
-    // Star position in [-1.5, 1.5]
-    vec2 sp = vec2(hash1(fi * 1.1) * 6.0 - 3.0,
-                   hash1(fi * 2.3) * 6.0 - 3.0);
-    sp.x *= uRes.x / uRes.y;
+    vec3 stars = vec3(0.0);
 
-    vec2 d    = uv - sp;
-    float dist = length(d);
-    float br  = hash1(fi * 0.7);
-    float sz  = 0.0003 + br * br * 0.002;
+    for (int i = 0; i < 10000; i++) {
+        float fi = float(i);
+        vec2 sp = vec2(hash1(fi * 1.1) * 6.0 - 3.0,
+                       hash1(fi * 2.3) * 6.0 - 3.0);
+        sp.x *= uRes.x / uRes.y;
 
-    // Core glow — early-out if far away to save ALU
-    if (dist > sz * 12.0 && br < 0.75) continue;
+        vec2 d = uv - sp;
+        float dist = length(d);
+        float br = hash1(fi * 0.7);
+        float sz = 0.0003 + br * br * 0.002;
 
-    float core = exp(-dist * dist / (sz * sz * 2.0));
-    vec3  sc   = starColor(fi);
+        if (dist > sz * 12.0 && br < 0.75) continue;
 
-    // Diffraction spikes for brighter stars
-    if (br > 0.75) {
-      float slen = 0.012 + br * 0.035;
-      float sw   = 0.0008;
-      float spk  = (spike(d, 0.0,        slen,       sw) +
-                    spike(d, PI,          slen,       sw) +
-                    spike(d, PI * 0.5,    slen,       sw) +
-                    spike(d, PI * 1.5,    slen,       sw)) * br * br
-                 + (spike(d, PI * 0.25,   slen * 0.6, sw * 0.7) +
-                    spike(d, PI * 0.75,   slen * 0.6, sw * 0.7) +
-                    spike(d, PI * 1.25,   slen * 0.6, sw * 0.7) +
-                    spike(d, PI * 1.75,   slen * 0.6, sw * 0.7)) * br * 0.5;
-      stars += sc * spk * (0.3 + br * 0.7);
+        float core = exp(-dist * dist / (sz * sz * 2.0));
+        vec3 sc = starColor(fi);
+
+        if (br > 0.75) {
+            float slen = 0.012 + br * 0.035;
+            float sw = 0.0008;
+            float spk = (spike(d, 0.0, slen, sw) +
+                         spike(d, PI, slen, sw) +
+                         spike(d, PI * 0.5, slen, sw) +
+                         spike(d, PI * 1.5, slen, sw)) * br * br
+                      + (spike(d, PI * 0.25, slen*0.6, sw*0.7) +
+                         spike(d, PI * 0.75, slen*0.6, sw*0.7) +
+                         spike(d, PI * 1.25, slen*0.6, sw*0.7) +
+                         spike(d, PI * 1.75, slen*0.6, sw*0.7)) * br * 0.5;
+            stars += sc * spk * (0.3 + br*0.7);
+        }
+        stars += sc * core * (0.5 + br*0.5);
     }
-    stars += sc * core * (0.5 + br * 0.5);
-  }
 
-  gl_FragColor = vec4(stars, 1.0);
+    gl_FragColor = vec4(stars * circleMask, 1.0); // apply circular mask
 }`;
 
 // ─── PASS 2: Main SNR shader ──────────────────────────────────────────────────
@@ -370,8 +368,11 @@ function resize() {
   canvas.height = Math.floor(innerHeight * dpr * 0.5);
 
   // Star texture at half the main canvas size (quarter of the original area).
-  createStarFBO(Math.max(1, canvas.width  >> 1),
+  createStarFBO(Math.max(1, canvas.width >> 1),
                 Math.max(1, canvas.height >> 1));
+  const uRadiusLoc = gl.getUniformLocation(starProg, 'uRadius');
+  gl.useProgram(starProg);
+  gl.uniform1f(uRadiusLoc, 2); // adjust radius (smaller = smaller circle)
   bakeStars();
 }
 window.addEventListener('resize', resize);
@@ -385,7 +386,7 @@ const uAngle = gl.getUniformLocation(mainProg, 'uAngle');
 const uStarTex = gl.getUniformLocation(mainProg, 'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom  = 1.0;
+let zoom  = 0.5;
 let angle = 0.0;
 let drag  = false, px = 0, py = 0;
 let velAngle = 0;
@@ -400,7 +401,7 @@ window.addEventListener('mousemove', e => {
   px = e.clientX; py = e.clientY;
 });
 canvas.addEventListener('wheel', e => {
-  zoom = Math.max(0.4, Math.min(6, zoom * (1 - e.deltaY * 0.001)));
+  zoom = Math.max(0.4, Math.min(4, zoom * (1 - e.deltaY * 0.001)));
   e.preventDefault();
 }, { passive: false });
 

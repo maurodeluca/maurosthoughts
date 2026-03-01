@@ -393,7 +393,7 @@ const uAngle = gl.getUniformLocation(mainProg, 'uAngle');
 const uStarTex = gl.getUniformLocation(mainProg, 'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom  = 1.0;
+let zoom  = 0.7;
 let angle = 0.0;
 let drag  = false, px = 0, py = 0;
 let velAngle = 0;
