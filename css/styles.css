@@ -474,6 +474,27 @@ nav a:hover {
   }
 }
 
+.simulation-grid {
+  display:flex; 
+  justify-content:center; 
+  flex-wrap:nowrap;
+}
+
+.simulation-card {
+  display:flex;
+  flex-direction:column; 
+  align-items:center; 
+  justify-content:center; 
+  width:300px; 
+  height:180px; 
+  text-decoration:none; 
+  color:inherit; 
+  border-radius:8px; 
+  overflow:hidden; 
+  background:#000; 
+  position:relative;
+}
+
 @media (max-width: 480px) {
 
   .terminal-window,
@@ -536,6 +557,10 @@ nav a:hover {
   #terminal-output {
     white-space: pre;
     overflow-x: auto;
+  }
+
+  .simulation-grid {
+    flex-wrap: wrap;
   }
 }
 
