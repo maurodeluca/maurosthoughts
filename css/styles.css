@@ -2,6 +2,7 @@
   --bg: #0d0d0d;
   --text: #f5f5f5;
   --accent: #b11212;
+  --accent-soft: rgba(143, 15, 26, 0.45);
   --muted: #888;
   --terminal-bg: #111;
   --terminal-border: #b11212;
@@ -159,7 +160,8 @@ h1 {
 }
 
 h1 .space {
-  font-size: 0; /* space exists for wrapping, but invisible */
+  font-size: 0;
+  /* space exists for wrapping, but invisible */
 }
 
 h2 {
@@ -473,16 +475,17 @@ nav a:hover {
 }
 
 @media (max-width: 480px) {
-    .terminal-window,
-    #terminal-output,
-    #terminal-input {
-        font-size: 11px;
-    }
-    
-    #terminal-output {
-        white-space: pre;
-        overflow-x: auto;
-    }
+
+  .terminal-window,
+  #terminal-output,
+  #terminal-input {
+    font-size: 11px;
+  }
+
+  #terminal-output {
+    white-space: pre;
+    overflow-x: auto;
+  }
 }
 
 @media (max-width: 768px) {
@@ -517,23 +520,23 @@ nav a:hover {
     right: 18px;
     opacity: 0.7;
   }
-  
+
   .terminal-window {
-        font-size: 13px;
-    }
+    font-size: 13px;
+  }
 
-    #terminal-output {
-        font-size: 13px;
-    }
+  #terminal-output {
+    font-size: 13px;
+  }
 
-    #terminal-input {
-        font-size: 13px;
-    }
-    
-    #terminal-output {
-        white-space: pre;
-        overflow-x: auto;
-    }
+  #terminal-input {
+    font-size: 13px;
+  }
+
+  #terminal-output {
+    white-space: pre;
+    overflow-x: auto;
+  }
 }
 
 @supports (-webkit-touch-callout: none) {
@@ -657,8 +660,10 @@ footer.copyright p {
 .radio-player {
   position: fixed;
   bottom: 25px;
-  left: 5px;       /* fix to the left side */
-  transform: none;  /* remove the translateX centering */
+  left: 5px;
+  /* fix to the left side */
+  transform: none;
+  /* remove the translateX centering */
   align-items: center;
   width: fit-content;
   background: rgba(8, 8, 8, 0.9);
@@ -874,11 +879,13 @@ footer.copyright p {
 .radio-player.minimized .radio-progress,
 .radio-player.minimized .radio-volume,
 .radio-player.minimized .radio-right {
-  display: none; /* hide everything except controls */
+  display: none;
+  /* hide everything except controls */
 }
 
 .radio-player.minimized .radio-controls-compact button#radio-minimize {
-  display: inline-block; /* keep minimize button visible */
+  display: inline-block;
+  /* keep minimize button visible */
 }
 
 .audio-icon {
@@ -975,15 +982,15 @@ footer.copyright p {
 }
 
 .terminal-window.godmode-glow {
-    box-shadow: 0 0 20px 5px rgba(255, 255, 0, 0.7);
-    transition: box-shadow 0.5s ease-in-out;
-    animation: pulseGoldBox 2s infinite alternate;
+  box-shadow: 0 0 20px 5px rgba(255, 255, 0, 0.7);
+  transition: box-shadow 0.5s ease-in-out;
+  animation: pulseGoldBox 2s infinite alternate;
 }
 
 .terminal-window.sudomode-glow {
-    box-shadow: 0 0 20px 5px rgba(0, 255, 9, 0.7);
-    transition: box-shadow 0.5s ease-in-out;
-    animation: pulseGreenBox 2s infinite alternate;
+  box-shadow: 0 0 20px 5px rgba(0, 255, 9, 0.7);
+  transition: box-shadow 0.5s ease-in-out;
+  animation: pulseGreenBox 2s infinite alternate;
 }
 
 /* Global glow effect */
@@ -1009,7 +1016,7 @@ body.sudomode {
   overflow: hidden;
 }
 
-body.godmode *  {
+body.godmode * {
   color: gold;
 }
 
@@ -1024,13 +1031,11 @@ body.godmode::before {
   pointer-events: none;
   z-index: 9999;
 
-  background: radial-gradient(
-    circle at center,
-    rgba(255, 255, 0, 0.35) 0%,
-    rgba(255, 255, 0, 0.15) 20%,
-    rgba(255, 255, 0, 0.05) 40%,
-    transparent 100%
-  );
+  background: radial-gradient(circle at center,
+      rgba(255, 255, 0, 0.35) 0%,
+      rgba(255, 255, 0, 0.15) 20%,
+      rgba(255, 255, 0, 0.05) 40%,
+      transparent 100%);
 
   animation: sudoGlow 2s ease-in-out infinite alternate;
 }
@@ -1042,13 +1047,11 @@ body.sudomode::before {
   pointer-events: none;
   z-index: 9999;
 
-  background: radial-gradient(
-    circle at center,
-    rgba(0, 255, 120, 0.35) 0%,
-    rgba(0, 255, 120, 0.15) 20%,
-    rgba(0, 255, 120, 0.05) 40%,
-    transparent 100%
-  );
+  background: radial-gradient(circle at center,
+      rgba(0, 255, 120, 0.35) 0%,
+      rgba(0, 255, 120, 0.15) 20%,
+      rgba(0, 255, 120, 0.05) 40%,
+      transparent 100%);
 
   animation: sudoGlow 2s ease-in-out infinite alternate;
 }
@@ -1057,9 +1060,11 @@ body.sudomode::before {
   0% {
     text-shadow: 0 0 5px gold, 0 0 10px gold;
   }
+
   50% {
     text-shadow: 0 0 15px gold, 0 0 25px gold;
   }
+
   100% {
     text-shadow: 0 0 5px gold, 0 0 10px gold;
   }
@@ -1069,9 +1074,11 @@ body.sudomode::before {
   0% {
     box-shadow: 0 0 5px gold, 0 0 10px gold;
   }
+
   50% {
     box-shadow: 0 0 15px gold, 0 0 25px gold;
   }
+
   100% {
     box-shadow: 0 0 5px gold, 0 0 10px gold;
   }
@@ -1082,6 +1089,7 @@ body.sudomode::before {
     opacity: 0.6;
     filter: blur(20px);
   }
+
   to {
     opacity: 1;
     filter: blur(40px);
@@ -1092,9 +1100,11 @@ body.sudomode::before {
   0% {
     text-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
   }
+
   50% {
     text-shadow: 0 0 15px rgba(0, 255, 9), 0 0 25px rgba(0, 255, 9);
   }
+
   100% {
     text-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
   }
@@ -1104,49 +1114,51 @@ body.sudomode::before {
   0% {
     box-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
   }
+
   50% {
     box-shadow: 0 0 15px rgba(0, 255, 9), 0 0 25px rgba(0, 255, 9);
   }
+
   100% {
     box-shadow: 0 0 5px rgba(0, 255, 9), 0 0 10px rgba(0, 255, 9);
   }
 }
 
 body.minimal-mode * {
-    background: black !important;
-    color: white !important;
-    font-family: monospace !important;
-    font-weight: normal !important;
-    text-shadow: none !important;
+  background: black !important;
+  color: white !important;
+  font-family: monospace !important;
+  font-weight: normal !important;
+  text-shadow: none !important;
 }
 
 body.minimal-mode .terminal-window,
 body.minimal-mode .overlay,
 body.minimal-mode #terminal-output,
 body.minimal-mode #terminal-input {
-    background: black !important;
-    color: white !important;
-    border: none !important;
-    box-shadow: none !important;
+  background: black !important;
+  color: white !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 
 .snake-grid {
-    white-space: pre;
-    line-height: 1;
+  white-space: pre;
+  line-height: 1;
 }
 
 .snake-grid .empty {
-    opacity: 0.2;
+  opacity: 0.2;
 }
 
 .snake-grid .snake {
-    opacity: 1;
+  opacity: 1;
 }
 
 .snake-grid .apple {
-    opacity: 1;
-    color: var(--accent);
+  opacity: 1;
+  color: var(--accent);
 }
 
 #lifeCanvas {
@@ -1155,7 +1167,9 @@ body.minimal-mode #terminal-input {
   left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: -9999;       /* behind everything */
+  z-index: -9999;
+  /* behind everything */
   opacity: 0.5;
-  pointer-events: none; /* let clicks pass through */
+  pointer-events: none;
+  /* let clicks pass through */
 }
