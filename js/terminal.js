@@ -621,8 +621,8 @@ function computeAwareness() {
         awareness =
             Math.sqrt(uniqueCommands) * 1.5 +
             (sessionLength / 60) +
-            (reflectionCount * 2.5) +
-            (controlAttempts * 1.5);
+            (Math.sqrt(reflectionCount) * 1.5) +
+            (Math.sqrt(controlAttempts) * 1.5);
 
         if (minimalMode) awareness = Math.max(0, Math.min(75, awareness));
         else if (privileged) awareness = Math.max(0, Math.min(100, awareness));
@@ -630,14 +630,16 @@ function computeAwareness() {
     }
 
     if (isAscended && !isTranscended) {
-        if (awareness < 25)
+        if (awareness < 25) {
             awareness = Math.max(awareness, awareness + 25);
+        }
         else {
             awareness =
                 Math.sqrt(uniqueCommands) * 1.5 +
                 (sessionLength / 60) +
-                (reflectionCount * 2.5) +
-                (controlAttempts * 1.5);
+                (Math.sqrt(reflectionCount) * 1.5) +
+                (Math.sqrt(controlAttempts) * 1.5);
+                awareness += 25;
         }
         if (minimalMode) awareness = Math.max(0, Math.min(75, awareness));
         else if (privileged) awareness = Math.max(0, Math.min(100, awareness));
@@ -650,14 +652,15 @@ function computeAwareness() {
             awareness =
                 Math.sqrt(uniqueCommands) * 1.5 +
                 (sessionLength / 60) +
-                (reflectionCount * 2.5) +
-                (controlAttempts * 1.5);
+                (Math.sqrt(reflectionCount) * 1.5) +
+                (Math.sqrt(controlAttempts) * 1.5);
             awareness += 75;
         }
         if (minimalMode) awareness = Math.max(0, Math.min(75, awareness));
         else if (privileged) awareness = Math.max(0, Math.min(100, awareness));
         else awareness = Math.max(0, Math.min(50, awareness));
     }
+    localStorage.setItem('awareness', awareness);
 }
 
 async function handleCommand(cmd) {
