@@ -57,10 +57,42 @@
       background: rgba(143, 15, 26, 0.08);
       box-shadow: 0 0 18px rgba(143, 15, 26, 0.25);
     }
+
+    #nav {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 20;
+      font-size: 4.0rem;
+      color: var(--text-muted);
+      /* above the canvas */
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    #nav a {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      text-decoration: none;
+      font-size: 1rem;
+      opacity: 0.6;
+    }
+
+    #nav a::before {
+      content: "↳ ";
+      opacity: 0.4;
+    }
+
+    #nav a:hover {
+      opacity: 1.0;
+    }
   </style>
 </head>
 
 <body>
+  <nav id="nav" class="visible">
+    <a href="../../index.html">home</a>
+  </nav>
   <canvas id="glCanvas"></canvas>
   <div id="ui">Drag to orbit &nbsp;·&nbsp; Scroll to zoom</div>
   <script type="module" src="/js/blackhole.js"></script>
