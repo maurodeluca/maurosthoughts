@@ -310,17 +310,6 @@ gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 gl.bindFramebuffer(gl.FRAMEBUFFER,null);
 }
 
-// ─── Resize ───────────────────────────────────────────────────────────────────
-function resize() {
-const dpr = Math.min(devicePixelRatio, 1.5);
-canvas.width  = Math.floor(innerWidth  * 0.5);
-canvas.height = Math.floor(innerHeight * 0.5);
-createStarFBO(Math.max(1,canvas.width>>2), Math.max(1,canvas.height>>2));
-bakeStars();
-}
-window.addEventListener('resize', resize);
-resize();
-
 // ─── Uniform locations ────────────────────────────────────────────────────────
 const uRes    = gl.getUniformLocation(mainProg,'uRes');
 const uTime   = gl.getUniformLocation(mainProg,'uTime');
@@ -329,7 +318,7 @@ const uAngle  = gl.getUniformLocation(mainProg,'uAngle');
 const uStarTx = gl.getUniformLocation(mainProg,'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom=0.5, angle=0.0, drag=false, px=0, py=0, velAngle=0;
+let zoom=0.4, angle=0.0, drag=false, px=0, py=0, velAngle=0;
 
 canvas.addEventListener('mousedown', e=>{drag=true;px=e.clientX;py=e.clientY;velAngle=0;});
 window.addEventListener('mouseup',   ()=>drag=false);
@@ -382,4 +371,16 @@ gl.uniform1i(uStarTx,0);
 
 gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
 }
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+function resize() {
+const dpr = Math.min(devicePixelRatio, 1.5);
+canvas.width  = Math.floor(innerWidth  * 0.5);
+canvas.height = Math.floor(innerHeight * 0.5);
+createStarFBO(Math.max(1,canvas.width>>2), Math.max(1,canvas.height>>2));
+bakeStars();
+frame();
+}
+window.addEventListener('resize', resize);
+resize();
 frame();

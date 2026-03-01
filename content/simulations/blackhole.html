@@ -5,88 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>maurosthoughts - gargantua</title>
-  <style>
-    :root {
-      --bg: #0a0a0a;
-      --accent: #8f0f1a;
-      --accent-soft: rgba(143, 15, 26, 0.45);
-      --text-muted: #c7b2b5;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: var(--bg);
-      overflow: hidden;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    canvas {
-      display: block;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-    }
-
-    #ui {
-      position: fixed;
-      bottom: 22px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'Courier New', monospace;
-      font-size: 11px;
-      letter-spacing: 0.25em;
-      text-transform: uppercase;
-      white-space: nowrap;
-      z-index: 10;
-      pointer-events: none;
-
-      color: var(--text-muted);
-
-      padding: 10px 18px;
-      border: 1px solid var(--accent-soft);
-      border-radius: 4px;
-
-      background: rgba(143, 15, 26, 0.08);
-      box-shadow: 0 0 18px rgba(143, 15, 26, 0.25);
-    }
-
-    #nav {
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 20;
-      font-size: 4.0rem;
-      color: var(--text-muted);
-      /* above the canvas */
-      background: rgba(0, 0, 0, 0.5);
-    }
-
-    #nav a {
-      display: block;
-      margin-bottom: 6px;
-      color: var(--text);
-      text-decoration: none;
-      font-size: 1rem;
-      opacity: 0.6;
-    }
-
-    #nav a::before {
-      content: "↳ ";
-      opacity: 0.4;
-    }
-
-    #nav a:hover {
-      opacity: 1.0;
-    }
-  </style>
+  <link rel="stylesheet" href="/css/simulations.css">
 </head>
 
 <body>
@@ -114,6 +33,9 @@
     </div>
     <input class="radio-volume" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="Volume">
   </div>
+  <footer class="copyright">
+    <p>&copy; 2026 maurosthoughts. all rights reserved.</p>
+  </footer>
   <script type="module" src="/js/blackhole.js"></script>
   <script type="module" src="/js/radio.js"></script>
 </body>

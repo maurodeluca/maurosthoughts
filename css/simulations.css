@@ -1,0 +1,358 @@
+:root {
+  --bg: #0a0a0a;
+  --text: #f5f5f5;
+  --accent: #8f0f1a;
+  --accent-soft: rgba(143, 15, 26, 0.45);
+  --text-muted: #c7b2b5;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg);
+  overflow: hidden;
+  width: 100vw;
+  height: 100vh;
+}
+
+canvas {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#ui {
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+
+  color: var(--text-muted);
+
+  padding: 10px 18px;
+  border: 1px solid var(--accent-soft);
+  border-radius: 4px;
+
+  background: rgba(143, 15, 26, 0.08);
+  box-shadow: 0 0 18px rgba(143, 15, 26, 0.25);
+}
+
+#nav {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 20;
+  font-size: 4.0rem;
+  color: var(--text-muted);
+  /* above the canvas */
+  background: rgba(0, 0, 0, 0);
+}
+
+#nav a {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+#nav a::before {
+  content: "↳ ";
+  opacity: 0.4;
+}
+
+#nav a:hover {
+  opacity: 1.0;
+}
+
+/* Radio player */
+.radio-player {
+  position: fixed;
+  bottom: 25px;
+  left: 5px;
+  /* fix to the left side */
+  transform: none;
+  /* remove the translateX centering */
+  align-items: center;
+  width: fit-content;
+  background: rgba(8, 8, 8, 0.9);
+  border: 1px solid rgba(177, 18, 18, 0.12);
+  color: var(--text);
+  padding: 4px 12px;
+  padding-right: 0.5rem;
+  border-radius: 8px;
+  display: flex;
+  gap: 10px;
+  z-index: 999;
+  backdrop-filter: blur(6px);
+}
+
+
+.radio-player .radio-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.radio-title {
+  font-size: 0.95rem;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  padding: 6px 8px;
+  margin-right: 4px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.radio-controls button:hover {
+  opacity: 0.95;
+}
+
+/* compact controls used in the minimal UI */
+.radio-controls-compact {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.radio-controls-compact button {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  padding: 8px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.radio-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.radio-progress {
+  width: 160px;
+  height: 6px;
+  background: rgba(177, 18, 18, 0.001);
+  border-radius: 6px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.3s ease, fill 0.3s ease;
+}
+
+.radio-progress-fill {
+  width: 0%;
+  height: 100%;
+  background: rgba(177, 18, 18, 0.001);
+  transition: transform 0.3s ease, fill 0.3s ease;
+}
+
+.radio-progress.live {
+  cursor: default;
+}
+
+.radio-progress.live .radio-progress-fill {
+  transition: transform 0.3s ease, fill 0.3s ease;
+  animation: pulse 1.6s infinite;
+}
+
+/* default live state (paused) */
+.radio-progress.live .radio-progress-fill {
+  background: white;
+  animation: none;
+}
+
+/* only pulse when actively playing */
+.radio-player.playing .radio-progress.live .radio-progress-fill {
+  transition: transform 0.3s ease, fill 0.3s ease;
+  background: var(--accent);
+  animation: pulse 1.6s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scaleX(1);
+    opacity: 0.9;
+  }
+
+  50% {
+    transform: scaleX(0.96);
+    opacity: 0.6;
+  }
+
+  100% {
+    transform: scaleX(1);
+    opacity: 0.9;
+  }
+}
+
+.radio-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.radio-time {
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-width: 72px;
+  text-align: right;
+}
+
+.radio-volume {
+  width: 80px;
+}
+
+/* Volume slider: red track and thumb */
+.radio-volume {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 6px;
+  outline: none;
+  padding: 0;
+}
+
+.radio-volume::-webkit-slider-runnable-track {
+  height: 6px;
+  background: rgba(177, 18, 18, 0.25);
+  border-radius: 6px;
+}
+
+.radio-volume::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  margin-top: -4px;
+  box-shadow: 0 0 0 4px rgba(177, 18, 18, 0.12);
+  cursor: pointer;
+}
+
+.radio-volume::-moz-range-track {
+  height: 6px;
+  background: rgba(177, 18, 18, 0.25);
+  border-radius: 6px;
+}
+
+.radio-volume::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--accent);
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+}
+
+.music-icon {
+  display: inline-block;
+  margin-right: 4px;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+  transition: transform 0.3s ease, fill 0.3s ease;
+}
+
+/* pulsing while playing */
+.radio-player.playing .music-icon {
+  animation: pulse 1.6s infinite;
+  fill: var(--accent);
+  /* red while playing */
+}
+
+/* white when paused */
+.radio-player:not(.playing) .music-icon {
+  fill: white;
+}
+
+/* Minimized radio */
+.radio-player.minimized {
+  padding: 4px 8px;
+  gap: 6px;
+  width: auto;
+  height: auto;
+}
+
+.radio-player.minimized .radio-title,
+.radio-player.minimized .radio-progress,
+.radio-player.minimized .radio-volume,
+.radio-player.minimized .radio-right {
+  display: none;
+  /* hide everything except controls */
+}
+
+.radio-player.minimized .radio-controls-compact button#radio-minimize {
+  display: inline-block;
+  /* keep minimize button visible */
+}
+
+.audio-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  fill: white;
+  transition: transform 0.3s ease, fill 0.3s ease;
+}
+
+.audio-icon.playing svg {
+  fill: var(--accent);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .radio-player {
+    display: flex;
+    width: auto;
+    max-width: 100%;
+    z-index: 1;
+  }
+
+  .radio-player .radio-volume {
+    display: none;
+  }
+}
+
+footer.copyright {
+  position: fixed;
+  bottom: 0px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  background: rgba(13, 13, 13, 0.95);
+  border-top: 1px solid var(--accent);
+  padding: 0px 10vw;
+  color: var(--text-muted);
+  z-index: 999;
+}
+
+footer.copyright p {
+  margin: 0;
+  font-size: 0.7rem;
+}

@@ -359,25 +359,6 @@ function bakeStars() {
   gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
-// ─── Resize ───────────────────────────────────────────────────────────────────
-function resize() {
-  // Cap dpr at 1.5 (was 2). Combined with the 0.5 multiplier this gives
-  // at most 0.75× physical pixels — visually identical, much cheaper.
-  const dpr = Math.min(devicePixelRatio, 1.5);
-  canvas.width  = Math.floor(innerWidth  * dpr * 0.5);
-  canvas.height = Math.floor(innerHeight * dpr * 0.5);
-
-  // Star texture at half the main canvas size (quarter of the original area).
-  createStarFBO(Math.max(1, canvas.width >> 1),
-                Math.max(1, canvas.height >> 1));
-  const uRadiusLoc = gl.getUniformLocation(starProg, 'uRadius');
-  gl.useProgram(starProg);
-  gl.uniform1f(uRadiusLoc, 2); // adjust radius (smaller = smaller circle)
-  bakeStars();
-}
-window.addEventListener('resize', resize);
-resize();
-
 // ─── Main uniform locations ───────────────────────────────────────────────────
 const uRes   = gl.getUniformLocation(mainProg, 'uRes');
 const uTime  = gl.getUniformLocation(mainProg, 'uTime');
@@ -452,4 +433,25 @@ function frame() {
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
+
+
+// ─── Resize ───────────────────────────────────────────────────────────────────
+function resize() {
+  // Cap dpr at 1.5 (was 2). Combined with the 0.5 multiplier this gives
+  // at most 0.75× physical pixels — visually identical, much cheaper.
+  const dpr = Math.min(devicePixelRatio, 1.5);
+  canvas.width  = Math.floor(innerWidth  * dpr * 0.5);
+  canvas.height = Math.floor(innerHeight * dpr * 0.5);
+
+  // Star texture at half the main canvas size (quarter of the original area).
+  createStarFBO(Math.max(1, canvas.width >> 1),
+                Math.max(1, canvas.height >> 1));
+  const uRadiusLoc = gl.getUniformLocation(starProg, 'uRadius');
+  gl.useProgram(starProg);
+  gl.uniform1f(uRadiusLoc, 2); // adjust radius (smaller = smaller circle)
+  bakeStars();
+  frame();
+}
+window.addEventListener('resize', resize);
+resize();
 frame();

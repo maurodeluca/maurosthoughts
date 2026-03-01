@@ -231,18 +231,18 @@ void main() {
 
 // ─── GL helpers ──────────────────────────────────────────────────────────────
 function mkShader(src, type) {
-const s = gl.createShader(type);
-gl.shaderSource(s, src); gl.compileShader(s);
-if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
-return s;
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s);
+    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+    return s;
 }
 function mkProg(vs, fs) {
-const p = gl.createProgram();
-gl.attachShader(p, mkShader(vs, gl.VERTEX_SHADER));
-gl.attachShader(p, mkShader(fs, gl.FRAGMENT_SHADER));
-gl.linkProgram(p);
-if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p));
-return p;
+    const p = gl.createProgram();
+    gl.attachShader(p, mkShader(vs, gl.VERTEX_SHADER));
+    gl.attachShader(p, mkShader(fs, gl.FRAGMENT_SHADER));
+    gl.linkProgram(p);
+    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p));
+    return p;
 }
 
 const starProg = mkProg(QUAD_VS, STAR_FS);
@@ -250,116 +250,125 @@ const mainProg = mkProg(QUAD_VS, MAIN_FS);
 
 const quadBuf = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,1,1]), gl.STATIC_DRAW);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
 
 function bindQuad(prog) {
-gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
-const l = gl.getAttribLocation(prog, 'aPos');
-gl.enableVertexAttribArray(l);
-gl.vertexAttribPointer(l, 2, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
+    const l = gl.getAttribLocation(prog, 'aPos');
+    gl.enableVertexAttribArray(l);
+    gl.vertexAttribPointer(l, 2, gl.FLOAT, false, 0, 0);
 }
 
 // ─── Star FBO ─────────────────────────────────────────────────────────────────
-let starFBO=null, starTex=null, starW=0, starH=0;
+let starFBO = null, starTex = null, starW = 0, starH = 0;
 
 function createStarFBO(w, h) {
-if (starTex) gl.deleteTexture(starTex);
-if (starFBO) gl.deleteFramebuffer(starFBO);
-starW=w; starH=h;
-starTex = gl.createTexture();
-gl.bindTexture(gl.TEXTURE_2D, starTex);
-gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);
-gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
-starFBO = gl.createFramebuffer();
-gl.bindFramebuffer(gl.FRAMEBUFFER,starFBO);
-gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,starTex,0);
-gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+    if (starTex) gl.deleteTexture(starTex);
+    if (starFBO) gl.deleteFramebuffer(starFBO);
+    starW = w; starH = h;
+    starTex = gl.createTexture();
+    gl.bindTexture(gl.TEXTURE_2D, starTex);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+    starFBO = gl.createFramebuffer();
+    gl.bindFramebuffer(gl.FRAMEBUFFER, starFBO);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, starTex, 0);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
 function bakeStars() {
-gl.bindFramebuffer(gl.FRAMEBUFFER, starFBO);
-gl.viewport(0,0,starW,starH);
-gl.useProgram(starProg);
-bindQuad(starProg);
-gl.uniform2f(gl.getUniformLocation(starProg,'uRes'), starW, starH);
-gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, starFBO);
+    gl.viewport(0, 0, starW, starH);
+    gl.useProgram(starProg);
+    bindQuad(starProg);
+    gl.uniform2f(gl.getUniformLocation(starProg, 'uRes'), starW, starH);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 }
 
 // ─── Resize ───────────────────────────────────────────────────────────────────
 function resize() {
-const dpr = Math.min(devicePixelRatio, 1.5);
-canvas.width  = Math.floor(innerWidth  * dpr * 0.5);
-canvas.height = Math.floor(innerHeight * dpr * 0.5);
-createStarFBO(Math.max(1,canvas.width>>1), Math.max(1,canvas.height>>1));
-bakeStars();
+    const dpr = window.devicePixelRatio || 1;
+    const displayWidth = Math.floor(canvas.clientWidth * dpr);
+    const displayHeight = Math.floor(canvas.clientHeight * dpr);
+
+    if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+        canvas.width = displayWidth;
+        canvas.height = displayHeight;
+    }
+    createStarFBO(Math.max(1, canvas.width >> 1), Math.max(1, canvas.height >> 1));
+    bakeStars();
+    frame();
+    gl.viewport(0, 0, canvas.width, canvas.height);
 }
+
 window.addEventListener('resize', () => {
-resize();
+    resize();
+    frame();
 });
 
 // ─── Uniform locations ────────────────────────────────────────────────────────
-const uRes    = gl.getUniformLocation(mainProg,'uRes');
-const uTime   = gl.getUniformLocation(mainProg,'uTime');
-const uZoom   = gl.getUniformLocation(mainProg,'uZoom');
-const uAngle  = gl.getUniformLocation(mainProg,'uAngle');
-const uStarTx = gl.getUniformLocation(mainProg,'uStarTex');
+const uRes = gl.getUniformLocation(mainProg, 'uRes');
+const uTime = gl.getUniformLocation(mainProg, 'uTime');
+const uZoom = gl.getUniformLocation(mainProg, 'uZoom');
+const uAngle = gl.getUniformLocation(mainProg, 'uAngle');
+const uStarTx = gl.getUniformLocation(mainProg, 'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom=0.7, angle=0.0, drag=false, px=0, py=0, velAngle=0;
+let zoom = 0.7, angle = 0.0, drag = false, px = 0, py = 0, velAngle = 0;
 
-canvas.addEventListener('mousedown', e=>{drag=true;px=e.clientX;py=e.clientY;velAngle=0;});
-window.addEventListener('mouseup',   ()=>drag=false);
-window.addEventListener('mousemove', e=>{
-if(!drag) return;
-const delta=((e.clientX-px)/innerWidth)*Math.PI*2.5;
-velAngle=delta; angle+=delta; px=e.clientX; py=e.clientY;
+canvas.addEventListener('mousedown', e => { drag = true; px = e.clientX; py = e.clientY; velAngle = 0; });
+window.addEventListener('mouseup', () => drag = false);
+window.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const delta = ((e.clientX - px) / innerWidth) * Math.PI * 2.5;
+    velAngle = delta; angle += delta; px = e.clientX; py = e.clientY;
 });
-canvas.addEventListener('wheel',e=>{
-zoom=Math.max(0.4,Math.min(6,zoom*(1-e.deltaY*0.001)));
-e.preventDefault();
-},{passive:false});
+canvas.addEventListener('wheel', e => {
+    zoom = Math.max(0.4, Math.min(6, zoom * (1 - e.deltaY * 0.001)));
+    e.preventDefault();
+}, { passive: false });
 
-let lastTD=null;
-canvas.addEventListener('touchstart',e=>{
-if(e.touches.length===1){drag=true;px=e.touches[0].clientX;py=e.touches[0].clientY;velAngle=0;}
-if(e.touches.length===2) lastTD=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+let lastTD = null;
+canvas.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) { drag = true; px = e.touches[0].clientX; py = e.touches[0].clientY; velAngle = 0; }
+    if (e.touches.length === 2) lastTD = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
 });
-window.addEventListener('touchend',()=>{drag=false;lastTD=null;});
-window.addEventListener('touchmove',e=>{
-if(e.touches.length===1&&drag){
-    const delta=((e.touches[0].clientX-px)/innerWidth)*Math.PI*2.5;
-    velAngle=delta;angle+=delta;px=e.touches[0].clientX;py=e.touches[0].clientY;
-}
-if(e.touches.length===2&&lastTD){
-    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    zoom=Math.max(0.4,Math.min(6,zoom*d/lastTD)); lastTD=d;
-}
+window.addEventListener('touchend', () => { drag = false; lastTD = null; });
+window.addEventListener('touchmove', e => {
+    if (e.touches.length === 1 && drag) {
+        const delta = ((e.touches[0].clientX - px) / innerWidth) * Math.PI * 2.5;
+        velAngle = delta; angle += delta; px = e.touches[0].clientX; py = e.touches[0].clientY;
+    }
+    if (e.touches.length === 2 && lastTD) {
+        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+        zoom = Math.max(0.4, Math.min(6, zoom * d / lastTD)); lastTD = d;
+    }
 });
 
 // ─── Render loop ──────────────────────────────────────────────────────────────
-const t0=performance.now();
-function frame(){
-requestAnimationFrame(frame);
-const t=(performance.now()-t0)*0.001;
-if(!drag){angle+=velAngle;velAngle*=0.92;}
+const t0 = performance.now();
+function frame() {
+    requestAnimationFrame(frame);
+    const t = (performance.now() - t0) * 0.001;
+    if (!drag) { angle += velAngle; velAngle *= 0.92; }
 
-gl.viewport(0,0,canvas.width,canvas.height);
-gl.useProgram(mainProg);
-bindQuad(mainProg);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.useProgram(mainProg);
+    bindQuad(mainProg);
 
-gl.uniform2f(uRes,  canvas.width,canvas.height);
-gl.uniform1f(uTime, t);
-gl.uniform1f(uZoom, zoom);
-gl.uniform1f(uAngle,angle);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1f(uTime, t);
+    gl.uniform1f(uZoom, zoom);
+    gl.uniform1f(uAngle, angle);
 
-gl.activeTexture(gl.TEXTURE0);
-gl.bindTexture(gl.TEXTURE_2D,starTex);
-gl.uniform1i(uStarTx,0);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, starTex);
+    gl.uniform1i(uStarTx, 0);
 
-gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 frame();
