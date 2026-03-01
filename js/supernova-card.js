@@ -377,12 +377,12 @@ function resize() {
   createStarFBO(Math.max(1, canvas.width  >> 1),
                 Math.max(1, canvas.height >> 1));
   bakeStars();
-  render();
+  frame();
   gl.viewport(0, 0, canvas.width, canvas.height);
 }
 window.addEventListener('resize', () => {
   resize();
-  render();
+  frame();
 });
 
 // ─── Main uniform locations ───────────────────────────────────────────────────

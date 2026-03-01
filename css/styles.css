@@ -475,28 +475,52 @@ nav a:hover {
 }
 
 .simulation-grid {
-  display:flex; 
-  justify-content:center; 
-  flex-wrap:nowrap;
+  display: grid;
+  grid-template-columns: repeat(3, 420px);
+  gap: 10px;
+  justify-content: center;
 }
 
 .simulation-card {
-  display:flex;
-  flex-direction:column; 
-  align-items:center; 
-  justify-content:center; 
-  width:300px; 
-  height:180px; 
-  text-decoration:none; 
-  color:inherit; 
-  border-radius:8px; 
-  overflow:hidden; 
-  background:#000; 
-  position:relative;
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  background: #000;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  align-content: center;
+}
+
+.simulation-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+
+.simulation-card canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.overlay-text {
+  position: absolute;
+  bottom: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 90%;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #fff;
+  pointer-events: none;
+  text-shadow: 0 0 4px rgba(0,0,0,0.7);
+  white-space: nowrap;
 }
 
 @media (max-width: 480px) {
-
   .terminal-window,
   #terminal-output,
   #terminal-input {
@@ -560,7 +584,15 @@ nav a:hover {
   }
 
   .simulation-grid {
-    flex-wrap: wrap;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 0 5rem;
+  }
+
+  .simulation-card {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9
   }
 }
 
