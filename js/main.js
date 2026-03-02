@@ -37,9 +37,9 @@ const observer = new IntersectionObserver((entries) => {
     supernovaModule = import('./supernova-card.js');
   }
   if (!entry.isIntersecting && simulationsLoaded) {
-    nebulaModule.stop();
-    blackholeModule.stop();
-    supernovaModule.stop();
+    nebulaModule.then(m => m.stop());
+    blackholeModule.then(m => m.stop());
+    supernovaModule.then(m => m.stop());
     simulationsLoaded = false;
   }
 }, {
