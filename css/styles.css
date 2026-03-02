@@ -476,7 +476,7 @@ nav a:hover {
 
 .simulation-grid {
   display: grid;
-  grid-template-columns: repeat(3, 420px);
+  grid-template-columns: repeat(3, 240px);
   gap: 10px;
   justify-content: center;
 }
@@ -484,7 +484,7 @@ nav a:hover {
 .simulation-card {
   position: relative;
   display: block;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 9 / 9;
   border-radius: 14px;
   overflow: hidden;
   text-decoration: none;
@@ -585,14 +585,16 @@ nav a:hover {
 
   .simulation-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 0 5rem;
+    gap: 0.5rem;
+    padding: 0 5.5rem;
+    margin-top: -2rem;
+    margin-bottom: 1rem;
   }
 
   .simulation-card {
     width: 100%;
     height: auto;
-    aspect-ratio: 16 / 9
+    aspect-ratio: 16 / 9;
   }
 }
 
