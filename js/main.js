@@ -19,3 +19,26 @@ if (skipBtn) {
     setTypingSkipped(true);
   });
 }
+
+const simulationsSection = document.querySelector('#simulations');
+
+let simulationsLoaded = false;
+
+const observer = new IntersectionObserver(async (entries) => {
+  const entry = entries[0];
+
+  if (entry.isIntersecting && !simulationsLoaded) {
+    simulationsLoaded = true;
+
+    // dynamically load modules
+    await import('./nebula-card.js');
+    await import('./blackhole-card.js');
+    await import('./supernova-card.js');
+
+    console.log('Simulations loaded');
+  }
+}, {
+  threshold: 0.2
+});
+
+observer.observe(simulationsSection);
