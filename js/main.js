@@ -35,15 +35,12 @@ const observer = new IntersectionObserver(async (entries) => {
     nebulaModule = await import('./nebula-card.js');
     blackholeModule = await import('./blackhole-card.js');
     supernovaModule = await import('./supernova-card.js');
-
-    console.log('Simulations loaded');
   }
   if (!entry.isIntersecting && simulationsLoaded) {
     nebulaModule.stop();
     blackholeModule.stop();
     supernovaModule.stop();
     simulationsLoaded = false;
-    console.log('Simulations destroyed')
   }
 }, {
   threshold: 0.2
