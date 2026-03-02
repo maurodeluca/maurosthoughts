@@ -252,18 +252,18 @@ void main(){
 
 // ── GL Helpers ─────────────────────────────────────────────────────────────────
 function mkShader(src, type) {
-    const s = gl.createShader(type);
-    gl.shaderSource(s, src); gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
-    return s;
+  const s = gl.createShader(type);
+  gl.shaderSource(s, src); gl.compileShader(s);
+  if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) console.error(gl.getShaderInfoLog(s));
+  return s;
 }
 function mkProg(vs, fs) {
-    const p = gl.createProgram();
-    gl.attachShader(p, mkShader(vs, gl.VERTEX_SHADER));
-    gl.attachShader(p, mkShader(fs, gl.FRAGMENT_SHADER));
-    gl.linkProgram(p);
-    if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p));
-    return p;
+  const p = gl.createProgram();
+  gl.attachShader(p, mkShader(vs, gl.VERTEX_SHADER));
+  gl.attachShader(p, mkShader(fs, gl.FRAGMENT_SHADER));
+  gl.linkProgram(p);
+  if (!gl.getProgramParameter(p, gl.LINK_STATUS)) console.error(gl.getProgramInfoLog(p));
+  return p;
 }
 
 const pBH = mkProg(VS, FS_BH);
@@ -276,10 +276,10 @@ gl.bindBuffer(gl.ARRAY_BUFFER, quad);
 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
 
 function bindQ(p) {
-    gl.bindBuffer(gl.ARRAY_BUFFER, quad);
-    const l = gl.getAttribLocation(p, 'aPos');
-    gl.enableVertexAttribArray(l);
-    gl.vertexAttribPointer(l, 2, gl.FLOAT, false, 0, 0);
+  gl.bindBuffer(gl.ARRAY_BUFFER, quad);
+  const l = gl.getAttribLocation(p, 'aPos');
+  gl.enableVertexAttribArray(l);
+  gl.vertexAttribPointer(l, 2, gl.FLOAT, false, 0, 0);
 }
 
 function uni1f(p, n, v) { gl.uniform1f(gl.getUniformLocation(p, n), v); }
@@ -289,33 +289,91 @@ function uniM3(p, n, v) { gl.uniformMatrix3fv(gl.getUniformLocation(p, n), false
 function uni1i(p, n, v) { gl.uniform1i(gl.getUniformLocation(p, n), v); }
 
 function mkRT(w, h) {
-    const fb = gl.createFramebuffer(), tex = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, tex);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
-    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
-    return { fb, tex, w, h };
+  const fb = gl.createFramebuffer(), tex = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, tex);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, w, h, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, tex, 0);
+  return { fb, tex, w, h };
 }
 
 function bindTex(p, name, unit, rt) {
-    gl.activeTexture(gl.TEXTURE0 + unit);
-    gl.bindTexture(gl.TEXTURE_2D, rt.tex);
-    uni1i(p, name, unit);
+  gl.activeTexture(gl.TEXTURE0 + unit);
+  gl.bindTexture(gl.TEXTURE_2D, rt.tex);
+  uni1i(p, name, unit);
 }
 
 // ── RTs ───────────────────────────────────────────────────────────────────────
 let W, H, rtScene, rtB1h, rtB1v, rtB2h, rtB2v, rtB3h, rtB3v;
 
 function initRTs() {
-    W = canvas.width; H = canvas.height;
-    rtScene = mkRT(W, H);
-    rtB1h = mkRT(W >> 1, H >> 1); rtB1v = mkRT(W >> 1, H >> 1);
-    rtB2h = mkRT(W >> 2, H >> 2); rtB2v = mkRT(W >> 2, H >> 2);
-    rtB3h = mkRT(W >> 3, H >> 3); rtB3v = mkRT(W >> 3, H >> 3);
+  W = canvas.width; H = canvas.height;
+  rtScene = mkRT(W, H);
+  rtB1h = mkRT(W >> 1, H >> 1); rtB1v = mkRT(W >> 1, H >> 1);
+  rtB2h = mkRT(W >> 2, H >> 2); rtB2v = mkRT(W >> 2, H >> 2);
+  rtB3h = mkRT(W >> 3, H >> 3); rtB3v = mkRT(W >> 3, H >> 3);
+}
+
+// ── Camera ────────────────────────────────────────────────────────────────────
+let theta = -0.25, phi = 0.32, dist = 40.0;
+let drag = false, px = 0, py = 0;
+
+function adjustCameraForCard() {
+  const w = canvas.clientWidth;
+  if (w < 400) dist = 60; else dist = 40;
+}
+
+// Adjust camera distance for mobile / small screens
+function adjustForMobile() {
+  const isMobile = window.innerWidth < 768; // you can tweak the breakpoint
+  if (isMobile) {
+    dist = 80;   // zoom out more
+  } else {
+    dist = 40;   // default distance
+  }
+}
+adjustCameraForCard();
+adjustForMobile(); // run once on load
+
+window.addEventListener('resize', () => {
+  adjustCameraForCard();
+  adjustForMobile();
+});
+
+function camSetup() {
+  const cx = dist * Math.cos(phi) * Math.sin(theta);
+  const cy = dist * Math.sin(phi);
+  const cz = dist * Math.cos(phi) * Math.cos(theta);
+  const fwd = [-cx, -cy, -cz].map((v, i, a) => { let l = Math.hypot(...a); return v / l; });
+  const wUp = [0, 1, 0];
+  const right = [
+    fwd[1] * wUp[2] - fwd[2] * wUp[1],
+    fwd[2] * wUp[0] - fwd[0] * wUp[2],
+    fwd[0] * wUp[1] - fwd[1] * wUp[0]
+  ];
+  const rl = Math.hypot(...right); const r = right.map(v => v / rl);
+  const up = [r[1] * fwd[2] - r[2] * fwd[1], r[2] * fwd[0] - r[0] * fwd[2], r[0] * fwd[1] - r[1] * fwd[0]];
+  return { pos: [cx, cy, cz], mat: [r[0], r[1], r[2], up[0], up[1], up[2], -fwd[0], -fwd[1], -fwd[2]] };
+}
+
+// ── Blur pass ─────────────────────────────────────────────────────────────────
+function blurPass(src, dstH, dstV) {
+  gl.useProgram(pBlur); bindQ(pBlur);
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dstH.fb);
+  gl.viewport(0, 0, dstH.w, dstH.h);
+  bindTex(pBlur, 'uTex', 0, src);
+  uni2f(pBlur, 'uDir', 1.0 / dstH.w, 0);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, dstV.fb);
+  gl.viewport(0, 0, dstV.w, dstV.h);
+  bindTex(pBlur, 'uTex', 0, dstH);
+  uni2f(pBlur, 'uDir', 0, 1.0 / dstV.h);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 
 // ── Resize for card ──
@@ -328,103 +386,55 @@ function resize() {
   initRTs();
 }
 window.addEventListener('resize', resize);
-resize();
-
-// ── Camera ────────────────────────────────────────────────────────────────────
-let theta = -0.25, phi = 0.32, dist = 40.0;
-let drag = false, px = 0, py = 0;
-
-function adjustCameraForCard() {
-  const w = canvas.clientWidth;
-  if (w < 400) dist = 60; else dist = 40;
-}
-adjustCameraForCard();
-window.addEventListener('resize', adjustCameraForCard);
-
-// Adjust camera distance for mobile / small screens
-function adjustForMobile() {
-    const isMobile = window.innerWidth < 768; // you can tweak the breakpoint
-    if (isMobile) {
-        dist = 80;   // zoom out more
-    } else {
-        dist = 40;   // default distance
-    }
-}
-
-window.addEventListener('resize', adjustForMobile);
-adjustForMobile(); // run once on load
-
-function camSetup() {
-    const cx = dist * Math.cos(phi) * Math.sin(theta);
-    const cy = dist * Math.sin(phi);
-    const cz = dist * Math.cos(phi) * Math.cos(theta);
-    const fwd = [-cx, -cy, -cz].map((v, i, a) => { let l = Math.hypot(...a); return v / l; });
-    const wUp = [0, 1, 0];
-    const right = [
-        fwd[1] * wUp[2] - fwd[2] * wUp[1],
-        fwd[2] * wUp[0] - fwd[0] * wUp[2],
-        fwd[0] * wUp[1] - fwd[1] * wUp[0]
-    ];
-    const rl = Math.hypot(...right); const r = right.map(v => v / rl);
-    const up = [r[1] * fwd[2] - r[2] * fwd[1], r[2] * fwd[0] - r[0] * fwd[2], r[0] * fwd[1] - r[1] * fwd[0]];
-    return { pos: [cx, cy, cz], mat: [r[0], r[1], r[2], up[0], up[1], up[2], -fwd[0], -fwd[1], -fwd[2]] };
-}
-
-// ── Blur pass ─────────────────────────────────────────────────────────────────
-function blurPass(src, dstH, dstV) {
-    gl.useProgram(pBlur); bindQ(pBlur);
-    gl.bindFramebuffer(gl.FRAMEBUFFER, dstH.fb);
-    gl.viewport(0, 0, dstH.w, dstH.h);
-    bindTex(pBlur, 'uTex', 0, src);
-    uni2f(pBlur, 'uDir', 1.0 / dstH.w, 0);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-    gl.bindFramebuffer(gl.FRAMEBUFFER, dstV.fb);
-    gl.viewport(0, 0, dstV.w, dstV.h);
-    bindTex(pBlur, 'uTex', 0, dstH);
-    uni2f(pBlur, 'uDir', 0, 1.0 / dstV.h);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-}
 
 // ── Render ────────────────────────────────────────────────────────────────────
 const t0 = performance.now();
+let animationId = null;
 
 function frame() {
-    requestAnimationFrame(frame);
-    const t = (performance.now() - t0) * 0.001;
-    const cam = camSetup();
+  animationId = requestAnimationFrame(frame);
+  const t = (performance.now() - t0) * 0.001;
+  const cam = camSetup();
 
-    // 1. Raymarch BH
-    gl.bindFramebuffer(gl.FRAMEBUFFER, rtScene.fb);
-    gl.viewport(0, 0, W, H);
-    gl.useProgram(pBH); bindQ(pBH);
-    uni2f(pBH, 'uRes', W, H);
-    uni1f(pBH, 'uTime', t);
-    uni3f(pBH, 'uCamPos', ...cam.pos);
-    uniM3(pBH, 'uCamMat', cam.mat);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  // 1. Raymarch BH
+  gl.bindFramebuffer(gl.FRAMEBUFFER, rtScene.fb);
+  gl.viewport(0, 0, W, H);
+  gl.useProgram(pBH); bindQ(pBH);
+  uni2f(pBH, 'uRes', W, H);
+  uni1f(pBH, 'uTime', t);
+  uni3f(pBH, 'uCamPos', ...cam.pos);
+  uniM3(pBH, 'uCamMat', cam.mat);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-    // 2. Extract bloom
-    gl.bindFramebuffer(gl.FRAMEBUFFER, rtB1h.fb);
-    gl.viewport(0, 0, rtB1h.w, rtB1h.h);
-    gl.useProgram(pExt); bindQ(pExt);
-    bindTex(pExt, 'uTex', 0, rtScene);
-    uni1f(pExt, 'uThresh', 1.0);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  // 2. Extract bloom
+  gl.bindFramebuffer(gl.FRAMEBUFFER, rtB1h.fb);
+  gl.viewport(0, 0, rtB1h.w, rtB1h.h);
+  gl.useProgram(pExt); bindQ(pExt);
+  bindTex(pExt, 'uTex', 0, rtScene);
+  uni1f(pExt, 'uThresh', 1.0);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-    // 3. Multi-scale blur
-    blurPass(rtB1h, rtB1v, rtB1h);  // read rtB1h, write horizontal -> vertical in rtB1v, then vertical -> horizontal in rtB1h
-    blurPass(rtB1h, rtB2v, rtB2h);  // read B1 result, write to B2
-    blurPass(rtB2h, rtB3v, rtB3h);  // read B2 result, write to B3
+  // 3. Multi-scale blur
+  blurPass(rtB1h, rtB1v, rtB1h);  // read rtB1h, write horizontal -> vertical in rtB1v, then vertical -> horizontal in rtB1h
+  blurPass(rtB1h, rtB2v, rtB2h);  // read B1 result, write to B2
+  blurPass(rtB2h, rtB3v, rtB3h);  // read B2 result, write to B3
 
-    // 4. Composite
-    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-    gl.viewport(0, 0, W, H);
-    gl.useProgram(pComp); bindQ(pComp);
-    bindTex(pComp, 'uScene', 0, rtScene);
-    bindTex(pComp, 'uB1', 1, rtB1h);
-    bindTex(pComp, 'uB2', 2, rtB2h);
-    bindTex(pComp, 'uB3', 3, rtB3h);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  // 4. Composite
+  gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+  gl.viewport(0, 0, W, H);
+  gl.useProgram(pComp); bindQ(pComp);
+  bindTex(pComp, 'uScene', 0, rtScene);
+  bindTex(pComp, 'uB1', 1, rtB1h);
+  bindTex(pComp, 'uB2', 2, rtB2h);
+  bindTex(pComp, 'uB3', 3, rtB3h);
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
+resize();
 frame();
+
+export function stop() {
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+}

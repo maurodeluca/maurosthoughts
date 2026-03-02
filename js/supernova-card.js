@@ -315,7 +315,7 @@ const mainProg = mkProg(QUAD_VS, MAIN_FS);
 // Single quad buffer shared by both passes
 const quadBuf = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
 
 function bindQuad(prog) {
   gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
@@ -328,7 +328,7 @@ function bindQuad(prog) {
 // The star texture is rendered at HALF the canvas resolution.
 // Stars are smooth shapes, so bilinear upscaling is invisible.
 let starFBO = null, starTex = null;
-let starW   = 0,    starH   = 0;
+let starW = 0, starH = 0;
 
 function createStarFBO(w, h) {
   if (starTex) gl.deleteTexture(starTex);
@@ -365,44 +365,42 @@ function bakeStars() {
 function resize() {
   const dpr = window.devicePixelRatio || 1;
 
-  const displayWidth  = Math.floor(canvas.clientWidth  * dpr);
+  const displayWidth = Math.floor(canvas.clientWidth * dpr);
   const displayHeight = Math.floor(canvas.clientHeight * dpr);
 
   if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
-    canvas.width  = displayWidth;
+    canvas.width = displayWidth;
     canvas.height = displayHeight;
   }
 
   // Star texture at half the main canvas size (quarter of the original area).
-  createStarFBO(Math.max(1, canvas.width  >> 1),
-                Math.max(1, canvas.height >> 1));
+  createStarFBO(Math.max(1, canvas.width >> 1),
+    Math.max(1, canvas.height >> 1));
   bakeStars();
   gl.viewport(0, 0, canvas.width, canvas.height);
 }
-window.addEventListener('resize', () => {
-  resize();
-  frame();
-});
+window.addEventListener('resize', resize);
 
 // ─── Main uniform locations ───────────────────────────────────────────────────
-const uRes   = gl.getUniformLocation(mainProg, 'uRes');
-const uTime  = gl.getUniformLocation(mainProg, 'uTime');
-const uZoom  = gl.getUniformLocation(mainProg, 'uZoom');
+const uRes = gl.getUniformLocation(mainProg, 'uRes');
+const uTime = gl.getUniformLocation(mainProg, 'uTime');
+const uZoom = gl.getUniformLocation(mainProg, 'uZoom');
 const uAngle = gl.getUniformLocation(mainProg, 'uAngle');
 const uStarTex = gl.getUniformLocation(mainProg, 'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom  = 0.7;
+let zoom = 0.7;
 let angle = 0.0;
-let drag  = false, px = 0, py = 0;
+let drag = false, px = 0, py = 0;
 let velAngle = 0;
 
 // ─── Render loop ──────────────────────────────────────────────────────────────
 const t0 = performance.now();
 resize();
+let animationId = null;
 
 function frame() {
-  requestAnimationFrame(frame);
+  animationId = requestAnimationFrame(frame);
   const t = (performance.now() - t0) * 0.001;
 
   if (!drag) { angle += velAngle; velAngle *= 0.92; }
@@ -412,9 +410,9 @@ function frame() {
   gl.useProgram(mainProg);
   bindQuad(mainProg);
 
-  gl.uniform2f(uRes,   canvas.width, canvas.height);
-  gl.uniform1f(uTime,  t);
-  gl.uniform1f(uZoom,  zoom);
+  gl.uniform2f(uRes, canvas.width, canvas.height);
+  gl.uniform1f(uTime, t);
+  gl.uniform1f(uZoom, zoom);
   gl.uniform1f(uAngle, angle);
 
   // Bind the pre-baked star texture to texture unit 0
@@ -425,3 +423,10 @@ function frame() {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 frame();
+
+export function stop() {
+  if (animationId !== null) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+}

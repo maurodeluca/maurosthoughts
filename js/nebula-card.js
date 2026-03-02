@@ -277,10 +277,7 @@ function resize() {
     gl.viewport(0, 0, canvas.width, canvas.height);
 }
 
-window.addEventListener('resize', () => {
-    resize();
-    frame();
-});
+window.addEventListener('resize', resize);
 
 // ─── Uniform locations ────────────────────────────────────────────────────────
 const uRes = gl.getUniformLocation(mainProg, 'uRes');
@@ -324,9 +321,10 @@ window.addEventListener('touchmove', e => {
 // ─── Render loop ──────────────────────────────────────────────────────────────
 const t0 = performance.now();
 resize();
+let animationId = null;
 
 function frame() {
-    requestAnimationFrame(frame);
+    animationId = requestAnimationFrame(frame);
     const t = (performance.now() - t0) * 0.001;
     if (!drag) { angle += velAngle; velAngle *= 0.92; }
 
@@ -346,3 +344,10 @@ function frame() {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
 frame();
+
+export function stop() {
+    if (animationId !== null) {
+        cancelAnimationFrame(animationId);
+        animationId = null;
+    }
+}

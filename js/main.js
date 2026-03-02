@@ -23,6 +23,7 @@ if (skipBtn) {
 const simulationsSection = document.querySelector('#simulations');
 
 let simulationsLoaded = false;
+let nebulaModule, blackholeModule, supernovaModule;
 
 const observer = new IntersectionObserver(async (entries) => {
   const entry = entries[0];
@@ -31,11 +32,18 @@ const observer = new IntersectionObserver(async (entries) => {
     simulationsLoaded = true;
 
     // dynamically load modules
-    await import('./nebula-card.js');
-    await import('./blackhole-card.js');
-    await import('./supernova-card.js');
+    nebulaModule = await import('./nebula-card.js');
+    blackholeModule = await import('./blackhole-card.js');
+    supernovaModule = await import('./supernova-card.js');
 
     console.log('Simulations loaded');
+  }
+  if (!entry.isIntersecting && simulationsLoaded) {
+    nebulaModule.stop();
+    blackholeModule.stop();
+    supernovaModule.stop();
+    simulationsLoaded = false;
+    console.log('Simulations destroyed')
   }
 }, {
   threshold: 0.2
