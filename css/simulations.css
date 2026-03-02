@@ -356,3 +356,17 @@ footer.copyright p {
   margin: 0;
   font-size: 0.7rem;
 }
+
+#info { 
+  position: fixed;
+  top: 40px;
+  left: 50%; 
+  transform: translateX(-50%); 
+  color: rgba(180,200,255,0.45); 
+  font-family: 'Courier New', monospace; 
+  font-size: 11px; 
+  letter-spacing: 0.15em; 
+  text-align: center; 
+  pointer-events: none; 
+  text-transform: uppercase;
+}
