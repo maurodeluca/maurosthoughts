@@ -36,8 +36,9 @@ vec3 starColor(float seed) {
 
 void main() {
     // Map vUv to [-2,2] space with aspect correction
-    vec2 uv = (vUv * 2.0 - 1.0) * 2.0;
-    uv.x *= uRes.x / uRes.y;
+    vec2 uv = vUv * 2.0 - 1.0;
+    float maxSide = max(uRes.x, uRes.y);
+    uv *= maxSide / min(uRes.x, uRes.y);
 
     // Compute distance from center
     float r = length(uv);
@@ -45,7 +46,7 @@ void main() {
 
     vec3 stars = vec3(0.0);
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 5000; i++) {
         float fi = float(i);
         vec2 sp = vec2(hash1(fi * 1.1) * 6.0 - 3.0,
                        hash1(fi * 2.3) * 6.0 - 3.0);
@@ -89,6 +90,7 @@ uniform float uTime;
 uniform float uZoom;
 uniform float uAngle;
 uniform sampler2D uStarTex;
+uniform float uRadius;
 
 #define PI 3.14159265359
 
@@ -117,7 +119,6 @@ float fbm(vec2 p){
 }
 
 void main(){
-
   vec2 uv=vUv*2.0-1.0;
   uv.x*=uRes.x/uRes.y;
   uv/=uZoom;
@@ -150,11 +151,8 @@ void main(){
   float dust = smoothstep(0.5,0.65,dustNoise);
 
   // -------- STAR SAMPLING ----------
-  float asp=uRes.x/uRes.y;
-  vec2 stUv=vec2(uv.x/asp,uv.y)*0.25+0.5;
-  vec3 stars=texture2D(uStarTex,stUv).rgb;
-  float starMask = dot(stars,vec3(0.333));
-  density *= (1.0 - starMask*0.9);
+  vec2 starUV = uv / uRadius * 0.5 + 0.5;
+  vec3 stars = texture2D(uStarTex, starUV).rgb;
 
   // -------- STRONGER LIGHTING ----------
   float e=0.0025;
@@ -278,7 +276,7 @@ const uAngle = gl.getUniformLocation(mainProg, 'uAngle');
 const uStarTx = gl.getUniformLocation(mainProg, 'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom = 0.5, angle = 0.0, drag = false, px = 0, py = 0, velAngle = 0;
+let zoom = 0.35, angle = 0.0, drag = false, px = 0, py = 0, velAngle = 0, worldRadius = 1;
 
 canvas.addEventListener('mousedown', e => { drag = true; px = e.clientX; py = e.clientY; velAngle = 0; });
 window.addEventListener('mouseup', () => drag = false);
@@ -315,10 +313,12 @@ function frame() {
     requestAnimationFrame(frame);
     const t = (performance.now() - t0) * 0.001;
     if (!drag) { angle += velAngle; velAngle *= 0.92; }
-
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.useProgram(mainProg);
     bindQuad(mainProg);
+
+    const uRadiusMain = gl.getUniformLocation(mainProg, 'uRadius');
+    gl.uniform1f(uRadiusMain, worldRadius);
     gl.uniform2f(uRes, canvas.width, canvas.height);
     gl.uniform1f(uTime, t);
     gl.uniform1f(uZoom, zoom);
@@ -332,15 +332,46 @@ function frame() {
 // ─── Resize ───────────────────────────────────────────────────────────────────
 function resize() {
     const dpr = Math.min(devicePixelRatio, 1.5);
+
     canvas.width = Math.floor(innerWidth * dpr * 0.5);
     canvas.height = Math.floor(innerHeight * dpr * 0.5);
-    createStarFBO(Math.max(1, canvas.width >> 1), Math.max(1, canvas.height >> 1));
-    const uRadiusLoc = gl.getUniformLocation(starProg, 'uRadius');
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+
+    // Compute maximum nebula radius in world space
+    const aspect = canvas.width / canvas.height;
+
+    // This matches your main shader:
+    // uv.x *= aspect;
+    // uv /= zoom;
+
+    const maxX = aspect / zoom;
+    const maxY = 1.0 / zoom;
+
+    worldRadius = Math.sqrt(maxX * maxX + maxY * maxY);
+
+    // Choose square resolution proportional to visible radius
+    const baseRes = 240;
+    const res = Math.floor(baseRes * worldRadius * 0.5);
+
+    createStarFBO(res, res);
+
     gl.useProgram(starProg);
-    gl.uniform1f(uRadiusLoc, 2); // adjust radius (smaller = smaller circle)
+
+    gl.uniform2f(
+        gl.getUniformLocation(starProg, "uRes"),
+        res,
+        res
+    );
+
+    gl.uniform1f(
+        gl.getUniformLocation(starProg, "uRadius"),
+        worldRadius
+    );
+
     bakeStars();
-    frame();
 }
+
 window.addEventListener('resize', resize);
 resize();
 frame();

@@ -39,8 +39,9 @@ vec3 starColor(float seed) {
 
 void main() {
     // Map vUv to [-2,2] space with aspect correction
-    vec2 uv = (vUv * 2.0 - 1.0) * 2.0;
-    uv.x *= uRes.x / uRes.y;
+    vec2 uv = vUv * 2.0 - 1.0;
+    float maxSide = max(uRes.x, uRes.y);
+    uv *= maxSide / min(uRes.x, uRes.y);
 
     // Compute distance from center
     float r = length(uv);
@@ -48,7 +49,7 @@ void main() {
 
     vec3 stars = vec3(0.0);
 
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < 5000; i++) {
         float fi = float(i);
         vec2 sp = vec2(hash1(fi * 1.1) * 6.0 - 3.0,
                        hash1(fi * 2.3) * 6.0 - 3.0);
@@ -95,6 +96,7 @@ uniform float uTime;
 uniform float uZoom;
 uniform float uAngle;
 uniform sampler2D uStarTex;   // pre-baked star field
+uniform float uRadius;
 
 #define PI  3.14159265359
 #define TAU 6.28318530718
@@ -156,7 +158,7 @@ void main() {
   // Sample star texture. Bake covers world space [-2,2] so divide by 2
   // before the standard *0.5+0.5 remap → overall * 0.25 + 0.5.
   float aspect   = uRes.x / uRes.y;
-  vec2 starTexUv = vec2(uv.x / aspect, uv.y) * 0.25 + 0.5;
+  vec2 starTexUv = uv / uRadius * 0.5 + 0.5;
   vec3 stars = texture2D(uStarTex, starTexUv).rgb;
 
   // Sparkle: modulate brightness with a per-star sine wave.
@@ -313,7 +315,7 @@ const mainProg = mkProg(QUAD_VS, MAIN_FS);
 // Single quad buffer shared by both passes
 const quadBuf = gl.createBuffer();
 gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
-gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
 
 function bindQuad(prog) {
   gl.bindBuffer(gl.ARRAY_BUFFER, quadBuf);
@@ -326,7 +328,7 @@ function bindQuad(prog) {
 // The star texture is rendered at HALF the canvas resolution.
 // Stars are smooth shapes, so bilinear upscaling is invisible.
 let starFBO = null, starTex = null;
-let starW   = 0,    starH   = 0;
+let starW = 0, starH = 0;
 
 function createStarFBO(w, h) {
   if (starTex) gl.deleteTexture(starTex);
@@ -360,20 +362,21 @@ function bakeStars() {
 }
 
 // ─── Main uniform locations ───────────────────────────────────────────────────
-const uRes   = gl.getUniformLocation(mainProg, 'uRes');
-const uTime  = gl.getUniformLocation(mainProg, 'uTime');
-const uZoom  = gl.getUniformLocation(mainProg, 'uZoom');
+const uRes = gl.getUniformLocation(mainProg, 'uRes');
+const uTime = gl.getUniformLocation(mainProg, 'uTime');
+const uZoom = gl.getUniformLocation(mainProg, 'uZoom');
 const uAngle = gl.getUniformLocation(mainProg, 'uAngle');
 const uStarTex = gl.getUniformLocation(mainProg, 'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom  = 0.5;
+let zoom = 0.35;
 let angle = 0.0;
-let drag  = false, px = 0, py = 0;
+let drag = false, px = 0, py = 0;
 let velAngle = 0;
+let worldRadius = 1;
 
 canvas.addEventListener('mousedown', e => { drag = true; px = e.clientX; py = e.clientY; velAngle = 0; });
-window.addEventListener('mouseup',   () => drag = false);
+window.addEventListener('mouseup', () => drag = false);
 window.addEventListener('mousemove', e => {
   if (!drag) return;
   const delta = ((e.clientX - px) / innerWidth) * Math.PI * 2.5;
@@ -382,7 +385,7 @@ window.addEventListener('mousemove', e => {
   px = e.clientX; py = e.clientY;
 });
 canvas.addEventListener('wheel', e => {
-  zoom = Math.max(0.4, Math.min(4, zoom * (1 - e.deltaY * 0.001)));
+  zoom = Math.max(0.35, Math.min(4, zoom * (1 - e.deltaY * 0.001)));
   e.preventDefault();
 }, { passive: false });
 
@@ -391,7 +394,7 @@ canvas.addEventListener('touchstart', e => {
   if (e.touches.length === 1) { drag = true; px = e.touches[0].clientX; py = e.touches[0].clientY; velAngle = 0; }
   if (e.touches.length === 2)
     lastTouchDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
-                               e.touches[0].clientY - e.touches[1].clientY);
+      e.touches[0].clientY - e.touches[1].clientY);
 });
 window.addEventListener('touchend', () => { drag = false; lastTouchDist = null; });
 window.addEventListener('touchmove', e => {
@@ -401,7 +404,7 @@ window.addEventListener('touchmove', e => {
   }
   if (e.touches.length === 2 && lastTouchDist) {
     const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX,
-                         e.touches[0].clientY - e.touches[1].clientY);
+      e.touches[0].clientY - e.touches[1].clientY);
     zoom = Math.max(0.4, Math.min(6, zoom * d / lastTouchDist));
     lastTouchDist = d;
   }
@@ -421,9 +424,11 @@ function frame() {
   gl.useProgram(mainProg);
   bindQuad(mainProg);
 
-  gl.uniform2f(uRes,   canvas.width, canvas.height);
-  gl.uniform1f(uTime,  t);
-  gl.uniform1f(uZoom,  zoom);
+  const uRadiusMain = gl.getUniformLocation(mainProg, 'uRadius');
+  gl.uniform1f(uRadiusMain, worldRadius);
+  gl.uniform2f(uRes, canvas.width, canvas.height);
+  gl.uniform1f(uTime, t);
+  gl.uniform1f(uZoom, zoom);
   gl.uniform1f(uAngle, angle);
 
   // Bind the pre-baked star texture to texture unit 0
@@ -437,21 +442,47 @@ function frame() {
 
 // ─── Resize ───────────────────────────────────────────────────────────────────
 function resize() {
-  // Cap dpr at 1.5 (was 2). Combined with the 0.5 multiplier this gives
-  // at most 0.75× physical pixels — visually identical, much cheaper.
   const dpr = Math.min(devicePixelRatio, 1.5);
-  canvas.width  = Math.floor(innerWidth  * dpr * 0.5);
+
+  canvas.width = Math.floor(innerWidth * dpr * 0.5);
   canvas.height = Math.floor(innerHeight * dpr * 0.5);
 
-  // Star texture at half the main canvas size (quarter of the original area).
-  createStarFBO(Math.max(1, canvas.width >> 1),
-                Math.max(1, canvas.height >> 1));
-  const uRadiusLoc = gl.getUniformLocation(starProg, 'uRadius');
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+  // Compute maximum nebula radius in world space
+  const aspect = canvas.width / canvas.height;
+
+  // This matches your main shader:
+  // uv.x *= aspect;
+  // uv /= zoom;
+
+  const maxX = aspect / zoom;
+  const maxY = 1.0 / zoom;
+
+  worldRadius = Math.sqrt(maxX * maxX + maxY * maxY);
+
+  // Choose square resolution proportional to visible radius
+  const baseRes = 240;
+  const res = Math.floor(baseRes * worldRadius * 0.5);
+
+  createStarFBO(res, res);
+
   gl.useProgram(starProg);
-  gl.uniform1f(uRadiusLoc, 2); // adjust radius (smaller = smaller circle)
+
+  gl.uniform2f(
+    gl.getUniformLocation(starProg, "uRes"),
+    res,
+    res
+  );
+
+  gl.uniform1f(
+    gl.getUniformLocation(starProg, "uRadius"),
+    worldRadius
+  );
+
   bakeStars();
-  frame();
 }
+
 window.addEventListener('resize', resize);
 resize();
 frame();
