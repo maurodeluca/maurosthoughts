@@ -13,57 +13,73 @@ gl_Position = vec4(aPos, 0.0, 1.0);
 const STAR_FS = `
 precision highp float;
 varying vec2 vUv;
-uniform vec2 uRes;
+uniform vec2  uRes;
+uniform float uRadius; // new: radius of circular star field
 #define PI 3.14159265359
 
 float hash1(float n) { return fract(sin(n) * 43758.5453); }
 
 float spike(vec2 uv, float angle, float len, float w) {
-float c = cos(angle), s = sin(angle);
-vec2 r = vec2(c*uv.x + s*uv.y, -s*uv.x + c*uv.y);
-float fade = (1.0 - clamp(r.x/len, 0.0, 1.0));
-return smoothstep(w, 0.0, abs(r.y)) * fade * fade * step(0.0, r.x);
+    float c = cos(angle), s = sin(angle);
+    vec2 r = vec2(c*uv.x + s*uv.y, -s*uv.x + c*uv.y);
+    float fade = (1.0 - clamp(r.x/len, 0.0, 1.0));
+    return smoothstep(w, 0.0, abs(r.y)) * fade * fade * step(0.0, r.x);
 }
 
 vec3 starColor(float seed) {
-float t = hash1(seed * 7.3);
-if (t < 0.25) return vec3(0.85, 0.92, 1.0);
-if (t < 0.55) return vec3(1.0, 0.98, 0.90);
-if (t < 0.78) return vec3(1.0, 0.75, 0.45);
-return vec3(0.95, 0.5, 0.35);
+    float t = hash1(seed * 7.3);
+    if (t < 0.3) return vec3(0.9, 0.95, 1.0);
+    if (t < 0.6) return vec3(1.0, 0.97, 0.88);
+    if (t < 0.8) return vec3(1.0, 0.7, 0.4);
+    return vec3(0.9, 0.4, 0.3);
 }
 
 void main() {
-// Bake covers world space [-2,2]
-vec2 uv = (vUv * 2.0 - 1.0) * 2.0;
-uv.x *= uRes.x / uRes.y;
-vec3 stars = vec3(0.0);
+    // Map vUv to [-2,2] space with aspect correction
+    vec2 uv = vUv * 2.0 - 1.0;
+    float maxSide = max(uRes.x, uRes.y);
+    uv *= maxSide / min(uRes.x, uRes.y);
 
-for (int i = 0; i < 10000; i++) {
-    float fi = float(i);
-    vec2 sp = vec2(hash1(fi*1.1)*6.0 - 3.0, hash1(fi*2.3)*6.0 - 3.0);
-    sp.x *= uRes.x / uRes.y;
-    vec2  d    = uv - sp;
-    float dist = length(d);
-    float br   = hash1(fi * 0.7);
-    float sz   = 0.0003 + br*br*0.0022;
-    if (dist > sz * 14.0 && br < 0.75) continue;
-    float core = exp(-dist*dist / (sz*sz*2.0));
-    vec3  sc   = starColor(fi);
-    if (br > 0.75) {
-    float slen = 0.012 + br*0.038;
-    float sw   = 0.0008;
-    float spk  = (spike(d,0.0,slen,sw)+spike(d,PI,slen,sw)+
-                    spike(d,PI*.5,slen,sw)+spike(d,PI*1.5,slen,sw))*br*br
-                + (spike(d,PI*.25,slen*.6,sw*.7)+spike(d,PI*.75,slen*.6,sw*.7)+
-                    spike(d,PI*1.25,slen*.6,sw*.7)+spike(d,PI*1.75,slen*.6,sw*.7))*br*.5;
-    stars += sc * spk * (0.3 + br*0.7);
+    // Compute distance from center
+    float r = length(uv);
+    float circleMask = smoothstep(uRadius, uRadius - 0.05, r); // 0 outside, 1 inside
+
+    vec3 stars = vec3(0.0);
+
+    for (int i = 0; i < 5000; i++) {
+        float fi = float(i);
+        vec2 sp = vec2(hash1(fi * 1.1) * 6.0 - 3.0,
+                       hash1(fi * 2.3) * 6.0 - 3.0);
+        sp.x *= uRes.x / uRes.y;
+
+        vec2 d = uv - sp;
+        float dist = length(d);
+        float br = hash1(fi * 0.7);
+        float sz = 0.0003 + br * br * 0.002;
+
+        if (dist > sz * 12.0 && br < 0.75) continue;
+
+        float core = exp(-dist * dist / (sz * sz * 2.0));
+        vec3 sc = starColor(fi);
+
+        if (br > 0.75) {
+            float slen = 0.012 + br * 0.035;
+            float sw = 0.0008;
+            float spk = (spike(d, 0.0, slen, sw) +
+                         spike(d, PI, slen, sw) +
+                         spike(d, PI * 0.5, slen, sw) +
+                         spike(d, PI * 1.5, slen, sw)) * br * br
+                      + (spike(d, PI * 0.25, slen*0.6, sw*0.7) +
+                         spike(d, PI * 0.75, slen*0.6, sw*0.7) +
+                         spike(d, PI * 1.25, slen*0.6, sw*0.7) +
+                         spike(d, PI * 1.75, slen*0.6, sw*0.7)) * br * 0.5;
+            stars += sc * spk * (0.3 + br*0.7);
+        }
+        stars += sc * core * (0.5 + br*0.5);
     }
-    stars += sc * core * (0.5 + br*0.5);
-}
-gl_FragColor = vec4(stars, 1.0);
-}`;
 
+    gl_FragColor = vec4(stars * circleMask, 1.0); // apply circular mask
+}`;
 // ─── Pass 2: JWST-style Crab Nebula ──────────────────────────────────────────
 // Key features from the image:
 //   • Pale blue-grey misty fill throughout the whole interior (not black)
@@ -80,6 +96,7 @@ uniform float uTime;
 uniform float uZoom;
 uniform float uAngle;
 uniform sampler2D uStarTex;
+uniform float uRadius;
 
 #define PI 3.14159265359
 
@@ -108,7 +125,6 @@ float fbm(vec2 p){
 }
 
 void main(){
-
   vec2 uv=vUv*2.0-1.0;
   uv.x*=uRes.x/uRes.y;
   uv/=uZoom;
@@ -141,11 +157,8 @@ void main(){
   float dust = smoothstep(0.5,0.65,dustNoise);
 
   // -------- STAR SAMPLING ----------
-  float asp=uRes.x/uRes.y;
-  vec2 stUv=vec2(uv.x/asp,uv.y)*0.25+0.5;
-  vec3 stars=texture2D(uStarTex,stUv).rgb;
-  float starMask = dot(stars,vec3(0.333));
-  density *= (1.0 - starMask*0.9);
+  vec2 starUV = uv / uRadius * 0.5 + 0.5;
+  vec3 stars = texture2D(uStarTex, starUV).rgb;
 
   // -------- STRONGER LIGHTING ----------
   float e=0.0025;
@@ -200,7 +213,6 @@ col *= lighting * density * 2.0;
   gl_FragColor=vec4(finalCol,1.0);
 }
 `;
-
 
 // ─── GL helpers ──────────────────────────────────────────────────────────────
 function mkShader(src, type) {
@@ -265,6 +277,7 @@ function bakeStars() {
 // ─── Resize ───────────────────────────────────────────────────────────────────
 function resize() {
     const dpr = window.devicePixelRatio || 1;
+
     const displayWidth = Math.floor(canvas.clientWidth * dpr);
     const displayHeight = Math.floor(canvas.clientHeight * dpr);
 
@@ -272,9 +285,41 @@ function resize() {
         canvas.width = displayWidth;
         canvas.height = displayHeight;
     }
-    createStarFBO(Math.max(1, canvas.width >> 1), Math.max(1, canvas.height >> 1));
-    bakeStars();
+
     gl.viewport(0, 0, canvas.width, canvas.height);
+
+    // Compute maximum nebula radius in world space
+    const aspect = canvas.width / canvas.height;
+
+    // This matches your main shader:
+    // uv.x *= aspect;
+    // uv /= zoom;
+
+    const maxX = aspect / zoom;
+    const maxY = 1.0 / zoom;
+
+    worldRadius = Math.sqrt(maxX * maxX + maxY * maxY);
+
+    // Choose square resolution proportional to visible radius
+    const baseRes = 240;
+    const res = Math.floor(baseRes * worldRadius * 0.5);
+
+    createStarFBO(res, res);
+
+    gl.useProgram(starProg);
+
+    gl.uniform2f(
+        gl.getUniformLocation(starProg, "uRes"),
+        res,
+        res
+    );
+
+    gl.uniform1f(
+        gl.getUniformLocation(starProg, "uRadius"),
+        worldRadius
+    );
+
+    bakeStars();
 }
 
 window.addEventListener('resize', resize);
@@ -287,7 +332,7 @@ const uAngle = gl.getUniformLocation(mainProg, 'uAngle');
 const uStarTx = gl.getUniformLocation(mainProg, 'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom = 0.7, angle = 0.0, drag = false, px = 0, py = 0, velAngle = 0;
+let zoom = 0.7, angle = 0.0, drag = false, px = 0, py = 0, velAngle = 0, worldRadius = 1;
 
 canvas.addEventListener('mousedown', e => { drag = true; px = e.clientX; py = e.clientY; velAngle = 0; });
 window.addEventListener('mouseup', () => drag = false);
@@ -297,7 +342,7 @@ window.addEventListener('mousemove', e => {
     velAngle = delta; angle += delta; px = e.clientX; py = e.clientY;
 });
 canvas.addEventListener('wheel', e => {
-    zoom = Math.max(0.4, Math.min(6, zoom * (1 - e.deltaY * 0.001)));
+    zoom = Math.max(0.7, Math.min(6, zoom * (1 - e.deltaY * 0.001)));
     e.preventDefault();
 }, { passive: false });
 
@@ -320,7 +365,6 @@ window.addEventListener('touchmove', e => {
 
 // ─── Render loop ──────────────────────────────────────────────────────────────
 const t0 = performance.now();
-resize();
 let animationId = null;
 
 function frame() {
@@ -332,6 +376,8 @@ function frame() {
     gl.useProgram(mainProg);
     bindQuad(mainProg);
 
+    const uRadiusMain = gl.getUniformLocation(mainProg, 'uRadius');
+    gl.uniform1f(uRadiusMain, worldRadius);
     gl.uniform2f(uRes, canvas.width, canvas.height);
     gl.uniform1f(uTime, t);
     gl.uniform1f(uZoom, zoom);
@@ -343,6 +389,7 @@ function frame() {
 
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
+resize();
 frame();
 
 export function stop() {
