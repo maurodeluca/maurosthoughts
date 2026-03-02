@@ -319,29 +319,17 @@ function initRTs() {
 }
 
 // ── Camera ────────────────────────────────────────────────────────────────────
-let theta = -0.25, phi = 0.32, dist = 40.0;
-let drag = false, px = 0, py = 0;
+let theta = -0.25, phi = 0.32, dist = 45.0;
 
 function adjustCameraForCard() {
   const w = canvas.clientWidth;
-  if (w < 400) dist = 60; else dist = 40;
+  if (w < 400) dist = 45; else dist = 45;
 }
 
-// Adjust camera distance for mobile / small screens
-function adjustForMobile() {
-  const isMobile = window.innerWidth < 768; // you can tweak the breakpoint
-  if (isMobile) {
-    dist = 80;   // zoom out more
-  } else {
-    dist = 40;   // default distance
-  }
-}
 adjustCameraForCard();
-adjustForMobile(); // run once on load
 
 window.addEventListener('resize', () => {
   adjustCameraForCard();
-  adjustForMobile();
 });
 
 function camSetup() {
