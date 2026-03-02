@@ -44,7 +44,7 @@ html {
 ========================= */
 
 section {
-  padding-right: 0rem;
+  padding-right: 1rem;
   padding-left: 1rem;
   display: flex;
   align-items: center;
