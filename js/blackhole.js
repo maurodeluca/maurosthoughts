@@ -8,6 +8,46 @@ varying vec2 vUv;
 void main() { vUv = aPos * 0.5 + 0.5; gl_Position = vec4(aPos, 0.0, 1.0); }
 `;
 
+const STAR_FS = `
+precision highp float;
+varying vec2 vUv;
+uniform vec2 uRes;
+
+float hash1(float n){ return fract(sin(n)*43758.5453); }
+
+vec3 starColor(float seed){
+  float t=hash1(seed*7.3);
+  if(t<0.3) return vec3(0.9,0.95,1.0);
+  if(t<0.6) return vec3(1.0,0.97,0.88);
+  if(t<0.8) return vec3(1.0,0.7,0.4);
+  return vec3(0.9,0.4,0.3);
+}
+
+void main(){
+  vec2 uv=vUv*2.0-1.0;
+  uv.x*=uRes.x/uRes.y;
+
+  vec3 stars=vec3(0.0);
+
+  for(int i=0;i<10000;i++){
+    float fi=float(i);
+    vec2 sp=vec2(hash1(fi*1.1)*6.0-3.0,
+                 hash1(fi*2.3)*6.0-3.0);
+    sp.x*=uRes.x/uRes.y;
+
+    vec2 d=uv-sp;
+    float dist=length(d);
+    float br=hash1(fi*0.7);
+    float sz=0.0004+br*br*0.002;
+
+    float core=exp(-dist*dist/(sz*sz*2.0));
+    stars+=starColor(fi)*core*(0.6+br*0.5);
+  }
+
+  gl_FragColor=vec4(stars,1.0);
+}
+`;
+
 const FS_BH = `
 precision highp float;
 varying vec2 vUv;
@@ -15,6 +55,7 @@ uniform vec2  uRes;
 uniform float uTime;
 uniform vec3  uCamPos;
 uniform mat3  uCamMat;
+uniform sampler2D uStarTex;
 
 const float PI      = 3.14159265359;
 const float RS      = 2.0;
@@ -101,25 +142,18 @@ vec4 sampleDisk(vec3 dp) {
 }
 
 vec3 background(vec3 dir) {
-  float up = dir.y*0.5+0.5;
+  // Convert 3D direction to spherical UV
+  float u = atan(dir.z, dir.x) / (2.0 * PI) + 0.5;
+  float v = dir.y * 0.5 + 0.5;
 
-  // Deep near-black base
-  vec3 dark = vec3(0.015, 0.005, 0.010);
+  vec2 starUV = vec2(u, v);
 
-  // Very subtle red atmospheric lift
-  vec3 lite = vec3(0.050, 0.010, 0.020);
+  vec3 stars = texture2D(uStarTex, starUV).rgb;
 
-  vec3 bg = mix(dark, lite, up*up);
+  // Very subtle deep-space lift
+  vec3 base = vec3(0.01, 0.003, 0.008);
 
-  // Faint star field (less blue, more neutral)
-  float s = pow(hash(vec2(
-      floor(dir.x*70.0+dir.y*33.0),
-      floor(dir.z*55.0+dir.y*17.0)
-  )), 38.0) * 0.4;
-
-  bg += vec3(s);
-
-  return bg;
+  return base + stars;
 }
 
 vec3 raymarch(vec3 ro, vec3 rd) {
@@ -266,6 +300,7 @@ function mkProg(vs, fs) {
     return p;
 }
 
+const pStar = mkProg(VS, STAR_FS);
 const pBH = mkProg(VS, FS_BH);
 const pExt = mkProg(VS, FS_EXTRACT);
 const pBlur = mkProg(VS, FS_BLUR);
@@ -317,6 +352,23 @@ function initRTs() {
     rtB3h = mkRT(W >> 3, H >> 3); rtB3v = mkRT(W >> 3, H >> 3);
 }
 
+let starRT;
+
+function initStars() {
+  starRT = mkRT(1024, 512); // 2:1 ratio works well for spherical map
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER, starRT.fb);
+  gl.viewport(0,0,starRT.w,starRT.h);
+
+  gl.useProgram(pStar);
+  bindQ(pStar);
+  uni2f(pStar,'uRes',starRT.w,starRT.h);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+
+  gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+}
+
 function resize() {
     const dpr = Math.min(devicePixelRatio, 1.5);
     canvas.width = Math.floor(innerWidth * dpr);
@@ -325,28 +377,85 @@ function resize() {
 }
 window.addEventListener('resize', resize);
 resize();
+initStars();
 
 // ── Camera ────────────────────────────────────────────────────────────────────
-let theta = -0.25, phi = 0.32, dist = 40.0;
-let drag = false, px = 0, py = 0;
+let theta = -0.25, phi = 0.32, dist = 40.0, lastDist = 0;
+let drag = false, px = 0, py = 0, pinch = false;
 
-canvas.addEventListener('mousedown', e => { drag = true; px = e.clientX; py = e.clientY; });
-window.addEventListener('mouseup', () => drag = false);
+function getDist(t1, t2) {
+  const dx = t1.clientX - t2.clientX;
+  const dy = t1.clientY - t2.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+canvas.addEventListener('mousedown', e => { 
+  drag = true; 
+  px = e.clientX; 
+  py = e.clientY;
+});
+
+window.addEventListener('mouseup', () => drag = false );
+
 window.addEventListener('mousemove', e => {
     if (!drag) return;
     theta -= (e.clientX - px) * 0.006;
     phi = Math.max(0.02, Math.min(1.4, phi + (e.clientY - py) * 0.005));
     px = e.clientX; py = e.clientY;
 });
+
 canvas.addEventListener('wheel', e => {
-    dist = Math.max(5, Math.min(80, dist + e.deltaY * 0.02)); e.preventDefault();
+    dist = Math.max(5, Math.min(80, dist + e.deltaY * 0.02));
+     e.preventDefault();
 }, { passive: false });
-canvas.addEventListener('touchstart', e => { drag = true; px = e.touches[0].clientX; py = e.touches[0].clientY; });
-window.addEventListener('touchend', () => drag = false);
-window.addEventListener('touchmove', e => {
-    theta -= (e.touches[0].clientX - px) * 0.006;
-    phi = Math.max(0.02, Math.min(1.4, phi + (e.touches[0].clientY - py) * 0.005));
-    px = e.touches[0].clientX; py = e.touches[0].clientY;
+
+canvas.addEventListener('touchstart', e => {
+  if (e.touches.length === 1) {
+    // Single finger → rotate
+    drag = true;
+    pinch = false;
+    px = e.touches[0].clientX;
+    py = e.touches[0].clientY;
+  }
+
+  if (e.touches.length === 2) {
+    // Two fingers → zoom
+    drag = false;
+    pinch = true;
+    lastDist = getDist(e.touches[0], e.touches[1]);
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchmove', e => {
+  e.preventDefault();
+
+  // ROTATION
+  if (drag && e.touches.length === 1) {
+    const nx = e.touches[0].clientX;
+    const ny = e.touches[0].clientY;
+
+    theta -= (nx - px) * 0.006;
+    phi = Math.max(0.02, Math.min(1.4, phi + (ny - py) * 0.005));
+
+    px = nx;
+    py = ny;
+  }
+
+  // PINCH ZOOM
+  if (pinch && e.touches.length === 2) {
+    const newDist = getDist(e.touches[0], e.touches[1]);
+    const delta = newDist - lastDist;
+
+    dist -= delta * 0.05;
+    dist = Math.max(5, Math.min(80, dist));
+
+    lastDist = newDist;
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', () => {
+  drag = false;
+  pinch = false;
 });
 
 // Adjust camera distance for mobile / small screens
@@ -410,6 +519,7 @@ function frame() {
     uni1f(pBH, 'uTime', t);
     uni3f(pBH, 'uCamPos', ...cam.pos);
     uniM3(pBH, 'uCamMat', cam.mat);
+    bindTex(pBH, 'uStarTex', 0, starRT);  
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     // 2. Extract bloom

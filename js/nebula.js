@@ -276,36 +276,74 @@ const uAngle = gl.getUniformLocation(mainProg, 'uAngle');
 const uStarTx = gl.getUniformLocation(mainProg, 'uStarTex');
 
 // ─── Interaction ──────────────────────────────────────────────────────────────
-let zoom = 0.35, angle = 0.0, drag = false, px = 0, py = 0, velAngle = 0, worldRadius = 1;
+let zoom = 0.35, angle = 0.0, drag = false, px = 0, py = 0, velAngle = 0, worldRadius = 1, lastTouchDist = null;
 
-canvas.addEventListener('mousedown', e => { drag = true; px = e.clientX; py = e.clientY; velAngle = 0; });
+canvas.addEventListener('mousedown', e => { 
+    drag = true; 
+    px = e.clientX; 
+    py = e.clientY; 
+    velAngle = 0;
+});
+
 window.addEventListener('mouseup', () => drag = false);
+
 window.addEventListener('mousemove', e => {
     if (!drag) return;
     const delta = ((e.clientX - px) / innerWidth) * Math.PI * 2.5;
     velAngle = delta; angle += delta; px = e.clientX; py = e.clientY;
 });
+
+// Mouse wheel zoom
 canvas.addEventListener('wheel', e => {
     zoom = Math.max(0.35, Math.min(7, zoom * (1 - e.deltaY * 0.001)));
     e.preventDefault();
 }, { passive: false });
 
-let lastTD = null;
+// Touch start
 canvas.addEventListener('touchstart', e => {
-    if (e.touches.length === 1) { drag = true; px = e.touches[0].clientX; py = e.touches[0].clientY; velAngle = 0; }
-    if (e.touches.length === 2) lastTD = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
+    if (e.touches.length === 1) {
+        // Single finger → rotate
+        drag = true;
+        px = e.touches[0].clientX;
+        py = e.touches[0].clientY;
+        velAngle = 0;
+    } else if (e.touches.length === 2) {
+        // Two fingers → start pinch
+        drag = false;
+        lastTouchDist = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+    }
+}, { passive: false });
+
+// Touch end
+window.addEventListener('touchend', () => {
+    drag = false;
+    lastTouchDist = null;
 });
-window.addEventListener('touchend', () => { drag = false; lastTD = null; });
+
+// Touch move
 window.addEventListener('touchmove', e => {
+    e.preventDefault();
+
     if (e.touches.length === 1 && drag) {
         const delta = ((e.touches[0].clientX - px) / innerWidth) * Math.PI * 2.5;
-        velAngle = delta; angle += delta; px = e.touches[0].clientX; py = e.touches[0].clientY;
+        velAngle = delta;
+        angle += delta;
+        px = e.touches[0].clientX;
+        py = e.touches[0].clientY;
     }
-    if (e.touches.length === 2 && lastTD) {
-        const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-        zoom = Math.max(0.35, Math.min(7, zoom * d / lastTD)); lastTD = d;
+
+    if (e.touches.length === 2 && lastTouchDist !== null) {
+        const d = Math.hypot(
+            e.touches[0].clientX - e.touches[1].clientX,
+            e.touches[0].clientY - e.touches[1].clientY
+        );
+        zoom = Math.max(0.35, Math.min(7, zoom * d / lastTouchDist));
+        lastTouchDist = d;
     }
-});
+}, { passive: false });
 
 // ─── Render loop ──────────────────────────────────────────────────────────────
 const t0 = performance.now();

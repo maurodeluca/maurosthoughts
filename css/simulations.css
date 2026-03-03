@@ -370,3 +370,7 @@ footer.copyright p {
   pointer-events: none; 
   text-transform: uppercase;
 }
+
+canvas {
+  touch-action: none;
+}
