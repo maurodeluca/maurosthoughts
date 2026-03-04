@@ -535,7 +535,7 @@ const RUN_MODS = [
   { id:'glass',    name:'GLASS CANNON',    desc:'2× SCORE — 50% MAX HP',        icon:'◇', mult:2.0 },
   { id:'marathon', name:'MARATHON',         desc:'BIGGER MAZE +3 FRAGS — 1.5× SCORE', icon:'∞', mult:1.5 },
   { id:'lights',   name:'LIGHTS OUT',       desc:'NO MINIMAP — 1.5× SCORE',      icon:'◌', mult:1.5 },
-  { id:'overclock',name:'OVERCLOCKER',      desc:'+30% SPEED −1s DASH CD',       icon:'⚡', mult:1.2 },
+  { id:'overclock',name:'OVERCLOCKER',      desc:'+30% SPEED −0.6s DASH CD',     icon:'⚡', mult:1.2 },
   { id:'fragile',  name:'FRAGILE CIRCUITS', desc:'TRAPS 3× DMG — +500/LEVEL',    icon:'△', mult:1.3 },
   { id:'swarm',    name:'PREDATOR SWARM',   desc:'+3 ENEMIES — 1.5× SCORE',      icon:'◈', mult:1.5 },
 ];
@@ -1092,10 +1092,11 @@ function generateMaze(rows, cols) {
   }
 
   // Step 7: Place fragments — prioritize dead ends and rooms, then spread remaining
+  // ONLY use BFS-reachable cells (dist >= 0) to prevent unreachable fragments
   THOUGHT_CELLS = [];
   // Shuffle dead ends and rooms
-  const shuffDE = [...deadEnds].sort(() => Math.random() - 0.5);
-  const roomCenters = rooms.map(rm => [rm.centerR, rm.centerC]).filter(([r,c]) => grid[r][c] === 0 && !(r===exitR && c===exitC));
+  const shuffDE = [...deadEnds].filter(([r,c]) => dist[r][c] > 0).sort(() => Math.random() - 0.5);
+  const roomCenters = rooms.map(rm => [rm.centerR, rm.centerC]).filter(([r,c]) => grid[r][c] === 0 && !(r===exitR && c===exitC) && dist[r][c] > 0);
   const shuffRC = roomCenters.sort(() => Math.random() - 0.5);
   // Fill from dead ends first, then room centers, then random floor
   const fragSources = [...shuffDE, ...shuffRC];
@@ -1106,9 +1107,9 @@ function generateMaze(rows, cols) {
     usedCells.add(key);
     THOUGHT_CELLS.push([r, c]);
   }
-  // Fill remaining with spread floor cells
+  // Fill remaining with spread floor cells (only reachable ones)
   if (THOUGHT_CELLS.length < numFragments) {
-    const shuffFloor = [...floorCells].sort(() => Math.random() - 0.5);
+    const shuffFloor = [...floorCells].filter(([r,c]) => dist[r][c] > 0).sort(() => Math.random() - 0.5);
     const step = Math.max(1, Math.floor(shuffFloor.length / (numFragments - THOUGHT_CELLS.length)));
     for (let i = 0; THOUGHT_CELLS.length < numFragments && i < shuffFloor.length; i += step) {
       const [r, c] = shuffFloor[i];
@@ -1222,16 +1223,24 @@ function generateMaze(rows, cols) {
   }
 
   // Step 13: Identify toggle walls (4-6 walls that border two floor cells)
+  // Never place toggle walls adjacent to fragment dead-ends (would block only path)
   TOGGLE_WALLS = [];
   if (!isBossLevel && currentLevel >= 2) {
+    const fragNeighborSet = new Set();
+    THOUGHT_CELLS.forEach(([fr,fc]) => {
+      [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc]) => {
+        const nr=fr+dr, nc=fc+dc;
+        if(nr>=0 && nr<MH && nc>=0 && nc<MW && grid[nr][nc]===1) fragNeighborSet.add(`${nr},${nc}`);
+      });
+    });
     const toggleCandidates = [];
     for (let r=2; r<MH-2; r++) for (let c=2; c<MW-2; c++) {
       if (grid[r][c] !== 1) continue;
+      if (fragNeighborSet.has(`${r},${c}`)) continue; // skip walls adjacent to fragments
       // Check N-S passage or E-W passage
       const ns = grid[r-1]?.[c]===0 && grid[r+1]?.[c]===0;
       const ew = grid[r]?.[c-1]===0 && grid[r]?.[c+1]===0;
       if ((ns && !ew) || (ew && !ns)) {
-        // Verify we won't block the only path (simple check: at least 2 neighbors of each side are connected)
         toggleCandidates.push({r,c});
       }
     }
@@ -2834,25 +2843,25 @@ window.addEventListener('keydown', e => {
     else if(gState==='paused') resumeGame();
   }
   // Debug: press L to enter a level number
-  if(gState==='playing' && e.code==='KeyL'){
-    e.preventDefault();
-    const input = prompt('Jump to level (1-20):');
-    if(input!==null){
-      const lvl = parseInt(input,10);
-      if(lvl>=1 && lvl<=20){
-        stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
-        showScreen(null); initAudio(); startDrone(); gState='playing';
-        flashLevel('LEVEL ' + lvl);
-        const cfg = getLevelConfig(lvl);
-        if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
-      } else { showMsg('INVALID LEVEL',1500); }
-    }
-  }
+  // if(gState==='playing' && e.code==='KeyL'){
+  //   e.preventDefault();
+  //   const input = prompt('Jump to level (1-20):');
+  //   if(input!==null){
+  //     const lvl = parseInt(input,10);
+  //     if(lvl>=1 && lvl<=20){
+  //       stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
+  //       showScreen(null); initAudio(); startDrone(); gState='playing';
+  //       flashLevel('LEVEL ' + lvl);
+  //       const cfg = getLevelConfig(lvl);
+  //       if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
+  //     } else { showMsg('INVALID LEVEL',1500); }
+  //   }
+  // }
   // Debug: G = toggle god mode
-  if(gState==='playing' && e.code==='KeyG'){
-    godMode=!godMode;
-    showMsg(godMode?'GOD MODE ON':'GOD MODE OFF',1500);
-  }
+  // if(gState==='playing' && e.code==='KeyG'){
+  //   godMode=!godMode;
+  //   showMsg(godMode?'GOD MODE ON':'GOD MODE OFF',1500);
+  // }
   // M = flash maze layout on minimap for 3 seconds
   if(gState==='playing' && e.code==='KeyM'){
     showMazeLayout=true;
@@ -3150,8 +3159,8 @@ function drawMinimap(){
   });
   // Enemies with type-specific colors
   enemies.forEach(e=>{
-    // Stalkers invisible on minimap unless scanner active
-    if(e.type===ETYPE_STALKER && scannerTimer<=0) return;
+    // Stalkers invisible on minimap unless scanner active or map scan (M key)
+    if(e.type===ETYPE_STALKER && scannerTimer<=0 && !showMazeLayout) return;
     const ec=Math.round(e.mesh.position.x/CELL);
     const er=Math.round(e.mesh.position.z/CELL);
     let color;
@@ -3243,7 +3252,8 @@ function updateHUD(){
   // Grow bar track width based on max HP (110px base, +27.5px per boss)
   const hpTrack=document.getElementById('hp-track');
   if(hpTrack) hpTrack.style.width=(110 * maxHp / 100)+'px';
-  const dashPct=Math.max(0,100-(player.dashCooldown/2.5*100));
+  const dashCdHud = Math.max(1.2, 3.0 - playerUpgrades.dashCdBonus);
+  const dashPct=Math.max(0,100-(player.dashCooldown/dashCdHud*100));
   dashFill.style.width=dashPct+'%';
   dashFill.style.background=dashPct>=100?'#ff6600':'#443300';
   dashInd.classList.toggle('dash-on',dashPct>=100);
@@ -3428,7 +3438,7 @@ function resetPlayer(){
   // Overclock modifier boosts
   if(runModifier?.id==='overclock'){
     playerUpgrades.speedBonus+=3; // +30% speed
-    playerUpgrades.dashCdBonus+=1; // -1s dash CD
+    playerUpgrades.dashCdBonus+=0.6; // -0.6s dash CD
   }
   clearKeys();
   smoothCamDist=3.2;
@@ -3483,7 +3493,7 @@ function updatePlayer(dt){
   if(player.dashTimer>0){ player.dashTimer-=dt; player.isDashing=true; }
   else { player.isDashing=false; }
 
-  const dashCd = Math.max(0.5, 2.5 - playerUpgrades.dashCdBonus);
+  const dashCd = Math.max(1.2, 3.0 - playerUpgrades.dashCdBonus);
   if(shift&&player.dashCooldown<=0&&!player.isDashing){
     player.dashTimer=0.3; player.dashCooldown=dashCd; player.isDashing=true;
     player.iframes=Math.max(player.iframes, 0.15); // brief invulnerability
@@ -4376,14 +4386,12 @@ function updateToggleWalls(dt){
       MAZE[tw.r][tw.c]=tw.isWall?1:0;
     });
 
-    // BFS check: ensure exit is still reachable from player
+    // BFS check: ensure exit AND all uncollected fragments are still reachable from player
     const pr=Math.round(player.z/CELL), pc=Math.round(player.x/CELL);
     const visited=new Set();
     const q=[[pr,pc]]; visited.add(`${pr},${pc}`);
-    let exitReachable=false;
     while(q.length>0){
       const [cr,cc]=q.shift();
-      if(MAZE[cr]?.[cc]===2){ exitReachable=true; break; }
       [[0,1],[0,-1],[1,0],[-1,0]].forEach(([dr,dc])=>{
         const nr=cr+dr, nc=cc+dc;
         const key=`${nr},${nc}`;
@@ -4392,8 +4400,21 @@ function updateToggleWalls(dt){
         }
       });
     }
-    // If not reachable, revert toggle
-    if(!exitReachable){
+    // Check exit reachable
+    let allReachable=false;
+    for(let r=0;r<MH;r++) for(let c=0;c<MW;c++){
+      if(MAZE[r]?.[c]===2 && visited.has(`${r},${c}`)){ allReachable=true; break; }
+    }
+    // Check all uncollected fragments reachable
+    if(allReachable){
+      for(let i=0;i<thoughtObjs.length;i++){
+        if(thoughtObjs[i].collected) continue;
+        const [fr,fc]=THOUGHT_CELLS[i];
+        if(!visited.has(`${fr},${fc}`)){ allReachable=false; break; }
+      }
+    }
+    // If not all reachable, revert toggle
+    if(!allReachable){
       toggleWallMeshes.forEach(tw=>{
         tw.isWall=!tw.isWall;
         if(tw.isWall){
@@ -4492,7 +4513,7 @@ function updateBoss(dt){
         const chosen=upgrades[Math.floor(Math.random()*upgrades.length)];
         switch(chosen){
           case 'speedBonus': playerUpgrades.speedBonus+=0.5; showMsg('UPGRADE: +25 MAX INTEGRITY & +SPEED',4000); break;
-          case 'dashCdBonus': playerUpgrades.dashCdBonus+=0.5; showMsg('UPGRADE: +25 MAX INTEGRITY & -0.5s DASH CD',4000); break;
+          case 'dashCdBonus': playerUpgrades.dashCdBonus+=0.3; showMsg('UPGRADE: +25 MAX INTEGRITY & -0.3s DASH CD',4000); break;
           case 'pulseCdBonus': playerUpgrades.pulseCdBonus+=1; showMsg('UPGRADE: +25 MAX INTEGRITY & -1s PULSE CD',4000); break;
         }
         // Unlock exit immediately
