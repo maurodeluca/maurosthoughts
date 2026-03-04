@@ -3583,12 +3583,20 @@ function updatePlayer(dt){
     const overclockMult=overclockTimer>0?2:1;
     const upgradeSpd=1+playerUpgrades.speedBonus*0.1;
     const speedMult=player.isDashing?3.2:1;
-    const step=player.speed*speedMult*trapSlow*overclockMult*upgradeSpd*dt*dir;
-    const nx=player.x+Math.sin(player.angle)*step;
-    const nz=player.z+Math.cos(player.angle)*step;
-    const res=resolveCollisions(nx,nz);
-    const moved=(Math.abs(res.x-player.x)>0.001||Math.abs(res.z-player.z)>0.001);
-    player.x=res.x; player.z=res.z;
+    const totalStep=player.speed*speedMult*trapSlow*overclockMult*upgradeSpd*dt*dir;
+    // Subdivide large steps to prevent wall clipping
+    const maxStep=PLAYER_R*0.8;
+    const subSteps=Math.max(1, Math.ceil(Math.abs(totalStep)/maxStep));
+    const stepPer=totalStep/subSteps;
+    let cx=player.x, cz=player.z;
+    for(let s=0;s<subSteps;s++){
+      const nx=cx+Math.sin(player.angle)*stepPer;
+      const nz=cz+Math.cos(player.angle)*stepPer;
+      const res=resolveCollisions(nx,nz);
+      cx=res.x; cz=res.z;
+    }
+    const moved=(Math.abs(cx-player.x)>0.001||Math.abs(cz-player.z)>0.001);
+    player.x=cx; player.z=cz;
     if(moved&&!player.isDashing){
       player.stepTimer-=dt;
       if(player.stepTimer<=0){sfxStep();player.stepTimer=0.3;}
