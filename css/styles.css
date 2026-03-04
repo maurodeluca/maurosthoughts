@@ -410,6 +410,124 @@ nav a:hover {
 }
 
 /* =========================
+   Game cards
+========================= */
+.game-grid {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.game-card {
+  position: relative;
+  display: block;
+  width: 340px;
+  text-decoration: none;
+  border-radius: 14px;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 40px rgba(57, 255, 20, 0.15);
+}
+
+.game-card-screen {
+  position: relative;
+  background: #020a02;
+  border: 2px solid #1a3a1a;
+  border-radius: 14px;
+  padding: 32px 24px;
+  overflow: hidden;
+}
+
+.game-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.15) 2px,
+    rgba(0, 0, 0, 0.15) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.game-card-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.game-title {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #39ff14;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+  margin-bottom: 8px;
+}
+
+.game-ext {
+  color: #666;
+  font-weight: normal;
+}
+
+.game-tagline {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.75rem;
+  color: #888;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+
+.game-meta {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.6rem;
+  color: #555;
+  letter-spacing: 0.12em;
+  margin-bottom: 20px;
+}
+
+.game-prompt {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.85rem;
+  color: #39ff14;
+  letter-spacing: 0.2em;
+  animation: game-blink 1.2s step-end infinite;
+}
+
+@keyframes game-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+.game-card:hover .game-card-screen {
+  border-color: #39ff14;
+  box-shadow: inset 0 0 30px rgba(57, 255, 20, 0.05);
+}
+
+.game-card:hover .game-prompt {
+  text-shadow: 0 0 12px rgba(57, 255, 20, 0.6);
+}
+
+@media (max-width: 480px) {
+  .game-card {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+/* =========================
    Writing page overrides
 ========================= */
 
