@@ -502,6 +502,7 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/utils/BufferGeometryUtils.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
@@ -604,6 +605,9 @@ let playerUpgrades = { maxHp:0, speedBonus:0, dashCdBonus:0, pulseCdBonus:0 };
 // Boss state
 let bossObj = null;
 let bossHP = 0;
+let bossMaxHP = 0;
+let bossLootDrops = 0;
+let bossLootTotal = 0;
 let bossPhase = 'idle'; // 'idle'|'charge'|'pulse'|'summon'
 let bossPhaseTimer = 0;
 let bossAttackCooldown = 4;
@@ -1952,8 +1956,69 @@ let skyDomes = [];
 
 const wallGeo = new THREE.BoxGeometry(CELL, WALL_H, CELL);
 const octGeo = new THREE.OctahedronGeometry(0.38, 0);
-const eGeo = new THREE.IcosahedronGeometry(0.6, 0);
 const particleGeo = new THREE.BoxGeometry(0.04, 0.04, 0.04);
+
+// ── Enemy geometry builders ───────────────────────────────
+// PATROL: Spiked octahedron (two octahedra stacked, second rotated 45°)
+function makePatrolGeo(s){
+  s=s||0.6;
+  const g1=new THREE.OctahedronGeometry(s, 0);
+  const g2=new THREE.OctahedronGeometry(s*0.7, 0);
+  // rotate second 45° around Y
+  g2.rotateY(Math.PI/4);
+  g2.rotateZ(Math.PI/6);
+  const merged=THREE.BufferGeometryUtils.mergeBufferGeometries([g1,g2]);
+  return merged||g1;
+}
+// STALKER: Flat diamond (two squashed cones tip-to-tip)
+function makeStalkerGeo(s){
+  s=s||0.55;
+  const top=new THREE.ConeGeometry(s*0.8, s*0.5, 4);
+  top.translate(0, s*0.25, 0);
+  const bot=new THREE.ConeGeometry(s*0.8, s*0.5, 4);
+  bot.rotateX(Math.PI);
+  bot.translate(0, -s*0.25, 0);
+  bot.rotateY(Math.PI/4);
+  const merged=THREE.BufferGeometryUtils.mergeBufferGeometries([top,bot]);
+  return merged||top;
+}
+// SPRINTER: Arrow/dart (cone + small box tail)
+function makeSprinterGeo(s){
+  s=s||0.5;
+  const cone=new THREE.ConeGeometry(s*0.6, s*1.4, 4);
+  cone.rotateX(-Math.PI/2);
+  const tail=new THREE.BoxGeometry(s*0.35, s*0.35, s*0.4);
+  tail.translate(0, 0, s*0.7);
+  const merged=THREE.BufferGeometryUtils.mergeBufferGeometries([cone,tail]);
+  return merged||cone;
+}
+// BLOCKER: Low-poly torus (capacitor/coil)
+function makeBlockerGeo(s){
+  s=s||0.9;
+  const torus=new THREE.TorusGeometry(s*0.45, s*0.2, 5, 6);
+  return torus;
+}
+// BOSS: Central sphere + 4 orbiting tetrahedra
+function makeBossGeo(s){
+  s=s||1.2;
+  const core=new THREE.IcosahedronGeometry(s*0.6, 1);
+  const parts=[core];
+  for(let i=0;i<4;i++){
+    const sat=new THREE.TetrahedronGeometry(s*0.3, 0);
+    const a=(Math.PI*2/4)*i;
+    sat.translate(Math.cos(a)*s*0.85, (i%2===0?0.3:-0.3)*s, Math.sin(a)*s*0.85);
+    parts.push(sat);
+  }
+  const merged=THREE.BufferGeometryUtils.mergeBufferGeometries(parts);
+  return merged||core;
+}
+// MINION: Tiny pyramid
+function makeMinionGeo(s){
+  s=s||0.35;
+  return new THREE.TetrahedronGeometry(s, 0);
+}
+
+const eGeo = makePatrolGeo(0.6);
 const particleMats = [
   new THREE.MeshBasicMaterial({ color:0x39ff14, transparent:true, opacity:0.35 }),
   new THREE.MeshBasicMaterial({ color:0xc8a000, transparent:true, opacity:0.25 }),
@@ -2459,9 +2524,9 @@ function buildWorld() {
 
   // Enemies — with type variants
   const cfg = getLevelConfig(currentLevel);
-  const stalkerGeo = new THREE.TetrahedronGeometry(0.55, 0);
-  const sprinterGeo = new THREE.DodecahedronGeometry(0.5, 0);
-  const blockerGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
+  const stalkerGeo = makeStalkerGeo(0.55);
+  const sprinterGeo = makeSprinterGeo(0.5);
+  const blockerGeo = makeBlockerGeo(0.9);
 
   ENEMY_STARTS.forEach(([r,c], i) => {
     // Assign enemy type based on level and index
@@ -2703,7 +2768,7 @@ function buildWorld() {
   if (isBossLevel && rooms.length > 0) {
     const bossRoom = rooms[0]; // first room is boss arena
     const br = bossRoom.centerR, bc = bossRoom.centerC;
-    const bGeo = new THREE.IcosahedronGeometry(1.2, 1);
+    const bGeo = makeBossGeo(1.2);
     const bMat = ps1mat(new THREE.MeshLambertMaterial({ color:0xcc0000, emissive:0x660000 }));
     const bMesh = new THREE.Mesh(bGeo, bMat);
     bMesh.position.set(bc*CELL, WALL_H*0.6, br*CELL);
@@ -2715,7 +2780,15 @@ function buildWorld() {
     bLight.position.set(bc*CELL, WALL_H*0.6, br*CELL);
     world.add(bMesh); world.add(bAura); world.add(bLight);
     bossObj = { mesh:bMesh, aura:bAura, light:bLight, r:br, c:bc };
-    bossHP = 100 + currentLevel * 20;
+    // Boss HP scales aggressively: lv5=200, lv10=400, lv15=700, lv20=1100
+    const bossIdx = Math.floor((currentLevel - 1) / 5); // 0,1,2,3
+    const bossHPTable = [200, 400, 700, 1100];
+    bossHP = bossHPTable[bossIdx] || (100 + currentLevel * 20);
+    bossMaxHP = bossHP;
+    // Loot: easy boss drops fewer, hard boss drops more
+    // lv5→1, lv10→2, lv15→3, lv20→4
+    bossLootTotal = bossIdx + 1;
+    bossLootDrops = 0;
     bossPhase = 'idle';
     bossPhaseTimer = 0;
     bossAttackCooldown = 3;
@@ -2746,20 +2819,20 @@ window.addEventListener('keydown', e => {
     else if(gState==='paused') resumeGame();
   }
   // Debug: press L to enter a level number
-  // if(gState==='playing' && e.code==='KeyL'){
-  //   e.preventDefault();
-  //   const input = prompt('Jump to level (1-20):');
-  //   if(input!==null){
-  //     const lvl = parseInt(input,10);
-  //     if(lvl>=1 && lvl<=20){
-  //       stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
-  //       showScreen(null); initAudio(); startDrone(); gState='playing';
-  //       flashLevel('LEVEL ' + lvl);
-  //       const cfg = getLevelConfig(lvl);
-  //       if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
-  //     } else { showMsg('INVALID LEVEL',1500); }
-  //   }
-  // }
+  if(gState==='playing' && e.code==='KeyL'){
+    e.preventDefault();
+    const input = prompt('Jump to level (1-20):');
+    if(input!==null){
+      const lvl = parseInt(input,10);
+      if(lvl>=1 && lvl<=20){
+        stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
+        showScreen(null); initAudio(); startDrone(); gState='playing';
+        flashLevel('LEVEL ' + lvl);
+        const cfg = getLevelConfig(lvl);
+        if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
+      } else { showMsg('INVALID LEVEL',1500); }
+    }
+  }
   // Debug: G = toggle god mode
   // if(gState==='playing' && e.code==='KeyG'){
   //   godMode=!godMode;
@@ -3132,7 +3205,7 @@ function updateHUD(){
   const bossHpFill=document.getElementById('boss-hp-fill');
   if(bossHud && isBossLevel && bossHP>0){
     bossHud.style.display='block';
-    const maxBossHP=100+currentLevel*20;
+    const maxBossHP=bossMaxHP||300;
     bossHpFill.style.width=Math.max(0,bossHP/maxBossHP*100)+'%';
   } else if(bossHud) {
     bossHud.style.display='none';
@@ -3241,9 +3314,12 @@ function restartGame(){
 
 function nextLevel(){
   stopDrone();
+  const preservedHp = player.hp; // persist integrity between levels
   currentLevel++;
   initLevel();
   resetPlayer();
+  player.hp = preservedHp; // restore preserved integrity
+  updateHUD();
   showScreen(null);
   initAudio(); startDrone();
   levelStartTime=performance.now(); pauseOffset=0;
@@ -3435,6 +3511,7 @@ function updatePlayer(dt){
         bossHP=Math.max(0,bossHP-dmg);
         sfxBossHit(); triggerShake(6,0.25);
         showMsg('BOSS DAMAGED');
+        checkBossLootDrop();
       }
     }
     // Visual pulse flash
@@ -3557,10 +3634,10 @@ function spawnEnemy(){
   else if(currentLevel>=4 && roll<0.45) etype = ETYPE_SPRINTER;
   else if(currentLevel>=2 && roll<0.5) etype = ETYPE_STALKER;
 
-  const stalkerGeo = new THREE.TetrahedronGeometry(0.55, 0);
-  const sprinterGeo = new THREE.DodecahedronGeometry(0.5, 0);
-  const blockerGeo = new THREE.BoxGeometry(0.9, 0.9, 0.9);
-  const eGeoSpawn = new THREE.IcosahedronGeometry(0.5, 0);
+  const stalkerGeo = makeStalkerGeo(0.55);
+  const sprinterGeo = makeSprinterGeo(0.5);
+  const blockerGeo = makeBlockerGeo(0.9);
+  const eGeoSpawn = makePatrolGeo(0.5);
   const typeConfig = {
     [ETYPE_PATROL]:  { geo:eGeoSpawn,    color:0xcc22ff, emissive:0x550088, auraColor:0xdd44ff, lightColor:0xcc44ff, scale:1 },
     [ETYPE_STALKER]: { geo:stalkerGeo,   color:0x2244aa, emissive:0x112244, auraColor:0x3366cc, lightColor:0x2244aa, scale:0.9 },
@@ -3767,6 +3844,7 @@ function updateEnemies(dt){
     if(e===bossObj && player.isDashing && cdist<1.5){
       bossHP-=30; sfxBossHit(); triggerShake(6,0.2);
       showMsg('BOSS DAMAGED');
+      checkBossLootDrop();
     }
   });
 }
@@ -4157,6 +4235,34 @@ function updateTerminal(dt){
   }
 }
 
+// ── Boss loot drop on damage thresholds ───────────────────
+function checkBossLootDrop(){
+  if(!bossObj || bossLootDrops >= bossLootTotal || bossMaxHP <= 0) return;
+  // Drop at evenly spaced HP thresholds (e.g. 4 drops → at 75%, 50%, 25%, 0%)
+  const nextThreshold = bossMaxHP * (1 - (bossLootDrops + 1) / bossLootTotal);
+  if(bossHP > nextThreshold) return;
+  bossLootDrops++;
+  const lootType = (bossLootDrops % 2 === 1) ? PICKUP_REPAIR : PICKUP_INVINCIBLE;
+  const lootConfigs = {
+    [PICKUP_REPAIR]:    { geo:new THREE.BoxGeometry(0.4,0.4,0.4), color:0xff4488, emissive:0x441122, label:'REPAIR' },
+    [PICKUP_INVINCIBLE]:{ geo:new THREE.OctahedronGeometry(0.4,0), color:0xffd700, emissive:0x886600, label:'SHIELD' },
+  };
+  const lc = lootConfigs[lootType];
+  const angle = Math.random() * Math.PI * 2;
+  const spread = 1.2 + Math.random() * 0.8;
+  const bx = bossObj.mesh.position.x + Math.cos(angle) * spread;
+  const bz = bossObj.mesh.position.z + Math.sin(angle) * spread;
+  const lMat = ps1mat(new THREE.MeshLambertMaterial({ color:lc.color, emissive:lc.emissive }));
+  const lMesh = new THREE.Mesh(lc.geo, lMat);
+  lMesh.position.set(bx, WALL_H * 0.4, bz);
+  const lLight = new THREE.PointLight(lc.color, 0.6, 5);
+  lLight.position.copy(lMesh.position);
+  world.add(lMesh); world.add(lLight);
+  pickupObjs.push({ mesh:lMesh, light:lLight, type:lootType, collected:false, label:lc.label, r:Math.round(bz/CELL), c:Math.round(bx/CELL) });
+  sfxPickup();
+  showMsg('BOSS DROPPED '+lc.label+'!', 2000);
+}
+
 // ── Update boss ───────────────────────────────────────────
 function updateBoss(dt){
   if(!bossObj || !isBossLevel || bossHP<=0) {
@@ -4271,7 +4377,7 @@ function updateBoss(dt){
         const angle=Math.random()*Math.PI*2;
         const mr=Math.round(bossObj.c)+Math.round(Math.sin(angle)*3);
         const mc=Math.round(bossObj.r)+Math.round(Math.cos(angle)*3);
-        const mGeo=new THREE.IcosahedronGeometry(0.35,0);
+        const mGeo=makeMinionGeo(0.35);
         const mMat=ps1mat(new THREE.MeshLambertMaterial({color:0xff4444,emissive:0x440000}));
         const mMesh=new THREE.Mesh(mGeo,mMat);
         mMesh.position.set(mr*CELL,WALL_H/2,mc*CELL);
