@@ -1125,8 +1125,11 @@ function generateMaze(rows, cols) {
       if (md >= 2 && md <= 5 && !usedCells.has(`${r},${c}`)) guardCandidates.push([r, c]);
     }
   });
-  const shuffGuard = [...new Set(guardCandidates.map(JSON.stringify))].map(JSON.parse).sort(() => Math.random() - 0.5);
-  const farCandidates = floorCells.filter(([r,c]) => dist[r][c] > maxDist * 0.4).sort(() => Math.random() - 0.5);
+  const SAFE_DIST = 6; // min Manhattan distance from player start (1,1)
+  const shuffGuard = [...new Set(guardCandidates.map(JSON.stringify))].map(JSON.parse)
+    .filter(([r,c]) => Math.abs(r-1)+Math.abs(c-1) >= SAFE_DIST)
+    .sort(() => Math.random() - 0.5);
+  const farCandidates = floorCells.filter(([r,c]) => dist[r][c] > maxDist * 0.4 && Math.abs(r-1)+Math.abs(c-1) >= SAFE_DIST).sort(() => Math.random() - 0.5);
 
   // Half guards, half roamers
   const guardCount = Math.ceil(numEnemies / 2);
