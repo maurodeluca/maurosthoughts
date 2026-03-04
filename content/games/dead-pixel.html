@@ -2964,11 +2964,23 @@ function showMsg(txt,dur=2500){
   msgTimer=setTimeout(()=>{msgEl.style.display='none';},dur);
 }
 
+let flashEl = null;
+let flashTimer = null;
 function flash(txt){
-  const el=document.createElement('div');
-  el.className='t-flash'; el.textContent=txt;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(),2300);
+  if(!flashEl){
+    flashEl = document.createElement('div');
+    flashEl.className='t-flash';
+    document.body.appendChild(flashEl);
+  }
+  // Reset animation by removing and re-adding the element
+  flashEl.remove();
+  flashEl.textContent = txt;
+  flashEl.style.display = 'block';
+  // Force reflow to restart CSS animation
+  void flashEl.offsetWidth;
+  document.body.appendChild(flashEl);
+  clearTimeout(flashTimer);
+  flashTimer = setTimeout(()=>{ flashEl.style.display='none'; }, 2300);
 }
 
 function flashLevel(txt){
@@ -3037,12 +3049,6 @@ function drawMinimap(){
       if(v!==1){mmCtx.strokeStyle='rgba(200,160,0,0.18)';mmCtx.strokeRect(offX+c*CZ,offY+r*CZ,CZ,CZ);}
     }
   }
-  thoughtObjs.forEach((t,i)=>{
-    if(t.collected)return;
-    const[tr,tc]=THOUGHT_CELLS[i];
-    mmCtx.fillStyle='rgba(57,255,20,0.7)';
-    mmCtx.fillRect(offX+tc*CZ+1,offY+tr*CZ+1,Math.max(CZ-2,2),Math.max(CZ-2,2));
-  });
   // Exit marker on minimap — always visible, pulsing
   for(let r=0;r<MH;r++) for(let c=0;c<MW;c++){
     if(MAZE[r][c]===2){
@@ -3137,6 +3143,14 @@ function drawMinimap(){
     mmCtx.beginPath(); mmCtx.arc(offX+c2*CZ+CZ/2, offY+r2*CZ+CZ/2, Math.max(CZ*0.6,2), 0, Math.PI*2); mmCtx.fill();
     mmCtx.globalAlpha = 1;
   });
+  // Fragments on minimap — drawn last so always visible on top
+  thoughtObjs.forEach((t,i)=>{
+    if(t.collected)return;
+    const[tr,tc]=THOUGHT_CELLS[i];
+    mmCtx.fillStyle='rgba(57,255,20,0.7)';
+    mmCtx.fillRect(offX+tc*CZ+1,offY+tr*CZ+1,Math.max(CZ-2,2),Math.max(CZ-2,2));
+  });
+  // Player dot + direction arrow
   const pc=Math.round(player.x/CELL), pr=Math.round(player.z/CELL);
   mmCtx.fillStyle=player.isDashing?'#ff6600':'#39ff14';
   mmCtx.fillRect(offX+pc*CZ+1,offY+pr*CZ+1,Math.max(CZ-2,2),Math.max(CZ-2,2));
@@ -4062,9 +4076,11 @@ function updateBonus(dt){
   if(dist<1.25){
     bonusObj.collected=true; bonusObj.mesh.visible=false; bonusObj.light.visible=false; bonusObj.ring.visible=false;
     score+=0; // doesn't count toward fragment progress, just bonus points
+    player.hp=Math.min(100, player.hp+25);
     sfxBonusCollect();
-    showMsg('RISK FRAGMENT ACQUIRED — +500 BONUS', 3000);
+    showMsg('RISK FRAGMENT — +500 BONUS +25 INTEGRITY', 3000);
     triggerShake(5,0.2);
+    updateHUD();
   }
 }
 
