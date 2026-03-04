@@ -151,7 +151,7 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
   animation:blink-border 1s step-start infinite;
 }
 @keyframes blink-border {
-  0%,100%{border-color:var(--red-glow);}
+  0%,100%{border-color:gold;}
   50%{border-color:transparent;}
 }
 /* hint replaced by controls-strip */
@@ -434,7 +434,8 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
     You were quantified.<br>
     You were found insufficient.<br>
     <span id="go-level" style="font-size:10px;opacity:.4;letter-spacing:.15em;color:var(--muted)">REACHED DEPTH: 1</span><br>
-    <span id="go-score" style="font-size:14px;letter-spacing:.2em;color:var(--amber);text-shadow:0 0 8px var(--amber)">SCORE: 0</span>
+    <span id="go-score" style="font-size:14px;letter-spacing:.2em;color:var(--amber);text-shadow:0 0 8px var(--amber)">SCORE: 0</span><br>
+    <span id="go-terminals" style="font-size:10px;opacity:.5;letter-spacing:.15em;color:var(--cyan);text-shadow:0 0 6px var(--cyan)"></span>
   </div>
   <button class="s-btn red" id="btn-restart" style="margin-bottom:18px">↩ &nbsp;REINITIALIZE</button>
   <div id="go-splits" class="split-display" style="margin-bottom:14px"></div>
@@ -2698,20 +2699,30 @@ function buildWorld() {
   // ── Toggle walls — walls that open/close periodically ───
   toggleWallMeshes = [];
   TOGGLE_WALLS.forEach(({r,c}, idx) => {
-    // These start as walls (already in MAZE). Create a distinct mesh
-    const twMat = ps1mat(new THREE.MeshLambertMaterial({ color:0x2a4a2a, emissive:0x0a1a0a }));
+    // These start as walls (already in MAZE). Use normal wall color when solid
+    const twMat = ps1mat(new THREE.MeshLambertMaterial({ color:0x0d2a0d, emissive:0x010801 }));
     const twMesh = new THREE.Mesh(wallGeo, twMat);
     twMesh.position.set(c*CELL, WALL_H/2, r*CELL);
     world.add(twMesh);
-    // Add warning stripes
-    const stripeMat = new THREE.MeshBasicMaterial({ color:0xffaa00, transparent:true, opacity:0.2 });
+    // Add warning stripes (for telegraph)
+    const stripeMat = new THREE.MeshBasicMaterial({ color:0xffee00, transparent:true, opacity:0.2 });
     const stripeGeo = new THREE.PlaneGeometry(CELL*0.8, 0.15);
     const stripe = new THREE.Mesh(stripeGeo, stripeMat);
     stripe.position.set(c*CELL, WALL_H*0.8, r*CELL);
     stripe.rotation.y = Math.PI/4;
+    stripe.visible = false;
     world.add(stripe);
-    toggleWallMeshes.push({ mesh:twMesh, stripe, r, c, isWall:true, telegraphing:false });
+    // Yellow floor marker — visible when passable
+    const floorMat = new THREE.MeshBasicMaterial({ color:0xddcc00, transparent:true, opacity:0.35 });
+    const floorGeo = new THREE.PlaneGeometry(CELL*0.9, CELL*0.9);
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.position.set(c*CELL, 0.06, r*CELL);
+    floor.rotation.x = -Math.PI/2;
+    floor.visible = false;
+    world.add(floor);
+    toggleWallMeshes.push({ mesh:twMesh, stripe, floor, r, c, isWall:true, telegraphing:false });
   });
+  rebuildToggleWallSet();
 
   // ── Terminal — retro monitor in a dead end ──────────────
   terminalObj = null;
@@ -2806,7 +2817,7 @@ const player = {
   angle:0,
   speed:5.4, turnSpeed:3.2,
   hp:100, iframes:0, stepTimer:0,
-  dashCooldown:0, dashTimer:0, isDashing:false,
+  dashCooldown:0, dashTimer:0, isDashing:false, dashMomentum:false,
   hopY:0, hopVel:0, isHopping:false,
   pulseCooldown:0, laserShots:3, laserShotDelay:0,
   portalCooldown:0,
@@ -3026,6 +3037,41 @@ function canMoveTo(wx,wz){
   const ddx=r.x-wx, ddz=r.z-wz;
   return ddx*ddx+ddz*ddz<0.01;
 }
+// Toggle-wall-aware helpers for enemies (they phase through reroute walls)
+const _toggleWallSet=new Set();
+function rebuildToggleWallSet(){
+  _toggleWallSet.clear();
+  toggleWallMeshes.forEach(tw=>{ _toggleWallSet.add(tw.r+','+tw.c); });
+}
+function isWallForEnemy(r,c){
+  if(r<0||r>=MH||c<0||c>=MW)return true;
+  if(MAZE[r][c]!==1) return false;
+  return !_toggleWallSet.has(r+','+c);
+}
+function resolveCollisionsEnemy(wx,wz){
+  const R=PLAYER_R, halfC=CELL/2;
+  const gr=Math.round(wz/CELL), gc=Math.round(wx/CELL);
+  for(let dr=-1;dr<=1;dr++) for(let dc=-1;dc<=1;dc++){
+    const cr=gr+dr, cc=gc+dc;
+    if(!isWallForEnemy(cr,cc)) continue;
+    const cx=cc*CELL, cz=cr*CELL;
+    const nearX=Math.max(cx-halfC, Math.min(wx, cx+halfC));
+    const nearZ=Math.max(cz-halfC, Math.min(wz, cz+halfC));
+    const ddx=wx-nearX, ddz=wz-nearZ;
+    const distSq=ddx*ddx+ddz*ddz;
+    if(distSq<R*R && distSq>0.0001){
+      const dist=Math.sqrt(distSq);
+      wx+=ddx/dist*(R-dist);
+      wz+=ddz/dist*(R-dist);
+    }
+  }
+  return {x:wx,z:wz};
+}
+function canMoveToEnemy(wx,wz){
+  const r=resolveCollisionsEnemy(wx,wz);
+  const ddx=r.x-wx, ddz=r.z-wz;
+  return ddx*ddx+ddz*ddz<0.01;
+}
 
 // ── Minimap ───────────────────────────────────────────────
 function drawMinimap(){
@@ -3095,10 +3141,10 @@ function drawMinimap(){
       mmCtx.stroke();
     }
   }
-  // Toggle walls on minimap
+  // Toggle walls on minimap — yellow when passable, hidden (normal wall) when solid
   toggleWallMeshes.forEach(tw=>{
-    if(tw.isWall){
-      mmCtx.fillStyle='rgba(255,140,0,0.4)';
+    if(!tw.isWall){
+      mmCtx.fillStyle='rgba(220,200,0,0.5)';
       mmCtx.fillRect(offX+tw.c*CZ,offY+tw.r*CZ,CZ,CZ);
     }
   });
@@ -3447,12 +3493,13 @@ function updatePlayer(dt){
   if(jump && !player.isHopping){
     player.isHopping=true;
     player.hopVel=5.5; // upward impulse
+    if(player.isDashing) player.dashMomentum=true; // carry dash speed in air
     sfxStep(); // reuse step sound for hop
   }
   if(player.isHopping){
     player.hopVel-=18*dt; // gravity
     player.hopY+=player.hopVel*dt;
-    if(player.hopY<=0){ player.hopY=0; player.hopVel=0; player.isHopping=false; }
+    if(player.hopY<=0){ player.hopY=0; player.hopVel=0; player.isHopping=false; player.dashMomentum=false; }
   }
 
   // Pulse ability — fires a laser beam that kills enemies (3 shots then cooldown)
@@ -3594,7 +3641,7 @@ function updatePlayer(dt){
     const trapSlow=getPlayerTrapSlow();
     const overclockMult=overclockTimer>0?2:1;
     const upgradeSpd=1+playerUpgrades.speedBonus*0.1;
-    const speedMult=player.isDashing?3.2:1;
+    const speedMult=(player.isDashing||player.dashMomentum)?1.5:1;
     const totalStep=player.speed*speedMult*trapSlow*overclockMult*upgradeSpd*dt*dir;
     // Subdivide large steps to prevent wall clipping
     const maxStep=PLAYER_R*0.8;
@@ -3952,8 +3999,8 @@ function updateEnemies(dt){
       const spd=e.chasing?e.speed*1.55:e.speed;
       const mnx=ex+(tx-ex)/len*spd*dt;
       const mnz=ez+(tz-ez)/len*spd*dt;
-      if(canMoveTo(mnx,ez))e.mesh.position.x=mnx;
-      if(canMoveTo(ex,mnz))e.mesh.position.z=mnz;
+      if(canMoveToEnemy(mnx,ez))e.mesh.position.x=mnx;
+      if(canMoveToEnemy(ex,mnz))e.mesh.position.z=mnz;
     }
     e.light.position.copy(e.mesh.position);
     e.aura.position.set(e.mesh.position.x,0.05,e.mesh.position.z);
@@ -3997,6 +4044,7 @@ function triggerDeath(){
   document.getElementById('go-level').textContent='REACHED DEPTH: '+currentLevel+' — '+fmtTime(getRunElapsed());
   const runPts = getRunScore();
   document.getElementById('go-score').textContent='SCORE: '+runPts;
+  document.getElementById('go-terminals').textContent='TERMINALS: '+visitedTerminals.size+'/'+LORE_ENTRIES.length;
   setTimeout(async ()=>{
     showScreen(scrGO);
     // Render splits
@@ -4176,6 +4224,7 @@ function updateTraps(dt){
   }
 }
 function getPlayerTrapSlow(){
+  if(player.isDashing) return 1;
   const pr=Math.round(player.z/CELL), pc=Math.round(player.x/CELL);
   for(const [tr,tc] of TRAP_CELLS){
     if(pr===tr && pc===tc) return 0.4;
@@ -4296,7 +4345,8 @@ function updateToggleWalls(dt){
     toggleWallMeshes.forEach(tw=>{
       if(!tw.telegraphing){
         tw.telegraphing=true;
-        tw.stripe.material.opacity=0.6;
+        tw.stripe.visible=true;
+        tw.stripe.material.color.setHex(tw.isWall ? 0xffee00 : 0xff4444);
       }
       tw.stripe.material.opacity=0.3+Math.sin(Date.now()*0.02)*0.3;
     });
@@ -4309,9 +4359,17 @@ function updateToggleWalls(dt){
 
     toggleWallMeshes.forEach(tw=>{
       tw.telegraphing=false;
+      tw.stripe.visible=false;
       tw.stripe.material.opacity=0.2;
       tw.isWall=!tw.isWall;
-      tw.mesh.visible=tw.isWall;
+      if(tw.isWall){
+        tw.mesh.material.color.setHex(0x0d2a0d);
+        tw.mesh.material.emissive.setHex(0x010801);
+      } else {
+        tw.mesh.material.color.setHex(0x8a7a20);
+        tw.mesh.material.emissive.setHex(0x2a2500);
+      }
+      tw.floor.visible=!tw.isWall;
       MAZE[tw.r][tw.c]=tw.isWall?1:0;
     });
 
@@ -4335,7 +4393,14 @@ function updateToggleWalls(dt){
     if(!exitReachable){
       toggleWallMeshes.forEach(tw=>{
         tw.isWall=!tw.isWall;
-        tw.mesh.visible=tw.isWall;
+        if(tw.isWall){
+          tw.mesh.material.color.setHex(0x0d2a0d);
+          tw.mesh.material.emissive.setHex(0x010801);
+        } else {
+          tw.mesh.material.color.setHex(0x8a7a20);
+          tw.mesh.material.emissive.setHex(0x2a2500);
+        }
+        tw.floor.visible=!tw.isWall;
         MAZE[tw.r][tw.c]=tw.isWall?1:0;
       });
     }
@@ -4479,8 +4544,8 @@ function updateBoss(dt){
         const spd=12;
         const mnx=bx+dx/len*spd*dt;
         const mnz=bz+dz/len*spd*dt;
-        if(canMoveTo(mnx,bz)) bossObj.mesh.position.x=mnx;
-        if(canMoveTo(bx,mnz)) bossObj.mesh.position.z=mnz;
+        if(canMoveToEnemy(mnx,bz)) bossObj.mesh.position.x=mnx;
+        if(canMoveToEnemy(bx,mnz)) bossObj.mesh.position.z=mnz;
       }
       bossObj.light.position.copy(bossObj.mesh.position);
       bossObj.aura.position.set(bossObj.mesh.position.x,0.05,bossObj.mesh.position.z);
@@ -4549,8 +4614,8 @@ function updateBoss(dt){
     if(mlen>0.3){
       const mnx=m.mesh.position.x+mdx/mlen*m.speed*dt;
       const mnz=m.mesh.position.z+mdz/mlen*m.speed*dt;
-      if(canMoveTo(mnx,m.mesh.position.z)) m.mesh.position.x=mnx;
-      if(canMoveTo(m.mesh.position.x,mnz)) m.mesh.position.z=mnz;
+      if(canMoveToEnemy(mnx,m.mesh.position.z)) m.mesh.position.x=mnx;
+      if(canMoveToEnemy(m.mesh.position.x,mnz)) m.mesh.position.z=mnz;
     }
     m.light.position.copy(m.mesh.position);
     m.aura.position.set(m.mesh.position.x,0.05,m.mesh.position.z);
@@ -4593,7 +4658,7 @@ function checkExit(){
       winTitle.style.color='#ffd700';
       winTitle.style.textShadow='0 0 24px #ffd700, 0 0 60px rgba(255,215,0,.4)';
       document.getElementById('win-flavor').textContent='You broke free. The maze remembers.';
-      document.getElementById('win-feature').textContent='★ FINAL TIME: '+fmtTime(getRunElapsed());
+      document.getElementById('win-feature').textContent='★ FINAL TIME: '+fmtTime(getRunElapsed())+' — TERMINALS: '+visitedTerminals.size+'/'+LORE_ENTRIES.length;
       document.getElementById('win-feature').style.color='#ffd700';
       document.getElementById('win-depth').textContent='SCORE: '+runPts;
       btnNext.textContent='★  RETURN TO TITLE';
