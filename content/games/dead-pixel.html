@@ -330,17 +330,17 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
 .hs-char {
   width:28px; height:34px; background:rgba(57,255,20,.06);
   border:1px solid rgba(57,255,20,.3);
-  color:var(--cyan); font-family:'Courier New',Courier,monospace;
+  color:varrgba(57,255,20,.3); font-family:'Courier New',Courier,monospace;
   font-size:20px; text-align:center; line-height:34px;
-  text-shadow:0 0 6px var(--cyan);
+  text-shadow:0 0 6px rgba(57,255,20,.3);
   cursor:pointer; user-select:none;
 }
 .hs-char:hover { background:rgba(57,255,20,.12); }
 .hs-confirm {
   font-family:inherit; font-size:11px; letter-spacing:.15em;
-  color:var(--cyan); background:transparent;
-  border:1px solid var(--cyan); padding:6px 18px;
-  cursor:pointer; text-shadow:0 0 6px var(--cyan);
+  color:rgba(57,255,20,.3); background:transparent;
+  border:1px solid rgba(57,255,20,.3); padding:6px 18px;
+  cursor:pointer; text-shadow:0 0 6px rgba(57,255,20,.3);
   margin-left:8px;
 }
 .hs-confirm:hover { background:rgba(57,255,20,.08); }
@@ -397,7 +397,7 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
   </div>
   <div id="msg"></div>
   <div id="controls-strip">
-    <span class="ck"><span class="k">WASD</span> MOVE</span>
+    <span class="ck"><span class="k">ARROWS</span> MOVE</span>
     <span class="ck" id="dash-ind"><span class="k">SHIFT</span> DASH</span>
     <span class="ck"><span class="k">E / CLICK</span> LASER</span>
     <span class="ck"><span class="k">R</span> RELOAD</span>
@@ -2834,25 +2834,25 @@ window.addEventListener('keydown', e => {
     else if(gState==='paused') resumeGame();
   }
   // Debug: press L to enter a level number
-  // if(gState==='playing' && e.code==='KeyL'){
-  //   e.preventDefault();
-  //   const input = prompt('Jump to level (1-20):');
-  //   if(input!==null){
-  //     const lvl = parseInt(input,10);
-  //     if(lvl>=1 && lvl<=20){
-  //       stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
-  //       showScreen(null); initAudio(); startDrone(); gState='playing';
-  //       flashLevel('LEVEL ' + lvl);
-  //       const cfg = getLevelConfig(lvl);
-  //       if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
-  //     } else { showMsg('INVALID LEVEL',1500); }
-  //   }
-  // }
+  if(gState==='playing' && e.code==='KeyL'){
+    e.preventDefault();
+    const input = prompt('Jump to level (1-20):');
+    if(input!==null){
+      const lvl = parseInt(input,10);
+      if(lvl>=1 && lvl<=20){
+        stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
+        showScreen(null); initAudio(); startDrone(); gState='playing';
+        flashLevel('LEVEL ' + lvl);
+        const cfg = getLevelConfig(lvl);
+        if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
+      } else { showMsg('INVALID LEVEL',1500); }
+    }
+  }
   // Debug: G = toggle god mode
-  // if(gState==='playing' && e.code==='KeyG'){
-  //   godMode=!godMode;
-  //   showMsg(godMode?'GOD MODE ON':'GOD MODE OFF',1500);
-  // }
+  if(gState==='playing' && e.code==='KeyG'){
+    godMode=!godMode;
+    showMsg(godMode?'GOD MODE ON':'GOD MODE OFF',1500);
+  }
   // M = flash maze layout on minimap for 3 seconds
   if(gState==='playing' && e.code==='KeyM'){
     showMazeLayout=true;
