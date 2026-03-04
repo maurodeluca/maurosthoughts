@@ -1310,7 +1310,7 @@ function sfxWin() {
 }
 function sfxStep() { tone(180+Math.random()*60,'square',.03,.025); }
 function sfxDash() {
-  tone(300,'sawtooth',.12,.1); tone(600,'sine',.08,.06,.04); tone(900,'sine',.06,.04,.06);
+  tone(300,'sawtooth',.15,.12); tone(600,'sine',.1,.08,.03); tone(900,'sine',.08,.05,.05); tone(1200,'sine',.05,.03,.08);
 }
 function sfxPulse() {
   tone(200,'sine',.3,.15); tone(400,'triangle',.2,.1,.05);
@@ -3484,8 +3484,9 @@ function updatePlayer(dt){
   else { player.isDashing=false; }
 
   const dashCd = Math.max(0.5, 2.5 - playerUpgrades.dashCdBonus);
-  if(shift&&(up||down)&&player.dashCooldown<=0&&!player.isDashing){
-    player.dashTimer=0.2; player.dashCooldown=dashCd; player.isDashing=true;
+  if(shift&&player.dashCooldown<=0&&!player.isDashing){
+    player.dashTimer=0.3; player.dashCooldown=dashCd; player.isDashing=true;
+    player.iframes=Math.max(player.iframes, 0.15); // brief invulnerability
     sfxDash(); triggerShake(3,0.15);
   }
 
@@ -3636,12 +3637,14 @@ function updatePlayer(dt){
   }
 
   // W/S = move forward/back along facing direction
-  if(up||down){
-    const dir=up?1:-0.6;
+  // Dash auto-moves forward even without W/S held
+  const wantMove = up || down || player.isDashing || player.dashMomentum;
+  if(wantMove){
+    const dir = (down && !player.isDashing && !player.dashMomentum) ? -0.6 : 1;
     const trapSlow=getPlayerTrapSlow();
     const overclockMult=overclockTimer>0?2:1;
     const upgradeSpd=1+playerUpgrades.speedBonus*0.1;
-    const speedMult=(player.isDashing||player.dashMomentum)?1.5:1;
+    const speedMult=(player.isDashing||player.dashMomentum)?2.5:1;
     const totalStep=player.speed*speedMult*trapSlow*overclockMult*upgradeSpd*dt*dir;
     // Subdivide large steps to prevent wall clipping
     const maxStep=PLAYER_R*0.8;
