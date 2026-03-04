@@ -2857,6 +2857,8 @@ window.addEventListener('keydown', e => {
   }
 });
 window.addEventListener('keyup', e => { keys[e.code]=false; });
+window.addEventListener('mousedown', e => { if(e.button===0) keys['Mouse0']=true; });
+window.addEventListener('mouseup', e => { if(e.button===0) keys['Mouse0']=false; });
 window.addEventListener('blur', clearKeys);
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden) clearKeys(); });
 
@@ -3396,7 +3398,7 @@ function updatePlayer(dt){
   const left=keys['KeyA']||keys['ArrowLeft'];
   const right=keys['KeyD']||keys['ArrowRight'];
   const shift=keys['ShiftLeft']||keys['ShiftRight'];
-  const pulse=keys['KeyE'];
+  const pulse=keys['KeyE']||keys['Mouse0'];
   const fKey=keys['KeyF'];
   const reload=keys['KeyR'];
   const jump=keys['Space'];
