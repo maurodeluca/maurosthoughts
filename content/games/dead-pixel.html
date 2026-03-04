@@ -2823,25 +2823,25 @@ window.addEventListener('keydown', e => {
     else if(gState==='paused') resumeGame();
   }
   // Debug: press L to enter a level number
-  if(gState==='playing' && e.code==='KeyL'){
-    e.preventDefault();
-    const input = prompt('Jump to level (1-20):');
-    if(input!==null){
-      const lvl = parseInt(input,10);
-      if(lvl>=1 && lvl<=20){
-        stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
-        showScreen(null); initAudio(); startDrone(); gState='playing';
-        flashLevel('LEVEL ' + lvl);
-        const cfg = getLevelConfig(lvl);
-        if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
-      } else { showMsg('INVALID LEVEL',1500); }
-    }
-  }
+  // if(gState==='playing' && e.code==='KeyL'){
+  //   e.preventDefault();
+  //   const input = prompt('Jump to level (1-20):');
+  //   if(input!==null){
+  //     const lvl = parseInt(input,10);
+  //     if(lvl>=1 && lvl<=20){
+  //       stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
+  //       showScreen(null); initAudio(); startDrone(); gState='playing';
+  //       flashLevel('LEVEL ' + lvl);
+  //       const cfg = getLevelConfig(lvl);
+  //       if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
+  //     } else { showMsg('INVALID LEVEL',1500); }
+  //   }
+  // }
   // Debug: G = toggle god mode
-  if(gState==='playing' && e.code==='KeyG'){
-    godMode=!godMode;
-    showMsg(godMode?'GOD MODE ON':'GOD MODE OFF',1500);
-  }
+  // if(gState==='playing' && e.code==='KeyG'){
+  //   godMode=!godMode;
+  //   showMsg(godMode?'GOD MODE ON':'GOD MODE OFF',1500);
+  // }
   // M = flash maze layout on minimap for 3 seconds
   if(gState==='playing' && e.code==='KeyM'){
     showMazeLayout=true;
