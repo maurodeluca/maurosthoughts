@@ -3224,6 +3224,7 @@ function updateHUD(){
   if(effectsEl){
     let html='';
     if(runModifier) html+='<div style="color:var(--amber)">MOD: '+runModifier.name.toUpperCase()+'</div>';
+    html+='<div style="color:var(--muted);opacity:.35;font-size:8px">v1.0.0</div>';
     if(invincibleTimer>0) html+='<div style="color:#ffd700;font-weight:bold">◆ INVINCIBLE '+Math.ceil(invincibleTimer)+'s</div>';
     if(scannerTimer>0) html+='<div style="color:#00ccff">SCANNER '+Math.ceil(scannerTimer)+'s</div>';
     if(overclockTimer>0) html+='<div style="color:#ffaa00">OVERCLOCK '+Math.ceil(overclockTimer)+'s</div>';
