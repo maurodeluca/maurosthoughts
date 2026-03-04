@@ -2822,20 +2822,20 @@ window.addEventListener('keydown', e => {
     else if(gState==='paused') resumeGame();
   }
   // Debug: press L to enter a level number
-  if(gState==='playing' && e.code==='KeyL'){
-    e.preventDefault();
-    const input = prompt('Jump to level (1-20):');
-    if(input!==null){
-      const lvl = parseInt(input,10);
-      if(lvl>=1 && lvl<=20){
-        stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
-        showScreen(null); initAudio(); startDrone(); gState='playing';
-        flashLevel('LEVEL ' + lvl);
-        const cfg = getLevelConfig(lvl);
-        if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
-      } else { showMsg('INVALID LEVEL',1500); }
-    }
-  }
+  // if(gState==='playing' && e.code==='KeyL'){
+  //   e.preventDefault();
+  //   const input = prompt('Jump to level (1-20):');
+  //   if(input!==null){
+  //     const lvl = parseInt(input,10);
+  //     if(lvl>=1 && lvl<=20){
+  //       stopDrone(); currentLevel=lvl; initLevel(); resetPlayer();
+  //       showScreen(null); initAudio(); startDrone(); gState='playing';
+  //       flashLevel('LEVEL ' + lvl);
+  //       const cfg = getLevelConfig(lvl);
+  //       if(cfg.featureText) setTimeout(()=>showMsg(cfg.featureText, 4000), 1500);
+  //     } else { showMsg('INVALID LEVEL',1500); }
+  //   }
+  // }
   // Debug: G = toggle god mode
   // if(gState==='playing' && e.code==='KeyG'){
   //   godMode=!godMode;
@@ -3081,11 +3081,6 @@ function drawMinimap(){
   // Terminal on minimap — only show during T-key ping scan
   if(terminalObj && !terminalObj.activated && showTerminalPing){
     const tr=terminalObj.r, tc=terminalObj.c;
-    const tPulse=0.6+Math.sin(Date.now()*0.006)*0.3;
-    mmCtx.fillStyle='rgba(57,255,20,'+tPulse+')';
-    mmCtx.fillRect(offX+tc*CZ-1,offY+tr*CZ-1,CZ+2,CZ+2);
-    mmCtx.strokeStyle='#39ff14'; mmCtx.lineWidth=2;
-    mmCtx.strokeRect(offX+tc*CZ-2,offY+tr*CZ-2,CZ+4,CZ+4);
     // T-key ping: expanding radar rings toward terminal
     const pingT=(Date.now()%1000)/1000;
     for(let i=0;i<3;i++){
@@ -3285,6 +3280,12 @@ function initLevel(){
   // Boss HUD
   const bossHud=document.getElementById('boss-hud');
   if(bossHud) bossHud.style.display=isBossLevel?'block':'none';
+
+  // Update objective text
+  const objEl=document.getElementById('hud-objective');
+  if(objEl) objEl.textContent=isBossLevel
+    ? 'OBJECTIVE: DEFEAT THE BOSS AND ESCAPE'
+    : 'OBJECTIVE: COLLECT ALL FRAGMENTS AND ESCAPE';
 }
 
 function showModScreen(){
@@ -4316,6 +4317,8 @@ function updateBoss(dt){
         score=numFragments;
         if(exitMesh){exitMesh.material=mExitOn.clone();exitMesh.material.flatShading=true;}
         if(exitLight){exitLight.intensity=1.2;exitLight.color.setHex(0x39ff14);}
+        const objEl=document.getElementById('hud-objective');
+        if(objEl) objEl.textContent='OBJECTIVE: FIND THE EXIT';
         updateHUD();
       }
     }
