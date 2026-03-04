@@ -122,6 +122,9 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
 #split-display .split-lbl { color:var(--amber); opacity:.5; }
 #split-display .split-time { color:var(--cyan); }
 #hud-tr { position:absolute; top:14px; right:14px; text-align:right; padding:8px 10px; }
+#hud-br {
+  position:absolute; bottom:14px; right:14px; text-align:right; padding:8px 10px;
+}
 .bar-label { font-size:10px; letter-spacing:.15em; opacity:.65; margin-bottom:3px; }
 .bar-track {
   width:110px; height:7px;
@@ -150,10 +153,13 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
   0%,100%{border-color:var(--red-glow);}
   50%{border-color:transparent;}
 }
-#hint {
-  position:absolute; bottom:14px; left:50%; transform:translateX(-50%);
-  font-size:10px; letter-spacing:.18em; opacity:.4;
-  color:var(--muted); text-shadow: none;
+/* hint replaced by controls-strip */
+#hud-objective {
+  position:absolute; top:20px; left:50%; transform:translateX(-50%);
+  font-size:12px; letter-spacing:.25em; opacity:.4;
+  color:var(--red-glow);
+  text-shadow:0 0 6px var(--red-glow);
+  white-space:nowrap;
 }
 
 .t-flash {
@@ -258,25 +264,33 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
 @keyframes sub-in { 0%{opacity:0;transform:translateY(4px);} 100%{opacity:.5;transform:translateY(0);} }
 
 #minimap {
-  display:block; margin-top:10px; margin-left:auto;
+  display:block; margin-left:auto;
   opacity:.85; image-rendering:pixelated;
   border:1px solid rgba(57,255,20,.45);
   box-shadow:0 0 8px rgba(57,255,20,.15), inset 0 0 12px rgba(0,0,0,.4);
   border-radius:2px;
 }
 #active-effects {
-  margin-top:8px; font-family:'Courier New',monospace;
-  font-size:9px; letter-spacing:.12em; text-align:right;
+  margin-top:6px; font-family:'Courier New',monospace;
+  font-size:9px; letter-spacing:.12em; text-align:left;
+  opacity:.55;
 }
 
-.dash-ready {
-  position:absolute; bottom:42px; left:50%; transform:translateX(-50%);
-  font-size:9px; letter-spacing:.25em; opacity:0;
-  color:var(--magenta);
-  text-shadow:0 0 6px var(--magenta);
-  transition: opacity .3s;
+#controls-strip {
+  position:absolute; bottom:20px; left:15px;
+  display:flex; flex-direction:column; gap:3px;
+  font-family:'Courier New',Courier,monospace;
+  font-size:10px; letter-spacing:.18em; opacity:.6;
+  line-height:1.5;
+  text-shadow:0 0 4px var(--magenta);
+  border:1px solid rgba(255,0,128,.3);
+  padding:8px 12px;
+  box-shadow:0 0 8px rgba(255,0,128,.1);
 }
-.dash-ready.on { opacity:.6; }
+#controls-strip .ck { color:var(--magenta); white-space:nowrap; }
+#controls-strip .ck .k { color:var(--magenta); opacity:1; }
+#controls-strip .ck.dash-on { opacity:1; text-shadow:0 0 8px var(--magenta); }
+#controls-strip .ck.dash-on .k { opacity:1; }
 
 #shake-wrap {
   position:fixed; top:0; left:0; width:100%; height:100%;
@@ -355,6 +369,7 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
 <div id="glitch-overlay"></div>
 
 <div id="hud">
+  <div id="hud-objective">OBJECTIVE: COLLECT ALL FRAGMENTS AND ESCAPE</div>
   <div id="hud-tl">
     <div>LEVEL: <span id="level-disp">1</span></div>
     <div>FRAGMENTS: <span id="score-disp">0</span>/<span id="max-disp">7</span></div>
@@ -363,8 +378,12 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
       <div class="sr-total">⏱ <span id="timer-total">00:00.0</span></div>
       <div class="sr-level">LEVEL: <span id="timer-level">00:00.0</span></div>
     </div>
+    <div id="active-effects"></div>
   </div>
   <div id="hud-tr">
+    <canvas id="minimap" width="90" height="90"></canvas>
+  </div>
+  <div id="hud-br">
     <div class="bar-label">INTEGRITY</div>
     <div class="bar-track"><div class="bar-fill" id="hp-fill" style="width:100%"></div></div>
     <div class="bar-label">DASH</div>
@@ -373,12 +392,18 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
       <div class="bar-label">LASER <span id="laser-pips" style="letter-spacing:2px">■ ■ ■</span></div>
       <div class="bar-track"><div class="bar-fill" id="pulse-fill" style="width:100%"></div></div>
     </div>
-    <canvas id="minimap" width="90" height="90"></canvas>
-    <div id="active-effects"></div>
   </div>
   <div id="msg"></div>
-  <div class="dash-ready" id="dash-ind">[ SHIFT — DASH ]</div>
-  <div id="hint">W A S D / ARROWS — MOVE &nbsp;|&nbsp; SHIFT — DASH &nbsp;|&nbsp; E — LASER &nbsp;|&nbsp; R — RELOAD &nbsp;|&nbsp; COLLECT FRAGMENTS</div>
+  <div id="controls-strip">
+    <span class="ck"><span class="k">WASD</span> MOVE</span>
+    <span class="ck" id="dash-ind"><span class="k">SHIFT</span> DASH</span>
+    <span class="ck"><span class="k">E / CLICK</span> LASER</span>
+    <span class="ck"><span class="k">R</span> RELOAD</span>
+    <span class="ck"><span class="k">SPACE</span> HOP</span>
+    <span class="ck"><span class="k">F</span> TERMINAL</span>
+    <span class="ck"><span class="k">M</span> MAP</span>
+    <span class="ck"><span class="k">T</span> SCAN</span>
+  </div>
 </div>
 
 <!-- TITLE -->
@@ -393,7 +418,7 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
     <br><span style="opacity:.45">Each level deeper. Each escape harder.</span>
   </div>
   <button class="s-btn" id="btn-start">▶ &nbsp;INITIALIZE</button>
-  <div class="s-sub">WASD OR ARROWS TO MOVE &nbsp;· &nbsp;SHIFT TO DASH</div>
+  <div class="s-sub">WASD MOVE &nbsp;·&nbsp; SHIFT DASH &nbsp;·&nbsp; E/CLICK LASER &nbsp;·&nbsp; R RELOAD &nbsp;·&nbsp; SPACE HOP</div>
   <div id="title-scores" class="hs-board" style="margin-top:18px"></div>
 </div>
 
@@ -2753,8 +2778,6 @@ window.addEventListener('keydown', e => {
   }
 });
 window.addEventListener('keyup', e => { keys[e.code]=false; });
-window.addEventListener('mousedown', e => { if(e.button===0){ keys['Mouse0']=true; e.preventDefault(); } });
-window.addEventListener('mouseup', e => { if(e.button===0) keys['Mouse0']=false; });
 window.addEventListener('blur', clearKeys);
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden) clearKeys(); });
 
@@ -2833,7 +2856,6 @@ const dashInd    = document.getElementById('dash-ind');
 const msgEl      = document.getElementById('msg');
 const mmCanvas   = document.getElementById('minimap');
 const mmCtx      = mmCanvas.getContext('2d');
-const hintEl     = document.getElementById('hint');
 
 document.getElementById('btn-start').onclick   = startGame;
 document.getElementById('btn-restart').onclick = restartGame;
@@ -3082,7 +3104,7 @@ function updateHUD(){
   const dashPct=Math.max(0,100-(player.dashCooldown/2.5*100));
   dashFill.style.width=dashPct+'%';
   dashFill.style.background=dashPct>=100?'#ff6600':'#443300';
-  dashInd.classList.toggle('on',dashPct>=100);
+  dashInd.classList.toggle('dash-on',dashPct>=100);
   // Laser bar (always shown) — shows shots or recharge
   pulseBarWrap.style.display='';
   const pulseCdHud = Math.max(1, 5 - playerUpgrades.pulseCdBonus);
@@ -3166,11 +3188,6 @@ function initLevel(){
   // Boss HUD
   const bossHud=document.getElementById('boss-hud');
   if(bossHud) bossHud.style.display=isBossLevel?'block':'none';
-
-  // Update hint
-  if(currentLevel>=3){
-    hintEl.textContent='WASD / ARROWS — MOVE  |  SHIFT — DASH  |  E — LASER  |  R — RELOAD  |  F — TERMINAL  |  COLLECT FRAGMENTS';
-  }
 }
 
 function showModScreen(){
@@ -3294,7 +3311,7 @@ function updatePlayer(dt){
   const left=keys['KeyA']||keys['ArrowLeft'];
   const right=keys['KeyD']||keys['ArrowRight'];
   const shift=keys['ShiftLeft']||keys['ShiftRight'];
-  const pulse=keys['KeyE']||keys['Mouse0'];
+  const pulse=keys['KeyE'];
   const fKey=keys['KeyF'];
   const reload=keys['KeyR'];
   const jump=keys['Space'];
