@@ -373,6 +373,7 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
   <div id="hud-tl">
     <div>LEVEL: <span id="level-disp">1</span></div>
     <div>FRAGMENTS: <span id="score-disp">0</span>/<span id="max-disp">7</span></div>
+    <div>SCORE: <span id="pts-disp">0</span></div>
     <div>STATUS: <span id="status-disp">PROCESSING</span></div>
     <div id="speedrun-timer">
       <div class="sr-total">⏱ <span id="timer-total">00:00.0</span></div>
@@ -431,7 +432,8 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
   <div style="font-size:13px;opacity:.65;margin:14px 0 20px;text-align:center;line-height:2.1;color:var(--text);text-shadow:none;">
     You were quantified.<br>
     You were found insufficient.<br>
-    <span id="go-level" style="font-size:10px;opacity:.4;letter-spacing:.15em;color:var(--muted)">REACHED DEPTH: 1</span>
+    <span id="go-level" style="font-size:10px;opacity:.4;letter-spacing:.15em;color:var(--muted)">REACHED DEPTH: 1</span><br>
+    <span id="go-score" style="font-size:14px;letter-spacing:.2em;color:var(--amber);text-shadow:0 0 8px var(--amber)">SCORE: 0</span>
   </div>
   <button class="s-btn red" id="btn-restart" style="margin-bottom:18px">↩ &nbsp;REINITIALIZE</button>
   <div id="go-splits" class="split-display" style="margin-bottom:14px"></div>
@@ -459,7 +461,8 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
   <div class="s-label">SYSTEM HALTED</div>
   <div class="s-title" style="font-size:clamp(36px,8vw,64px);color:var(--amber);text-shadow:0 0 24px var(--amber),0 0 60px rgba(255,170,0,.3)">PAUSED</div>
   <div style="font-size:12px;opacity:.5;margin:18px 0 38px;text-align:center;line-height:2.1;color:var(--text);text-shadow:none;letter-spacing:.08em;">
-    DEPTH: <span id="pause-level">1</span> &nbsp;|&nbsp; FRAGMENTS: <span id="pause-score">0</span>/<span id="pause-max">7</span> &nbsp;|&nbsp; INTEGRITY: <span id="pause-hp">100</span>%
+    DEPTH: <span id="pause-level">1</span> &nbsp;|&nbsp; FRAGMENTS: <span id="pause-score">0</span>/<span id="pause-max">7</span> &nbsp;|&nbsp; INTEGRITY: <span id="pause-hp">100</span>%<br>
+    SCORE: <span id="pause-pts">0</span>
   </div>
   <button class="s-btn" id="btn-resume" style="margin-bottom:14px">▶ &nbsp;RESUME</button>
   <button class="s-btn" id="btn-sound" style="margin-bottom:14px">♪ &nbsp;SOUND: ON</button>
@@ -472,7 +475,7 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
   <div style="border:2px solid #39ff14;padding:30px 40px;max-width:500px;background:rgba(0,20,0,0.8);box-shadow:0 0 40px rgba(57,255,20,0.3);">
     <div style="color:#39ff14;font-size:10px;letter-spacing:0.2em;margin-bottom:12px;opacity:0.6">▸ AUDIO LOG RECOVERED</div>
     <div id="terminal-text" style="color:#39ff14;font-size:13px;line-height:1.8;min-height:80px;text-shadow:0 0 8px rgba(57,255,20,0.5)"></div>
-    <div style="color:#39ff14;font-size:9px;opacity:0.4;margin-top:16px;letter-spacing:0.15em">PRESS [F] OR [ESC] TO CLOSE</div>
+    <div style="color:#39ff14;font-size:9px;opacity:0.4;margin-top:16px;letter-spacing:0.15em">PRESS [F] TO CLOSE</div>
   </div>
 </div>
 
@@ -2738,7 +2741,7 @@ function clearKeys(){ Object.keys(keys).forEach(k=>keys[k]=false); }
 window.addEventListener('keydown', e => {
   keys[e.code]=true;
   if(e.code.startsWith('Arrow'))e.preventDefault();
-  if(e.code==='Escape'){
+  if(e.code==='Escape' && !terminalOpen){
     if(gState==='playing') pauseGame();
     else if(gState==='paused') resumeGame();
   }
@@ -3095,6 +3098,7 @@ function updateHUD(){
   levelDisp.textContent = currentLevel;
   scoreDisp.textContent = score;
   maxDisp.textContent = numFragments;
+  document.getElementById('pts-disp').textContent = getRunScore();
   if(score>=numFragments)      { statusDisp.textContent='LIBERATED'; statusDisp.style.color='#39ff14'; }
   else if(score>=numFragments/2){ statusDisp.textContent='RESISTING'; statusDisp.style.color='#ff6600'; }
   else                          { statusDisp.textContent='PROCESSING'; statusDisp.style.color='#39ff14'; }
@@ -3286,6 +3290,7 @@ function pauseGame(){
   document.getElementById('pause-score').textContent=score;
   document.getElementById('pause-max').textContent=numFragments;
   document.getElementById('pause-hp').textContent=Math.round(player.hp);
+  document.getElementById('pause-pts').textContent=getRunScore();
   showScreen(scrPause);
   clearKeys();
 }
@@ -3464,7 +3469,7 @@ function updatePlayer(dt){
         else clearInterval(typeInterval);
       },35);
       const dismissFn=(ev)=>{
-        if(ev.code==='KeyF'||ev.code==='Escape'){
+        if(ev.code==='KeyF'){
           overlay.style.display='none'; terminalOpen=false;
           showMsg('AUDIO LOG ARCHIVED — +200 BONUS',3000);
           document.removeEventListener('keydown',dismissFn);
@@ -3772,6 +3777,7 @@ function triggerDeath(){
   gState='dead'; stopDrone(); sfxDeath(); triggerShake(15,0.5);
   document.getElementById('go-level').textContent='REACHED DEPTH: '+currentLevel+' — '+fmtTime(getRunElapsed());
   const runPts = getRunScore();
+  document.getElementById('go-score').textContent='SCORE: '+runPts;
   setTimeout(async ()=>{
     showScreen(scrGO);
     // Render splits
@@ -4349,7 +4355,7 @@ function checkExit(){
       winTitle.style.textShadow='0 0 24px var(--cyan),0 0 60px rgba(0,229,255,.3)';
       document.getElementById('win-flavor').textContent='Fragment recovered. Going deeper.';
       document.getElementById('win-feature').style.color='var(--magenta)';
-      document.getElementById('win-depth').textContent='DEPTH: '+currentLevel+' — NEXT: '+(currentLevel+1)+' — '+fmtTime(getRunElapsed());
+      document.getElementById('win-depth').textContent='DEPTH: '+currentLevel+' — NEXT: '+(currentLevel+1)+' — SCORE: '+runPts;
       const nextCfg=getLevelConfig(currentLevel+1);
       document.getElementById('win-feature').textContent=nextCfg.featureText||'';
       btnNext.textContent='▶  GO DEEPER';
