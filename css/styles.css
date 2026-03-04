@@ -413,16 +413,16 @@ nav a:hover {
    Game cards
 ========================= */
 .game-grid {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 240px);
+  gap: 10px;
   justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
 }
 
 .game-card {
   position: relative;
   display: block;
-  width: 340px;
+  width: auto;
   text-decoration: none;
   border-radius: 14px;
   overflow: hidden;
@@ -441,6 +441,10 @@ nav a:hover {
   border-radius: 14px;
   padding: 32px 24px;
   overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .game-scanlines {
@@ -489,13 +493,18 @@ nav a:hover {
 
 .game-meta {
   display: flex;
-  justify-content: center;
-  gap: 8px;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.6rem;
   color: #555;
   letter-spacing: 0.12em;
   margin-bottom: 20px;
+}
+
+.game-meta span:empty {
+  display: none;
 }
 
 .game-prompt {
@@ -520,10 +529,37 @@ nav a:hover {
   text-shadow: 0 0 12px rgba(57, 255, 20, 0.6);
 }
 
-@media (max-width: 480px) {
+/* Disabled / coming-soon card */
+.game-card-disabled {
+  pointer-events: auto;
+  filter: grayscale(1) brightness(0.5);
+  opacity: 0.5;
+}
+.game-card-disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+.game-card-disabled:hover .game-card-screen {
+  border-color: #1a3a1a;
+  box-shadow: none;
+}
+.game-card-disabled .game-prompt {
+  color: #555;
+  animation: none;
+}
+.game-card-disabled:hover .game-prompt {
+  text-shadow: none;
+}
+
+@media (max-width: 768px) {
+  .game-grid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+    padding: 0 5.5rem;
+  }
+
   .game-card {
     width: 100%;
-    max-width: 300px;
   }
 }
 
@@ -713,6 +749,10 @@ nav a:hover {
     width: 100%;
     height: auto;
     aspect-ratio: 16 / 9;
+  }
+
+  .game-grid {
+    padding: 0 5.5rem;
   }
 }
 
