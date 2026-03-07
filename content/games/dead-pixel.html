@@ -3681,31 +3681,14 @@ function updatePlayer(dt){
   playerLight.color.setHex(player.isDashing?0xff6600:0x39ff14);
 }
 
-// ── Camera (first-person style, behind player) ───────────────
-let smoothCamDist=3.2;
+// ── Camera (true first-person) ────────────────────────────────
 function updateCamera(){
-  const maxDist=player.isDashing?4.0:3.2;
-  const camH=2.1;
-  const bx=-Math.sin(player.angle); // direction behind player
-  const bz=-Math.cos(player.angle);
-  // Simple wall check: step back from player, stop before hitting wall
-  let safeDist=0.5;
-  for(let i=1;i<=16;i++){
-    const t=maxDist*(i/16);
-    if(isWall(Math.round((player.z+bz*t)/CELL),Math.round((player.x+bx*t)/CELL))) break;
-    safeDist=t;
-  }
-  smoothCamDist+=(safeDist-smoothCamDist)*0.3;
+  const camH=1.6;
   const hopOff=player.hopY||0;
-  camera.position.set(
-    player.x+bx*smoothCamDist,
-    camH+hopOff,
-    player.z+bz*smoothCamDist
-  );
-  // Look ahead of player
+  camera.position.set(player.x, camH+hopOff, player.z);
   camera.lookAt(
     player.x+Math.sin(player.angle)*3,
-    1.1+hopOff,
+    camH+hopOff,
     player.z+Math.cos(player.angle)*3
   );
   camera.fov+=((player.isDashing?82:72)-camera.fov)*0.15;
