@@ -2876,6 +2876,12 @@ window.addEventListener('keydown', e => {
     if(terminalPingTimer) clearTimeout(terminalPingTimer);
     terminalPingTimer=setTimeout(()=>{ showTerminalPing=false; terminalPingTimer=null; },3000);
   }
+  // Enter/Space on win screen = click the next/quit button
+  if(gState==='win' && (e.code==='Enter' || e.code==='Space')){
+    e.preventDefault();
+    const btn = document.getElementById('btn-next');
+    if(btn) btn.click();
+  }
 });
 window.addEventListener('keyup', e => { keys[e.code]=false; });
 window.addEventListener('mousedown', e => { if(e.button===0) keys['Mouse0']=true; });
