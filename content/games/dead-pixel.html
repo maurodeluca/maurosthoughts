@@ -3555,22 +3555,22 @@ function updatePlayer(dt){
         killEnemy(e);
       }
     });
-    // Visual laser beam — FPS: project gun muzzle to screen, then into world
-    // 1. Gun muzzle tip in gunCamera space (gunGroup origin + muzzle flash local pos)
+    // Visual laser beam — start from gun muzzle, aim at crosshair (screen center)
+    // 1. Gun muzzle tip in gunCamera space → project to NDC
     const muzzleTipGun = new THREE.Vector3(GUN_REST.x + 0, GUN_REST.y + 0.01, GUN_REST.z + (-0.52));
     const mNDC = muzzleTipGun.clone().project(gunCamera);
-    // 2. Cast ray from main camera through that screen position
+    // 2. Cast ray from main camera through that screen position to find muzzle in world
     const mNear = new THREE.Vector3(mNDC.x, mNDC.y, -1).unproject(camera);
     const mFar = new THREE.Vector3(mNDC.x, mNDC.y, 1).unproject(camera);
     const mRayDir = new THREE.Vector3().subVectors(mFar, mNear).normalize();
-    // Beam starts 1.5 units along this ray from the near-plane point
     const muzzleX = mNear.x + mRayDir.x * 1.5;
     const muzzleY = mNear.y + mRayDir.y * 1.5;
     const muzzleZ = mNear.z + mRayDir.z * 1.5;
-    // 3. Aim target = center of screen at beam distance (where crosshair points)
+    // 3. Aim target = crosshair = screen center = camera forward at beam distance
+    const camH = camera.position.y;
     const aimX = player.x + ldx * beamLen;
     const aimZ = player.z + ldz * beamLen;
-    const aimY = 1.1;
+    const aimY = camH;
     // 4. Build beam from muzzle → aim
     const bDx=aimX-muzzleX, bDy=aimY-muzzleY, bDz=aimZ-muzzleZ;
     const bDist=Math.sqrt(bDx*bDx+bDy*bDy+bDz*bDz);
