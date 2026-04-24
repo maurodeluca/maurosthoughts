@@ -417,8 +417,9 @@ function blurPass(src, dstH, dstV) {
 }
 
 // ── Resize for card ──
+const _isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
 function resize() {
-  const dpr = Math.min(devicePixelRatio, 1.5);
+  const dpr = _isMobile ? 1 : Math.min(devicePixelRatio, 1.5);
   canvas.width = canvas.clientWidth * dpr;
   canvas.height = canvas.clientHeight * dpr;
   W = canvas.width;

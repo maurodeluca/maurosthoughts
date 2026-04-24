@@ -275,8 +275,9 @@ function bakeStars() {
 }
 
 // ─── Resize ───────────────────────────────────────────────────────────────────
+const _isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
 function resize() {
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = _isMobile ? 1 : (window.devicePixelRatio || 1);
 
     const displayWidth = Math.floor(canvas.clientWidth * dpr);
     const displayHeight = Math.floor(canvas.clientHeight * dpr);

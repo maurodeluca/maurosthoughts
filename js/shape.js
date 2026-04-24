@@ -1,8 +1,12 @@
-import * as THREE from 'https://unpkg.com/three@0.161.0/build/three.module.js';
+import * as THREE from 'three';
+
+const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
 
 function initShape() {
   const container = document.getElementById('shape-container');
   if (!container) return;
+
+  const section = container.closest('section');
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
@@ -13,11 +17,13 @@ function initShape() {
   );
   camera.position.z = 5;
 
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  // Disable antialiasing on mobile
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: !isMobile });
   renderer.setSize(container.clientWidth, container.clientHeight);
 
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-  renderer.setPixelRatio(isSafari ? 1.5 : Math.min(window.devicePixelRatio, 2));
+  // Cap pixel ratio: 1 on mobile, 1.5 on Safari desktop, ≤2 elsewhere
+  renderer.setPixelRatio(isMobile ? 1 : isSafari ? 1.5 : Math.min(window.devicePixelRatio, 2));
 
   container.appendChild(renderer.domElement);
 
@@ -41,7 +47,7 @@ function initShape() {
     emissiveIntensity: 100
   });
   const mesh = new THREE.Mesh(geometry, material);
-  mesh.scale.set(1.5, 1.5, 1.5); // doubles the size
+  mesh.scale.set(1.5, 1.5, 1.5);
   scene.add(mesh); 
 
   const dirLight = new THREE.DirectionalLight(0xffffff, 1.5);
@@ -55,17 +61,19 @@ function initShape() {
   let lastTimestamp = 0;
   let lastMoveTime = 0;
   let lastMoveDelta = { x: 0, y: 0 };
-  // spin speeds are in radians/second now (approximation of previous defaults)
   let spinSpeedX = 0.18;
   let spinSpeedY = 0.24;
   let isDragging = false;
   let lastPointer = { x: 0, y: 0 };
   let pointerDelta = { x: 0, y: 0 };
 
-  // Tunable constants
-  const rotationScale = 1.5; // multiplies normalized delta to rotation units
+  // Visibility tracking
+  let isVisible = false;
+  let animFrameId = null;
+
+  const rotationScale = 1.5;
   const spinMultiplier = 0.05;
-  const minSpin = 0.02; // minimum spin in radians/second on release
+  const minSpin = 0.02;
 
   const onPointerDown = (e) => {
     isDragging = true;
@@ -82,18 +90,15 @@ function initShape() {
     const now = performance.now();
     const dt = lastMoveTime ? Math.max((now - lastMoveTime) / 1000, 1 / 120) : (1 / 60);
 
-    // Normalize movement to container size so touch and mouse match
     const deltaX = (x - lastPointer.x) / container.clientWidth;
     const deltaY = (y - lastPointer.y) / container.clientHeight;
 
     pointerDelta.x = deltaX * rotationScale;
     pointerDelta.y = deltaY * rotationScale;
 
-    // Immediate rotation during drag (keeps feeling responsive)
     mesh.rotation.y += pointerDelta.x;
     mesh.rotation.x += pointerDelta.y;
 
-    // Convert the last movement into a velocity (radians/second)
     lastMoveDelta.x = pointerDelta.x / dt;
     lastMoveDelta.y = pointerDelta.y / dt;
     lastMoveTime = now;
@@ -106,12 +111,9 @@ function initShape() {
     isDragging = false;
     renderer.domElement.style.cursor = 'grab';
 
-    // Use the last measured velocity (radians/second) as initial spin speed,
-    // scaled down by `spinMultiplier` to slow flicks
     spinSpeedX = (lastMoveDelta.y || 0) * spinMultiplier;
     spinSpeedY = (lastMoveDelta.x || 0) * spinMultiplier;
 
-    // Ensure minimum spin momentum
     if (Math.abs(spinSpeedX) < minSpin) spinSpeedX = minSpin * Math.sign(spinSpeedX || 1);
     if (Math.abs(spinSpeedY) < minSpin) spinSpeedY = minSpin * Math.sign(spinSpeedY || 1);
   };
@@ -120,11 +122,10 @@ function initShape() {
   document.addEventListener('pointermove', onPointerMove);
   document.addEventListener('pointerup', onPointerUp);
 
-  // Use pointer events only to avoid duplicate touch+pointer handling
-  // (modern browsers support pointer events on both desktop and mobile)
-
   function animate(timestamp = 0) {
-    const deltaTime = Math.min((timestamp - lastTimestamp) / 1000, 0.016); // Cap at ~60fps
+    if (!isVisible) { animFrameId = null; return; }
+
+    const deltaTime = Math.min((timestamp - lastTimestamp) / 1000, 0.016);
     lastTimestamp = timestamp;
     
     t += deltaTime;
@@ -134,7 +135,6 @@ function initShape() {
       mesh.rotation.y += spinSpeedY;
 
       const decay = 0.95;
-
       spinSpeedX *= decay;
       spinSpeedY *= decay;
 
@@ -145,10 +145,27 @@ function initShape() {
     mesh.position.y = Math.sin(t) * 0.15;
     renderer.render(scene, camera);
 
-    requestAnimationFrame(animate);
+    animFrameId = requestAnimationFrame(animate);
   }
 
-  animate();
+  function startAnimation() {
+    if (animFrameId) return;
+    isVisible = true;
+    animFrameId = requestAnimationFrame(animate);
+  }
+
+  function stopAnimation() {
+    isVisible = false;
+    if (animFrameId) { cancelAnimationFrame(animFrameId); animFrameId = null; }
+  }
+
+  // Pause/resume based on visibility
+  const shapeObserver = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) startAnimation();
+    else stopAnimation();
+  }, { threshold: 0.1 });
+
+  shapeObserver.observe(section || container);
 
   window.addEventListener('resize', () => {
     const w = container.clientWidth;

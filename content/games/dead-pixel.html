@@ -3687,14 +3687,31 @@ function updatePlayer(dt){
   playerLight.color.setHex(player.isDashing?0xff6600:0x39ff14);
 }
 
-// ── Camera (true first-person) ────────────────────────────────
+// ── Camera (over-the-shoulder FPS hybrid) ─────────────────────
+let smoothCamDist=1.4;
 function updateCamera(){
-  const camH=1.6;
+  const maxDist=player.isDashing?1.8:1.4; // close behind — enough to peek corners
+  const camH=1.9;    // slightly elevated eye line
+  const lookH=1.2;   // look slightly downward for depth
+  const bx=-Math.sin(player.angle);
+  const bz=-Math.cos(player.angle);
+  // Step back from player, stop before hitting a wall
+  let safeDist=0.3;
+  for(let i=1;i<=8;i++){
+    const t=maxDist*(i/8);
+    if(isWall(Math.round((player.z+bz*t)/CELL),Math.round((player.x+bx*t)/CELL))) break;
+    safeDist=t;
+  }
+  smoothCamDist+=(safeDist-smoothCamDist)*0.35;
   const hopOff=player.hopY||0;
-  camera.position.set(player.x, camH+hopOff, player.z);
+  camera.position.set(
+    player.x+bx*smoothCamDist,
+    camH+hopOff,
+    player.z+bz*smoothCamDist
+  );
   camera.lookAt(
     player.x+Math.sin(player.angle)*3,
-    camH+hopOff,
+    lookH+hopOff,
     player.z+Math.cos(player.angle)*3
   );
   camera.fov+=((player.isDashing?82:72)-camera.fov)*0.15;

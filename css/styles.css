@@ -66,6 +66,8 @@ section {
 .home-page section {
   min-height: 100vh;
   scroll-snap-align: start;
+  contain: layout style paint;
+  will-change: scroll-position;
 }
 
 /* =========================
