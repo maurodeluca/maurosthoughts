@@ -46,4 +46,6 @@ const observer = new IntersectionObserver((entries) => {
   threshold: 0.2
 });
 
-observer.observe(simulationsSection);
+if (simulationsSection) {
+  observer.observe(simulationsSection);
+}

@@ -1,10 +1,10 @@
-import * as THREE from 'three';
-
 const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
 
-function initShape() {
+async function initShape() {
   const container = document.getElementById('shape-container');
   if (!container) return;
+
+  const THREE = await import('three');
 
   const section = container.closest('section');
 
