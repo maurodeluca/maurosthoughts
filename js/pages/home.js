@@ -101,7 +101,7 @@ function initHomePage() {
     sceneReady = true;
 
     const [threeModule, { GLTFLoader }, { DRACOLoader }] = await Promise.all([
-      import('three'),
+      import('https://unpkg.com/three@0.182.0/build/three.module.js'),
       import('https://unpkg.com/three@0.182.0/examples/jsm/loaders/GLTFLoader.js?module'),
       import('https://unpkg.com/three@0.182.0/examples/jsm/loaders/DRACOLoader.js?module')
     ]);
