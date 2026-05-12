@@ -325,27 +325,125 @@ strong {
 
 nav {
   position: fixed;
-  top: 20px;
-  left: 20px;
+  top: 16px;
+  left: 16px;
   z-index: 1000;
 }
 
-nav a {
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(13, 13, 13, 0.75);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 6px 10px 6px 8px;
+}
+
+.nav-home {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  opacity: 0.7;
+  text-decoration: none;
+  padding: 2px 4px;
+  border-radius: 50%;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.nav-home:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+/* thin divider between home and chevron */
+.nav-inner::after {
+  content: '';
   display: block;
-  margin-bottom: 6px;
+  width: 1px;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 2px;
+}
+
+.nav-dropdown {
+  position: relative;
+}
+
+.nav-toggle {
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text);
+  opacity: 0.7;
+  padding: 2px 4px;
+  transition: opacity 0.2s ease, color 0.2s ease;
+}
+
+.nav-toggle:hover {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.nav-chevron {
+  transition: transform 0.25s ease;
+}
+
+.nav-dropdown.open .nav-chevron {
+  transform: rotate(180deg);
+}
+
+.nav-menu {
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  background: rgba(13, 13, 13, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  min-width: 190px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.nav-dropdown.open .nav-menu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.nav-menu li a {
+  display: block;
+  padding: 9px 18px;
   color: var(--text);
   text-decoration: none;
-  font-size: 0.9rem;
-  opacity: 0.6;
+  font-size: 0.85rem;
+  opacity: 0.7;
+  transition: opacity 0.15s ease, padding-left 0.15s ease;
+  white-space: nowrap;
 }
 
-nav a::before {
-  content: "↳ ";
-  opacity: 0.4;
-}
-
-nav a:hover {
+.nav-menu li a:hover {
   opacity: 1;
+  padding-left: 22px;
+}
+
+@media (max-width: 768px) {
+  nav {
+    top: 12px;
+    left: 12px;
+  }
 }
 
 /* =========================
@@ -416,7 +514,7 @@ nav a:hover {
 ========================= */
 .game-grid {
   display: grid;
-  grid-template-columns: repeat(2, 240px);
+  grid-template-columns: 340px;
   gap: 10px;
   justify-content: center;
 }
@@ -424,7 +522,7 @@ nav a:hover {
 .game-card {
   position: relative;
   display: block;
-  width: auto;
+  width: 100%;
   text-decoration: none;
   border-radius: 14px;
   overflow: hidden;
@@ -433,13 +531,13 @@ nav a:hover {
 
 .game-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 10px 40px rgba(57, 255, 20, 0.15);
+  box-shadow: 0 10px 40px rgba(177, 18, 18, 0.25);
 }
 
 .game-card-screen {
   position: relative;
-  background: #020a02;
-  border: 2px solid #1a3a1a;
+  background: #0d0000;
+  border: 2px solid #2a0505;
   border-radius: 14px;
   padding: 32px 24px;
   overflow: hidden;
@@ -473,10 +571,12 @@ nav a:hover {
   font-family: 'Courier New', Courier, monospace;
   font-size: 1.3rem;
   font-weight: bold;
-  color: #39ff14;
+  color: var(--accent);
   letter-spacing: 0.08em;
-  text-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+  text-shadow: 0 0 10px rgba(177, 18, 18, 0.6);
   margin-bottom: 8px;
+  word-break: break-all;
+  overflow-wrap: break-word;
 }
 
 .game-ext {
@@ -512,7 +612,7 @@ nav a:hover {
 .game-prompt {
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.85rem;
-  color: #39ff14;
+  color: var(--accent);
   letter-spacing: 0.2em;
   animation: game-blink 1.2s step-end infinite;
 }
@@ -523,12 +623,12 @@ nav a:hover {
 }
 
 .game-card:hover .game-card-screen {
-  border-color: #39ff14;
-  box-shadow: inset 0 0 30px rgba(57, 255, 20, 0.05);
+  border-color: var(--accent);
+  box-shadow: inset 0 0 30px rgba(177, 18, 18, 0.08);
 }
 
 .game-card:hover .game-prompt {
-  text-shadow: 0 0 12px rgba(57, 255, 20, 0.6);
+  text-shadow: 0 0 12px rgba(177, 18, 18, 0.7);
 }
 
 /* Disabled / coming-soon card */
@@ -542,7 +642,7 @@ nav a:hover {
   box-shadow: none;
 }
 .game-card-disabled:hover .game-card-screen {
-  border-color: #1a3a1a;
+  border-color: #2a0505;
   box-shadow: none;
 }
 .game-card-disabled .game-prompt {
@@ -557,11 +657,217 @@ nav a:hover {
   .game-grid {
     grid-template-columns: 1fr;
     gap: 0.5rem;
-    padding: 0 5.5rem;
+    padding: 0;
   }
 
   .game-card {
     width: 100%;
+  }
+
+  #games .content {
+    width: 90vw;
+  }
+}
+
+/* =========================
+   Writing carousel
+========================= */
+
+.writing-carousel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.writing-carousel-track-wrap {
+  flex: 1;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.writing-carousel-track {
+  display: flex;
+  transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+.writing-carousel-btn {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.writing-carousel-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.writing-carousel-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.writing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #444;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.writing-dot.active {
+  background: var(--accent);
+  transform: scale(1.3);
+}
+
+.writing-card {
+  position: relative;
+  flex: 0 0 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 420px;
+  border-radius: 14px;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text);
+  transition: box-shadow 0.3s ease;
+}
+
+.writing-card:hover {
+  box-shadow: 0 12px 40px rgba(177, 18, 18, 0.3);
+}
+
+/* Background image layer */
+.writing-card-bg {
+  position: absolute;
+  inset: 0;
+  background-image: var(--writing-img, none);
+  background-size: cover;
+  background-position: center;
+  background-color: #1a0a0a;
+  filter: grayscale(100%);
+  transition: transform 0.4s ease;
+}
+
+.writing-card:hover .writing-card-bg {
+  transform: scale(1.03);
+}
+
+/* Red/black gradient overlay */
+.writing-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(100, 5, 5, 0.6) 45%,
+    rgba(177, 18, 18, 0.2) 75%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+}
+
+/* Accent border on hover */
+.writing-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease;
+  pointer-events: none;
+}
+
+.writing-card:hover::after {
+  border-color: var(--accent);
+}
+
+.writing-card-body {
+  position: relative;
+  z-index: 2;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.writing-card-date {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+.writing-card-title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+.writing-card-excerpt {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #aaa;
+  line-height: 1.6;
+  max-width: 480px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.writing-card-cta {
+  margin-top: 10px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.writing-card:hover .writing-card-cta {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 768px) {
+  .writing-carousel {
+    gap: 10px;
+    max-width: 100%;
+  }
+
+  .writing-card {
+    height: 300px;
+  }
+
+  .writing-card-body {
+    padding: 20px;
+  }
+
+  .writing-card-title {
+    font-size: 1.05rem;
   }
 }
 

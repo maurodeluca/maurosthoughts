@@ -145,7 +145,7 @@
             <div class="game-scanlines"></div>
             <div class="game-card-content">
               <div class="game-title">DEAD_PIXEL<span class="game-ext">.EXE</span></div>
-              <div class="game-tagline">ethereal maze crawler<br></br>world one</div>
+              <div class="game-tagline">ethereal maze crawler</div>
               <div class="game-meta">
                 <span>20 LEVELS</span>
                 <span></span>
@@ -154,23 +154,6 @@
                 <span>LEADERBOARD</span>
               </div>
               <div class="game-prompt">PRESS START →</div>
-            </div>
-          </div>
-        </a>
-        <a href="content/games/404.html" class="game-card game-card-disabled">
-          <div class="game-card-screen">
-            <div class="game-scanlines"></div>
-            <div class="game-card-content">
-              <div class="game-title">DEAD_PIXEL<span class="game-ext">.exe</span></div>
-              <div class="game-tagline">?<br></br>world two</div>
-              <div class="game-meta">
-                <span></span>
-                <span></span>
-                <span>?</span>
-                <span></span>
-                <span></span>
-              </div>
-              <div class="game-prompt">COMING SOON</div>
             </div>
           </div>
         </a>
@@ -183,14 +166,55 @@
     <div class="content">
       <h2 align=center>vibe<span class="accent">writing</span></h2>
       <p align=center>Essays, notes, longer pieces.</p>
-      <p align=center class="muted">
-        (Some ideas take more than one scroll.)
-      </p>
-      <p align=center style="margin-top: 1.5rem;">
-        <a href="content/writings/manifesto.html" class="accent-link">On the broken hiring system →</a><br />
-        <a href="content/writings/existence.html" class="accent-link">On a life that happens →</a><br />
-        <a href="content/writings/cancer.html" class="accent-link">On inevitable cellular evolution →</a><br />
-      </p>
+      <p align=center class="muted">(Some ideas take more than one scroll.)</p>
+      <br>
+      <div class="writing-carousel">
+        <button class="writing-carousel-btn prev" aria-label="Previous">&#8592;</button>
+        <div class="writing-carousel-track-wrap">
+          <div class="writing-carousel-track">
+
+            <a href="content/writings/manifesto.html" class="writing-card" style="--writing-img: url('/images/writings/manifesto.png')">
+              <div class="writing-card-bg"></div>
+              <div class="writing-card-overlay"></div>
+              <div class="writing-card-body">
+                <span class="writing-card-date">Jan 23, 2026</span>
+                <h3 class="writing-card-title">On the broken hiring system</h3>
+                <p class="writing-card-excerpt">The system rewards familiarity, penalises rest, and confuses suffering with seriousness.</p>
+                <span class="writing-card-cta">read &#8594;</span>
+              </div>
+            </a>
+
+            <a href="content/writings/existence.html" class="writing-card" style="--writing-img: url('/images/writings/existence.png')">
+              <div class="writing-card-bg"></div>
+              <div class="writing-card-overlay"></div>
+              <div class="writing-card-body">
+                <span class="writing-card-date">Feb 2, 2026</span>
+                <h3 class="writing-card-title">On a life that happens</h3>
+                <p class="writing-card-excerpt">A brief alignment. Inside connected to outside. Awareness lit. The universe briefly noticing itself.</p>
+                <span class="writing-card-cta">read &#8594;</span>
+              </div>
+            </a>
+
+            <a href="content/writings/cancer.html" class="writing-card" style="--writing-img: url('/images/writings/cancer.png')">
+              <div class="writing-card-bg"></div>
+              <div class="writing-card-overlay"></div>
+              <div class="writing-card-body">
+                <span class="writing-card-date">Feb 22, 2026</span>
+                <h3 class="writing-card-title">On inevitable cellular evolution</h3>
+                <p class="writing-card-excerpt">Cancer is not a bug in the code. It is an emergent property of scalable, self-replicating architecture.</p>
+                <span class="writing-card-cta">read &#8594;</span>
+              </div>
+            </a>
+
+          </div>
+        </div>
+        <button class="writing-carousel-btn next" aria-label="Next">&#8594;</button>
+      </div>
+      <div class="writing-carousel-dots">
+        <span class="writing-dot active" data-index="0"></span>
+        <span class="writing-dot" data-index="1"></span>
+        <span class="writing-dot" data-index="2"></span>
+      </div>
     </div>
   </section>
 
@@ -199,10 +223,25 @@
 
   <!-- Hidden Nav -->
   <nav id="nav">
-    <a href="#home">home</a>
-    <a href="#simulations">simulation<span class="accent">theory</span></a>
-    <a href="#games">retro<span class="accent">arcade</span></a>
-    <a href="#writings">vibe<span class="accent">writing</span></a>
+    <div class="nav-inner">
+      <a href="#home" class="nav-home" aria-label="Home">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+          <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+        </svg>
+      </a>
+      <div class="nav-dropdown">
+        <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
+          <svg class="nav-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+        <ul class="nav-menu" role="menu">
+          <li><a href="#simulations" role="menuitem">simulation<span class="accent">theory</span></a></li>
+          <li><a href="#games" role="menuitem">retro<span class="accent">arcade</span></a></li>
+          <li><a href="#writings" role="menuitem">vibe<span class="accent">writing</span></a></li>
+        </ul>
+      </div>
+    </div>
   </nav>
 
   <a href="https://github.com/maurodeluca" class="github-corner" target="_blank" rel="noopener noreferrer"
@@ -288,6 +327,7 @@
   </script>
   <script type="module" src="js/terminal.js"></script>
   <script type="module" src="js/radio.js" defer></script>
+  <script type="module" src="js/writing-carousel.js" defer></script>
   <script type="module" src="js/main.js"></script>
 </body>
 
