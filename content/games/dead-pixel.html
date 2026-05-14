@@ -2,30 +2,156 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>DEAD_PIXEL.EXE — maurosthoughts</title>
 <style>
-/* Mobile blocker overlay */
-#mobile-block {
-  display:none;
-  position:fixed; inset:0; z-index:9999;
-  background:#041a04;
-  color:#39ff14;
-  font-family:'Courier New',monospace;
-  text-align:center;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  padding:2rem;
-  gap:1rem;
-}
-#mobile-block .title { font-size:1.4rem; letter-spacing:.15em; font-weight:bold; text-shadow:0 0 10px rgba(57,255,20,.5); }
-#mobile-block .sub { font-size:.8rem; color:#5a8a5a; letter-spacing:.1em; line-height:1.6; }
-#mobile-block .back-btn { margin-top:1.5rem; color:#39ff14; text-decoration:none; border:1px solid #39ff14; padding:8px 24px; font-family:'Courier New',monospace; font-size:.8rem; letter-spacing:.15em; transition:background .2s; }
-#mobile-block .back-btn:hover { background:rgba(57,255,20,.1); }
+/* Mobile blocker removed — game now supports touch */
+#mobile-block { display:none !important; }
+
+/* ── Mobile touch controls ─────────────────────── */
+#touch-controls { display:none !important; }
 @media (max-width: 768px), (hover: none) and (pointer: coarse) {
-  #mobile-block { display:flex !important; }
-  #game-canvas, #hud, .screen, #crosshair, #boss-hud, #terminal-overlay { display:none !important; }
+  #touch-controls.tc-active { display:block !important; }
+  #crosshair { display:none !important; }
+  #controls-strip { display:none !important; }
+}
+
+#touch-joystick-zone {
+  position:fixed; bottom:10px; left:10px;
+  width:140px; height:140px;
+  z-index:100; touch-action:none;
+}
+#touch-joystick-base {
+  position:absolute; bottom:0; left:0;
+  width:120px; height:120px;
+  border:2px solid rgba(57,255,20,.3);
+  border-radius:50%;
+  background:rgba(57,255,20,.04);
+}
+#touch-joystick-knob {
+  position:absolute;
+  width:44px; height:44px;
+  border:2px solid rgba(57,255,20,.6);
+  border-radius:50%;
+  background:rgba(57,255,20,.12);
+  box-shadow:0 0 8px rgba(57,255,20,.3);
+  transform:translate(-50%,-50%);
+  top:50%; left:50%;
+  pointer-events:none;
+}
+
+#touch-buttons {
+  position:fixed; bottom:10px; right:10px;
+  z-index:100; touch-action:none;
+  display:flex; flex-direction:column; gap:8px; align-items:flex-end;
+}
+.touch-btn {
+  width:56px; height:56px;
+  border:2px solid rgba(57,255,20,.4);
+  border-radius:50%;
+  background:rgba(57,255,20,.06);
+  color:rgba(57,255,20,.8);
+  font-family:'Courier New',monospace;
+  font-size:9px; font-weight:bold;
+  letter-spacing:.08em;
+  display:flex; align-items:center; justify-content:center;
+  text-shadow:0 0 6px rgba(57,255,20,.4);
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
+.touch-btn.active {
+  background:rgba(57,255,20,.2);
+  border-color:rgba(57,255,20,.8);
+  box-shadow:0 0 12px rgba(57,255,20,.4);
+}
+.touch-btn-fire {
+  width:56px; height:56px;
+  border-color:rgba(255,102,0,.5);
+  color:rgba(255,102,0,.9);
+  background:rgba(255,102,0,.08);
+  font-size:9px;
+  text-shadow:0 0 6px rgba(255,102,0,.4);
+}
+.touch-btn-fire.active {
+  background:rgba(255,102,0,.25);
+  border-color:rgba(255,102,0,.8);
+  box-shadow:0 0 12px rgba(255,102,0,.5);
+}
+.touch-btn-row { display:flex; gap:8px; }
+
+#touch-top-buttons {
+  position:fixed; top:10px; right:10px;
+  z-index:100; touch-action:none;
+  display:flex; gap:6px;
+}
+#touch-pause-btn {
+  position:fixed; z-index:100; touch-action:none;
+}
+.touch-btn-sm {
+  width:36px; height:36px;
+  border:1px solid rgba(57,255,20,.3);
+  border-radius:6px;
+  background:rgba(57,255,20,.04);
+  color:rgba(57,255,20,.6);
+  font-family:'Courier New',monospace;
+  font-size:8px;
+  display:flex; align-items:center; justify-content:center;
+  user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
+}
+.touch-btn-sm.active {
+  background:rgba(57,255,20,.15);
+  border-color:rgba(57,255,20,.6);
+}
+
+/* Turn zone for left/right rotation on right side of screen */
+#touch-turn-zone {
+  position:fixed; top:0; right:0;
+  width:50%; height:100%;
+  z-index:99; touch-action:none;
+  pointer-events:none;
+}
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  #touch-turn-zone { pointer-events:auto; }
+}
+
+/* Mobile HUD adjustments */
+@media (max-width: 768px), (hover: none) and (pointer: coarse) {
+  #hud-tl { font-size:10px !important; top:8px !important; left:8px !important; }
+  /* Move minimap to top-left, next to the Level/Fragments text */
+  #hud-tr { top:8px !important; left:130px !important; right:auto !important; text-align:left !important; padding:4px !important; }
+  #minimap { width:120px !important; height:120px !important; }
+  /* HP/Dash/Laser bars at top-right */
+  #hud-br { top:8px !important; bottom:auto !important; right:6px !important; text-align:right !important; padding:4px 6px !important; }
+  .bar-track { width:75px !important; height:5px !important; }
+  .bar-label { font-size:8px !important; letter-spacing:.1em !important; margin-bottom:1px !important; }
+  #pulse-bar-wrap .bar-label { font-size:8px !important; }
+  #hud-objective { font-size:9px !important; letter-spacing:.12em !important; top:auto !important; bottom:8px !important; left:50% !important; transform:translateX(-50%) !important; max-width:70vw; white-space:normal !important; text-align:center !important; color:#ffd700 !important; text-shadow:0 0 6px #ffd700 !important; }
+  #msg { bottom:75px !important; font-size:10px !important; left:50% !important; transform:translateX(-50%) !important; }
+  #boss-hud { bottom:75px !important; }
+  /* Title screen */
+  .s-title { font-size:clamp(26px,7vw,44px) !important; letter-spacing:.06em !important; }
+  .s-ver { letter-spacing:.1em !important; font-size:9px !important; }
+  .s-desc { font-size:11px !important; padding:0 1.2rem !important; }
+  .s-sub { display:none !important; }
+  .s-btn { font-size:12px !important; letter-spacing:.12em !important; padding:10px 20px !important; }
+  .s-label { letter-spacing:.18em !important; }
+  /* Make screens scrollable when content overflows (landscape) */
+  .screen { overflow-y:auto !important; justify-content:flex-start !important; padding:20px 10px !important; }
+  .s-title { margin-top:10px !important; margin-bottom:4px !important; }
+  .s-ver { margin-bottom:12px !important; }
+  .s-desc { margin-bottom:16px !important; line-height:1.6 !important; }
+  .hs-board { margin:6px 0 !important; }
+  .hs-board table { font-size:10px !important; }
+  #speedrun-timer { font-size:9px !important; }
+  #active-effects { font-size:8px !important; }
+  #terminal-overlay > div { padding:20px !important; margin:0 10px; }
+  #terminal-overlay > div > div:last-child { display:none; }
+  /* Pause button below MOD/active-effects in top-left */
+  #touch-pause-btn { top:160px !important; left:8px !important; }
+  #touch-top-buttons { display:none !important; }
 }
 :root {
   --red: #b11212;
@@ -39,7 +165,7 @@
   --muted: #5a8a5a;
 }
 * { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
+html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; touch-action:none; -webkit-overflow-scrolling:none; overscroll-behavior:none; }
 
 #game-canvas {
   display:block;
@@ -348,14 +474,34 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; }
 </head>
 <body>
 
-<div id="mobile-block">
-  <div class="title">DEAD_PIXEL.EXE</div>
-  <div class="sub">
-    THIS PROGRAM REQUIRES<br>
-    A REAL PC.<br><br>
-    PLEASE OPEN ON DESKTOP.
+<div id="mobile-block"></div>
+
+<!-- Touch Controls -->
+<div id="touch-controls">
+  <div id="touch-turn-zone"></div>
+  <div id="touch-joystick-zone">
+    <div id="touch-joystick-base">
+      <div id="touch-joystick-knob"></div>
+    </div>
   </div>
-  <a href="/" class="back-btn">← RETURN TO SITE</a>
+  <div id="touch-buttons">
+    <div class="touch-btn-row">
+      <div class="touch-btn" id="tbtn-dash">DASH</div>
+      <div class="touch-btn" id="tbtn-hop">HOP</div>
+    </div>
+    <div class="touch-btn-row">
+      <div class="touch-btn touch-btn-fire" id="tbtn-fire">FIRE</div>
+      <div class="touch-btn" id="tbtn-reload">RLD</div>
+      <div class="touch-btn" id="tbtn-interact">ACT</div>
+    </div>
+    <div class="touch-btn-row">
+      <div class="touch-btn" id="tbtn-map">MAP</div>
+      <div class="touch-btn" id="tbtn-scan">SCN</div>
+    </div>
+  </div>
+  <div id="touch-pause-btn">
+    <div class="touch-btn-sm" id="tbtn-pause">| |</div>
+  </div>
 </div>
 
 <div id="shake-wrap">
@@ -2884,10 +3030,182 @@ window.addEventListener('keydown', e => {
   }
 });
 window.addEventListener('keyup', e => { keys[e.code]=false; });
-window.addEventListener('mousedown', e => { if(e.button===0) keys['Mouse0']=true; });
+window.addEventListener('mousedown', e => {
+  if(e.button===0 && !e.target.closest('#touch-controls')) keys['Mouse0']=true;
+});
 window.addEventListener('mouseup', e => { if(e.button===0) keys['Mouse0']=false; });
 window.addEventListener('blur', clearKeys);
 document.addEventListener('visibilitychange', ()=>{ if(document.hidden) clearKeys(); });
+
+// ── Touch controls (mobile) ──────────────────────────────
+const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+(function initTouchControls(){
+  // Always init if controls exist (needed for desktop emulation too)
+  const jZone = document.getElementById('touch-joystick-zone');
+  if(!jZone) return;
+
+  // Prevent pinch-zoom and scroll on the game
+  document.addEventListener('touchmove', e => { if(e.touches.length > 1) e.preventDefault(); }, {passive:false});
+  document.body.style.touchAction = 'none';
+  document.body.style.overscrollBehavior = 'none';
+
+  // ── Virtual Joystick (Pointer Events) ──
+  const jBase = document.getElementById('touch-joystick-base');
+  const jKnob = document.getElementById('touch-joystick-knob');
+
+  let jPointerId = null;
+  const jRadius = 45;
+
+  function updateJoystick(tx, ty){
+    const rect = jBase.getBoundingClientRect();
+    const cx = rect.left + rect.width/2;
+    const cy = rect.top + rect.height/2;
+    let dx = tx - cx;
+    let dy = ty - cy;
+    const dist = Math.sqrt(dx*dx+dy*dy);
+    if(dist > jRadius){ dx=dx/dist*jRadius; dy=dy/dist*jRadius; }
+    jKnob.style.left = (rect.width/2 + dx) + 'px';
+    jKnob.style.top = (rect.height/2 + dy) + 'px';
+    const normX = dx/jRadius;
+    const normY = dy/jRadius;
+    keys['KeyW'] = normY < -0.15;
+    keys['KeyS'] = normY > 0.15;
+    keys['KeyA'] = normX < -0.15;
+    keys['KeyD'] = normX > 0.15;
+  }
+
+  function resetJoystick(){
+    jKnob.style.left = '50%';
+    jKnob.style.top = '50%';
+    keys['KeyW'] = false;
+    keys['KeyS'] = false;
+    keys['KeyA'] = false;
+    keys['KeyD'] = false;
+  }
+
+  jZone.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if(jPointerId !== null) return;
+    jPointerId = e.pointerId;
+    jZone.setPointerCapture(e.pointerId);
+    updateJoystick(e.clientX, e.clientY);
+  });
+
+  jZone.addEventListener('pointermove', e => {
+    if(e.pointerId === jPointerId){
+      e.preventDefault();
+      updateJoystick(e.clientX, e.clientY);
+    }
+  });
+
+  jZone.addEventListener('pointerup', e => {
+    if(e.pointerId === jPointerId){
+      jPointerId = null;
+      resetJoystick();
+    }
+  });
+  jZone.addEventListener('pointercancel', e => {
+    if(e.pointerId === jPointerId){
+      jPointerId = null;
+      resetJoystick();
+    }
+  });
+
+  // ── Turn zone (drag right half of screen to rotate) ──
+  const turnZone = document.getElementById('touch-turn-zone');
+  let turnPointerId = null;
+  let turnLastX = 0;
+
+  turnZone.addEventListener('pointerdown', e => {
+    if(e.target.closest('#touch-buttons') || e.target.closest('#touch-top-buttons')) return;
+    turnPointerId = e.pointerId;
+    turnLastX = e.clientX;
+    turnZone.setPointerCapture(e.pointerId);
+  });
+
+  turnZone.addEventListener('pointermove', e => {
+    if(e.pointerId === turnPointerId){
+      e.preventDefault();
+      const dx = e.clientX - turnLastX;
+      turnLastX = e.clientX;
+      if(typeof player !== 'undefined' && gState === 'playing'){
+        player.angle -= dx * 0.006;
+      }
+    }
+  });
+
+  turnZone.addEventListener('pointerup', e => {
+    if(e.pointerId === turnPointerId) turnPointerId = null;
+  });
+  turnZone.addEventListener('pointercancel', e => {
+    if(e.pointerId === turnPointerId) turnPointerId = null;
+  });
+
+  // ── Action buttons (Pointer Events) ──
+  function bindTouchBtn(id, keyCode, opts){
+    const el = document.getElementById(id);
+    if(!el) return;
+    const oneshot = opts && opts.oneshot;
+
+    el.addEventListener('pointerdown', e => {
+      e.preventDefault(); e.stopPropagation();
+      el.classList.add('active');
+      if(oneshot){
+        keys[keyCode] = true;
+        window.dispatchEvent(new KeyboardEvent('keydown', {code:keyCode, bubbles:true}));
+        setTimeout(() => { keys[keyCode] = false; }, 120);
+      } else {
+        keys[keyCode] = true;
+        el.setPointerCapture(e.pointerId);
+      }
+    });
+
+    el.addEventListener('pointerup', e => {
+      e.preventDefault(); e.stopPropagation();
+      el.classList.remove('active');
+      if(!oneshot) keys[keyCode] = false;
+    });
+
+    el.addEventListener('pointercancel', e => {
+      el.classList.remove('active');
+      if(!oneshot) keys[keyCode] = false;
+    });
+
+    // Prevent context menu on long press
+    el.addEventListener('contextmenu', e => e.preventDefault());
+  }
+
+  bindTouchBtn('tbtn-fire', 'Mouse0');
+  bindTouchBtn('tbtn-dash', 'ShiftLeft', {oneshot:true});
+  bindTouchBtn('tbtn-hop', 'Space', {oneshot:true});
+  bindTouchBtn('tbtn-interact', 'KeyF', {oneshot:true});
+  bindTouchBtn('tbtn-reload', 'KeyR', {oneshot:true});
+  bindTouchBtn('tbtn-map', 'KeyM', {oneshot:true});
+  bindTouchBtn('tbtn-scan', 'KeyT', {oneshot:true});
+
+  // Pause button
+  const pauseBtn = document.getElementById('tbtn-pause');
+  if(pauseBtn){
+    pauseBtn.addEventListener('pointerdown', e => {
+      e.preventDefault(); e.stopPropagation();
+      if(gState === 'playing') pauseGame();
+      else if(gState === 'paused') resumeGame();
+    });
+    pauseBtn.addEventListener('contextmenu', e => e.preventDefault());
+  }
+
+  // Terminal dismissal on tap/click
+  document.addEventListener('pointerdown', e => {
+    if(terminalOpen){
+      const overlay = document.getElementById('terminal-overlay');
+      if(overlay && overlay.style.display !== 'none'){
+        overlay.style.display = 'none';
+        terminalOpen = false;
+        showMsg('AUDIO LOG ARCHIVED — +200 BONUS', 3000);
+      }
+    }
+  });
+})();
 
 // ── Game state ────────────────────────────────────────────
 let gState = 'menu';
@@ -3379,11 +3697,40 @@ function showModScreen(){
   showScreen(scrMods);
 }
 
+function setTouchControls(visible){
+  const tc = document.getElementById('touch-controls');
+  if(tc) tc.classList.toggle('tc-active', visible);
+
+  // Apply HUD repositioning via inline styles so it works in DevTools emulation too
+  const hudBr  = document.getElementById('hud-br');
+  const hudTr  = document.getElementById('hud-tr');
+  const minimap = document.getElementById('minimap');
+  const hudTl  = document.getElementById('hud-tl');
+  const pauseBtn = document.getElementById('touch-pause-btn');
+
+  if(visible){
+    // Integrity/Dash/Laser bars → top-right
+    if(hudBr){ hudBr.style.top='8px'; hudBr.style.bottom='auto'; hudBr.style.right='6px'; }
+    // Minimap → top-left next to stats
+    if(hudTr){ hudTr.style.top='8px'; hudTr.style.left='130px'; hudTr.style.right='auto'; hudTr.style.textAlign='left'; }
+    if(minimap){ minimap.style.width='120px'; minimap.style.height='120px'; }
+    // Pause button below active-effects
+    if(pauseBtn){ pauseBtn.style.top='185px'; pauseBtn.style.left='8px'; }
+  } else {
+    // Restore defaults
+    if(hudBr){ hudBr.style.top=''; hudBr.style.bottom=''; hudBr.style.right=''; }
+    if(hudTr){ hudTr.style.top=''; hudTr.style.left=''; hudTr.style.right=''; hudTr.style.textAlign=''; }
+    if(minimap){ minimap.style.width=''; minimap.style.height=''; }
+    if(pauseBtn){ pauseBtn.style.top=''; pauseBtn.style.left=''; }
+  }
+}
+
 function actualStartGame(){
   currentLevel=1;
   playerUpgrades={maxHp:0,speedBonus:0,dashCdBonus:0,pulseCdBonus:0};
   splits=[]; runStartTime=performance.now(); levelStartTime=performance.now(); pauseOffset=0;
   initAudio(); initLevel(); startDrone(); showScreen(null); resetPlayer(); gState='playing';
+  setTouchControls(true);
   const modLabel=runModifier?(' ['+runModifier.name.toUpperCase()+']'):'';
   flashLevel('LEVEL 1'+modLabel);
 }
@@ -3400,6 +3747,7 @@ function restartGame(){
   // Keep runModifier — don't reset it
   initLevel(); showScreen(null);
   resetPlayer(); initAudio(); startDrone(); gState='playing';
+  setTouchControls(true);
   const modLabel=runModifier?(' ['+runModifier.name.toUpperCase()+']'):''; 
   flashLevel('LEVEL 1'+modLabel);
 }
@@ -3418,6 +3766,7 @@ function nextLevel(){
   initAudio(); startDrone();
   levelStartTime=performance.now(); pauseOffset=0;
   gState='playing';
+  setTouchControls(true);
   sfxLevelUp();
   const cfg = getLevelConfig(currentLevel);
   const bossLabel=cfg.isBoss?' ⚠ BOSS LEVEL':'';
@@ -3462,17 +3811,20 @@ function pauseGame(){
   document.getElementById('pause-hp').textContent=Math.round(player.hp);
   document.getElementById('pause-pts').textContent=getRunScore();
   showScreen(scrPause);
+  setTouchControls(false);
   clearKeys();
 }
 function resumeGame(){
   if(runPaused){ pauseOffset+=performance.now()-pauseStart; runPaused=false; }
   gState='playing';
   showScreen(null);
+  setTouchControls(true);
   clearKeys();
   clock.getDelta(); // discard elapsed time while paused
 }
 function quitToTitle(){
   gState='menu';
+  setTouchControls(false);
   stopDrone();
   showScreen(scrTitle);
   clearKeys();
@@ -4060,6 +4412,7 @@ function updateEnemies(dt){
 function triggerDeath(){
   recordSplit();
   gState='dead'; stopDrone(); sfxDeath(); triggerShake(15,0.5);
+  setTouchControls(false);
   document.getElementById('go-level').textContent='REACHED DEPTH: '+currentLevel+' — '+fmtTime(getRunElapsed());
   const runPts = getRunScore();
   document.getElementById('go-score').textContent='SCORE: '+runPts;
@@ -4672,6 +5025,7 @@ function checkExit(){
   const d=Math.sqrt((player.x-ep.x)**2+(player.z-ep.z)**2);
   if(d<2.0){
     gState='win'; stopDrone(); sfxWin(); triggerShake(5,0.3);
+    setTouchControls(false);
     recordSplit();
 
     const isFinalLevel = (currentLevel >= 20);
