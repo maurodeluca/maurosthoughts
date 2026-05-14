@@ -5,8 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>DEAD_PIXEL.EXE — maurosthoughts</title>
 <style>
-/* Mobile blocker removed — game now supports touch */
-#mobile-block { display:none !important; }
+/* Portrait blocker — require landscape on mobile */
+#mobile-block { display:none; }
+#mobile-block .title { font-size:1.4rem; letter-spacing:.15em; font-weight:bold; text-shadow:0 0 10px rgba(57,255,20,.5); }
+#mobile-block .sub { font-size:.8rem; color:#5a8a5a; letter-spacing:.1em; line-height:1.6; margin-top:1rem; }
+#mobile-block .rotate-icon {
+  font-size:4rem; display:inline-block;
+  animation:rotate-phone 2s ease-in-out infinite;
+  text-shadow:0 0 20px rgba(57,255,20,.5);
+  margin-bottom:0.5rem;
+}
+@keyframes rotate-phone {
+  0%,100%{ transform:rotate(0deg); }
+  25%{ transform:rotate(-90deg); }
+  50%,75%{ transform:rotate(-90deg); }
+}
+@media (max-width: 768px) and (orientation: portrait), (hover: none) and (pointer: coarse) and (orientation: portrait) {
+  #mobile-block { display:flex !important; position:fixed; inset:0; z-index:9999; background:#041a04; color:#39ff14; font-family:'Courier New',monospace; text-align:center; flex-direction:column; align-items:center; justify-content:center; padding:2rem; gap:1rem; }
+  #game-canvas, #hud, .screen, #crosshair, #boss-hud, #terminal-overlay, #touch-controls { visibility:hidden !important; }
+}
 
 /* ── Mobile touch controls ─────────────────────── */
 #touch-controls { display:none !important; }
@@ -474,7 +491,17 @@ html, body { width:100%; height:100%; background:var(--dark); overflow:hidden; t
 </head>
 <body>
 
-<div id="mobile-block"></div>
+<div id="mobile-block">
+  <div class="rotate-icon">📱</div>
+  <div class="title">ROTATE YOUR DEVICE</div>
+  <div class="sub">
+    DEAD_PIXEL.EXE REQUIRES<br>
+    LANDSCAPE MODE<br><br>
+    ╔══════════╗<br>
+    ║&nbsp; ⟳ &nbsp;║<br>
+    ╚══════════╝
+  </div>
+</div>
 
 <!-- Touch Controls -->
 <div id="touch-controls">
