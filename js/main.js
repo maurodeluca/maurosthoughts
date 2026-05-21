@@ -44,31 +44,3 @@ if (skipBtn) {
     setTypingSkipped(true);
   });
 }
-
-const simulationsSection = document.querySelector('#simulations');
-
-let simulationsLoaded = false;
-let nebulaModule, blackholeModule, supernovaModule;
-
-const observer = new IntersectionObserver((entries) => {
-  const entry = entries[0];
-
-  if (entry.isIntersecting && !simulationsLoaded) {
-    simulationsLoaded = true;
-
-    // dynamically load modules
-    nebulaModule = import('./nebula-card.js');
-    blackholeModule = import('./blackhole-card.js');
-    supernovaModule = import('./supernova-card.js');
-  }
-  if (!entry.isIntersecting && simulationsLoaded) {
-    nebulaModule.then(m => m.stop());
-    blackholeModule.then(m => m.stop());
-    supernovaModule.then(m => m.stop());
-    simulationsLoaded = false;
-  }
-}, {
-  threshold: 0.2
-});
-
-observer.observe(simulationsSection);
