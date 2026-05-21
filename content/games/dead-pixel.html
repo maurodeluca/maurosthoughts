@@ -3853,6 +3853,12 @@ function quitToTitle(){
   gState='menu';
   setTouchControls(false);
   stopDrone();
+  // Reset speedrun timer
+  runStartTime=0; levelStartTime=0; pauseOffset=0; runPaused=false; splits=[];
+  const timerTotal=document.getElementById('timer-total');
+  const timerLevel=document.getElementById('timer-level');
+  if(timerTotal) timerTotal.textContent='00:00.0';
+  if(timerLevel) timerLevel.textContent='00:00.0';
   showScreen(scrTitle);
   clearKeys();
 }
