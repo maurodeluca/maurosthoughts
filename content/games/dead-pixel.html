@@ -3724,9 +3724,16 @@ function showModScreen(){
   showScreen(scrMods);
 }
 
+function isMobileLayout(){
+  return window.matchMedia('(max-width: 768px), (hover: none) and (pointer: coarse)').matches;
+}
+
 function setTouchControls(visible){
   const tc = document.getElementById('touch-controls');
   if(tc) tc.classList.toggle('tc-active', visible);
+
+  // Only reposition HUD on mobile/touch devices
+  if(!isMobileLayout()) return;
 
   // Apply HUD repositioning via inline styles so it works in DevTools emulation too
   const hudBr  = document.getElementById('hud-br');
