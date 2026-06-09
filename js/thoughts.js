@@ -44,15 +44,23 @@ palette?.querySelectorAll('.color-swatch').forEach(swatch => {
 const fsBtn     = document.getElementById('thoughts-fullscreen');
 const section   = document.getElementById('thoughts');
 
+function exitFullscreen() {
+  if (!section?.classList.contains('fullscreen')) return;
+  section.classList.remove('fullscreen');
+  section.scrollIntoView({ behavior: 'instant' });
+}
+
 fsBtn?.addEventListener('click', () => {
-  section?.classList.toggle('fullscreen');
+  if (section?.classList.contains('fullscreen')) {
+    exitFullscreen();
+  } else {
+    section?.classList.add('fullscreen');
+  }
 });
 
 // ESC to exit fullscreen
 window.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && section?.classList.contains('fullscreen')) {
-    section.classList.remove('fullscreen');
-  }
+  if (e.key === 'Escape') exitFullscreen();
 });
 
 if (!container) {
