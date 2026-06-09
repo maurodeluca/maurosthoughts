@@ -155,6 +155,113 @@ function renderBubbles() {
   });
 }
 
+// ── Drag & throw physics ──
+(function initDragThrow() {
+  if (!container) return;
+
+  let dragEl     = null;
+  let offsetX    = 0;
+  let offsetY    = 0;
+  let velX       = 0;
+  let velY       = 0;
+  let lastX      = 0;
+  let lastY      = 0;
+  let lastTime   = 0;
+  let animFrame  = null;
+
+  function getPointer(e) {
+    return e.touches ? e.touches[0] : e;
+  }
+
+  function onDown(e) {
+    const bubble = e.target.closest('.thought-bubble');
+    if (!bubble) return;
+    e.preventDefault();
+
+    dragEl = bubble;
+    dragEl.classList.add('dragging');
+
+    const rect = container.getBoundingClientRect();
+    const p    = getPointer(e);
+    offsetX = p.clientX - bubble.offsetLeft;
+    offsetY = p.clientY - (bubble.offsetTop - rect.top) - rect.top;
+
+    // Reset for fresh offset-based positioning
+    offsetX = p.clientX - bubble.offsetLeft;
+    offsetY = p.clientY - bubble.offsetTop;
+
+    lastX    = p.clientX;
+    lastY    = p.clientY;
+    lastTime = performance.now();
+    velX     = 0;
+    velY     = 0;
+
+    if (animFrame) { cancelAnimationFrame(animFrame); animFrame = null; }
+  }
+
+  function onMove(e) {
+    if (!dragEl) return;
+    e.preventDefault();
+
+    const p   = getPointer(e);
+    const now = performance.now();
+    const dt  = now - lastTime || 1;
+
+    velX = (p.clientX - lastX) / dt * 16;   // px per frame (~16ms)
+    velY = (p.clientY - lastY) / dt * 16;
+
+    lastX    = p.clientX;
+    lastY    = p.clientY;
+    lastTime = now;
+
+    dragEl.style.left = `${p.clientX - offsetX}px`;
+    dragEl.style.top  = `${p.clientY - offsetY}px`;
+  }
+
+  function onUp() {
+    if (!dragEl) return;
+    dragEl.classList.remove('dragging');
+    fling(dragEl, velX, velY);
+    dragEl = null;
+  }
+
+  function fling(el, vx, vy) {
+    const friction = 0.94;
+    const minSpeed = 0.3;
+    const bounds   = container.getBoundingClientRect();
+
+    function step() {
+      vx *= friction;
+      vy *= friction;
+
+      let x = el.offsetLeft + vx;
+      let y = el.offsetTop  + vy;
+
+      // Bounce off container edges
+      if (x < 0)                           { x = 0; vx = -vx * 0.5; }
+      if (x + el.offsetWidth > bounds.width){ x = bounds.width - el.offsetWidth; vx = -vx * 0.5; }
+      if (y < 0)                           { y = 0; vy = -vy * 0.5; }
+      if (y + el.offsetHeight > bounds.height){ y = bounds.height - el.offsetHeight; vy = -vy * 0.5; }
+
+      el.style.left = `${x}px`;
+      el.style.top  = `${y}px`;
+
+      if (Math.abs(vx) > minSpeed || Math.abs(vy) > minSpeed) {
+        animFrame = requestAnimationFrame(step);
+      } else {
+        animFrame = null;
+      }
+    }
+    animFrame = requestAnimationFrame(step);
+  }
+
+  // Pointer events (mouse + touch)
+  container.addEventListener('pointerdown', onDown);
+  window.addEventListener('pointermove', onMove);
+  window.addEventListener('pointerup', onUp);
+  window.addEventListener('pointercancel', onUp);
+})();
+
 // ── Helpers ──
 function formatTimeLeft(ms) {
   if (ms <= 0) return 'expired';

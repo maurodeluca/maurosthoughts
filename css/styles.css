@@ -1778,17 +1778,15 @@ body.minimal-mode #terminal-input {
   overflow: hidden;
 }
 
-/* Inline input panel — centered at the bottom of the section */
+/* Inline input panel — below the heading text */
 #thoughts-panel-inline {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
+  margin: 20px auto 0;
   width: 320px;
   background: rgba(13, 13, 13, 0.9);
   border: 1px solid rgba(177, 18, 18, 0.2);
   border-radius: 12px;
   padding: 14px;
+  position: relative;
   z-index: 100;
   backdrop-filter: blur(12px);
 }
@@ -1898,10 +1896,22 @@ body.minimal-mode #terminal-input {
   border-radius: 10px;
   padding: 10px 14px;
   pointer-events: auto;
+  cursor: grab;
   animation: thoughtDrift 8s ease-in-out infinite alternate;
   opacity: 0;
   animation-fill-mode: forwards;
   transition: opacity 0.6s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.thought-bubble.dragging {
+  cursor: grabbing;
+  animation: none !important;
+  z-index: 200;
+  opacity: 1;
+  transition: none;
 }
 
 .thought-bubble {
