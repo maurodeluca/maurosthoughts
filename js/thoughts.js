@@ -165,6 +165,11 @@ function renderBubbles() {
       <span class="thought-ttl">${remaining}</span>
     `;
 
+    // After appear animation ends, lock opacity so drag/release doesn't flash
+    bubble.addEventListener('animationend', () => {
+      bubble.style.opacity = '1';
+    }, { once: true });
+
     container.appendChild(bubble);
   });
 }
