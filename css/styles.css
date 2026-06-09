@@ -1759,3 +1759,247 @@ body.minimal-mode #terminal-input {
   pointer-events: none;
   /* let clicks pass through */
 }
+
+/* =========================
+   Floating Thoughts
+========================= */
+
+/* Container that holds the floating bubbles — fills the writing section */
+#thoughts-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+  overflow: hidden;
+}
+
+/* Toggle button (bottom-left, above radio) */
+#thoughts-toggle {
+  position: fixed;
+  bottom: 70px;
+  left: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(13, 13, 13, 0.9);
+  border: 1px solid rgba(177, 18, 18, 0.25);
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  backdrop-filter: blur(6px);
+}
+
+#thoughts-toggle:hover,
+#thoughts-toggle.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.08);
+}
+
+/* Count badge */
+#thoughts-count {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.55rem;
+  font-weight: bold;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+/* Input panel — slides up from toggle */
+#thoughts-panel {
+  position: fixed;
+  bottom: 118px;
+  left: 12px;
+  width: 280px;
+  background: rgba(13, 13, 13, 0.95);
+  border: 1px solid rgba(177, 18, 18, 0.2);
+  border-radius: 12px;
+  padding: 14px;
+  z-index: 1001;
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#thoughts-panel.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+#thoughts-panel label {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+#thoughts-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  resize: none;
+  outline: none;
+  min-height: 60px;
+  transition: border-color 0.2s ease;
+}
+
+#thoughts-input:focus {
+  border-color: rgba(177, 18, 18, 0.4);
+}
+
+#thoughts-input::placeholder {
+  color: #555;
+}
+
+.thoughts-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+#thoughts-ttl {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  padding: 6px 8px;
+  color: var(--text);
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#thoughts-ttl option {
+  background: #111;
+  color: var(--text);
+}
+
+#thoughts-submit {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.75rem;
+  font-weight: bold;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+#thoughts-submit:hover {
+  opacity: 0.85;
+}
+
+/* Individual floating bubble */
+.thought-bubble {
+  position: absolute;
+  max-width: 220px;
+  background: rgba(177, 18, 18, 0.08);
+  border: 1px solid rgba(177, 18, 18, 0.15);
+  border-radius: 10px;
+  padding: 10px 14px;
+  pointer-events: auto;
+  animation: thoughtDrift 8s ease-in-out infinite alternate;
+  opacity: 0;
+  animation-fill-mode: forwards;
+  transition: opacity 0.6s ease;
+}
+
+.thought-bubble {
+  animation: thoughtAppear 0.6s ease forwards, thoughtDrift 8s 0.6s ease-in-out infinite alternate;
+}
+
+.thought-bubble.fading {
+  opacity: 0 !important;
+  transition: opacity 0.6s ease;
+}
+
+.thought-text {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.78rem;
+  color: var(--text);
+  opacity: 0.8;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.thought-ttl {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.55rem;
+  color: var(--accent);
+  opacity: 0.6;
+  margin-top: 6px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@keyframes thoughtAppear {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes thoughtDrift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(var(--drift-x, 5px), var(--drift-y, -15px));
+  }
+}
+
+@media (max-width: 768px) {
+  #thoughts-panel {
+    width: calc(100vw - 24px);
+    left: 12px;
+    right: 12px;
+  }
+
+  .thought-bubble {
+    max-width: 160px;
+    padding: 8px 10px;
+  }
+
+  .thought-text {
+    font-size: 0.7rem;
+  }
+}
