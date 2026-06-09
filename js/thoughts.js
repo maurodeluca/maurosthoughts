@@ -36,7 +36,18 @@ const toggleBtn   = document.getElementById('thoughts-toggle');
 const panel       = document.getElementById('thoughts-panel');
 const input       = document.getElementById('thoughts-input');
 const ttlSelect   = document.getElementById('thoughts-ttl');
+const palette     = document.getElementById('thoughts-palette');
 const submitBtn   = document.getElementById('thoughts-submit');
+
+// ── Color palette selection ──
+let selectedColor = 'red';
+palette?.querySelectorAll('.color-swatch').forEach(swatch => {
+  swatch.addEventListener('click', () => {
+    palette.querySelector('.active')?.classList.remove('active');
+    swatch.classList.add('active');
+    selectedColor = swatch.dataset.color;
+  });
+});
 const countEl     = document.getElementById('thoughts-count');
 
 if (!container) {
@@ -66,17 +77,21 @@ async function submit() {
   if (!text || text.length > 200) return;
 
   const ttlKey  = ttlSelect?.value || '1h';
+  const color   = selectedColor;
   const ttlMs   = TTL_OPTIONS[ttlKey];
   const now     = Date.now();
+
+  const left = Math.round(5 + Math.random() * 80);  // 5-85%
+  const top  = Math.round(10 + Math.random() * 70); // 10-80%
 
   const doc = {
     page: PAGE,
     text,
+    color,
     createdAt: now,
     expiresAt: now + ttlMs,
-    // Random position for floating (percentage-based)
-    left: Math.round(5 + Math.random() * 80),  // 5-85%
-    top:  Math.round(10 + Math.random() * 70),  // 10-80%
+    left,
+    top,
   };
 
   try {
@@ -141,18 +156,19 @@ function renderBubbles() {
     const bubble = document.createElement('div');
     bubble.className = 'thought-bubble';
     bubble.dataset.id = t.id;
+    bubble.dataset.color = t.color || 'red';
     bubble.style.left = `${t.left}%`;
     bubble.style.top  = `${t.top}%`;
 
-    // Random drift direction
-    const driftX = (Math.random() - 0.5) * 30;  // -15 to 15px
-    const driftY = -10 - Math.random() * 20;      // -10 to -30px (upward)
+    // Random drift — generous range, free movement
+    const driftX = (Math.random() - 0.5) * 80;  // -40 to 40px
+    const driftY = (Math.random() - 0.5) * 60;  // -30 to 30px (any direction)
     bubble.style.setProperty('--drift-x', `${driftX}px`);
     bubble.style.setProperty('--drift-y', `${driftY}px`);
 
-    // Random animation duration for variety
-    const dur = 6 + Math.random() * 6;  // 6-12s
-    bubble.style.animationDuration = `${dur}s`;
+    // Wider animation duration spread for organic feel
+    const dur = 5 + Math.random() * 10;  // 5-15s
+    bubble.style.animationDuration = `0.6s, ${dur}s`;
 
     // Time remaining label
     const remaining = formatTimeLeft(t.expiresAt - Date.now());

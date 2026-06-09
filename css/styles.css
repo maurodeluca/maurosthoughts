@@ -1922,6 +1922,34 @@ body.minimal-mode #terminal-input {
   opacity: 0.85;
 }
 
+/* Color palette */
+#thoughts-palette {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.color-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: var(--swatch);
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.2s ease, transform 0.15s ease;
+  outline: none;
+}
+
+.color-swatch:hover {
+  transform: scale(1.2);
+}
+
+.color-swatch.active {
+  border-color: var(--text);
+  transform: scale(1.15);
+}
+
 /* Individual floating bubble */
 .thought-bubble {
   position: absolute;
@@ -1939,6 +1967,37 @@ body.minimal-mode #terminal-input {
 
 .thought-bubble {
   animation: thoughtAppear 0.6s ease forwards, thoughtDrift 8s 0.6s ease-in-out infinite alternate;
+}
+
+/* Color variations */
+.thought-bubble[data-color="red"] {
+  background: rgba(177, 18, 18, 0.08);
+  border: 1px solid rgba(177, 18, 18, 0.15);
+}
+
+.thought-bubble[data-color="blue"] {
+  background: rgba(18, 100, 177, 0.08);
+  border: 1px solid rgba(18, 100, 177, 0.15);
+}
+
+.thought-bubble[data-color="green"] {
+  background: rgba(18, 177, 80, 0.08);
+  border: 1px solid rgba(18, 177, 80, 0.15);
+}
+
+.thought-bubble[data-color="yellow"] {
+  background: rgba(200, 150, 18, 0.08);
+  border: 1px solid rgba(200, 150, 18, 0.15);
+}
+
+.thought-bubble[data-color="purple"] {
+  background: rgba(130, 18, 177, 0.08);
+  border: 1px solid rgba(130, 18, 177, 0.15);
+}
+
+.thought-bubble[data-color="pink"] {
+  background: rgba(255, 105, 180, 0.08);
+  border: 1px solid rgba(255, 105, 180, 0.15);
 }
 
 .thought-bubble.fading {
