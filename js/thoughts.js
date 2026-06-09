@@ -329,6 +329,9 @@ requestAnimationFrame(brownianStep);
 
   function onUp() {
     if (!dragEl) return;
+    // Kill the appear animation so it can't replay and flash opacity
+    dragEl.style.animation = 'none';
+    dragEl.style.opacity = '1';
     dragEl.classList.remove('dragging');
     // Cap throw speed
     const maxV = 12;
