@@ -299,8 +299,8 @@ strong {
   top: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  height: 100%;
+  width: 616px;
+  height: 616px;
   z-index: 1;
   margin-bottom: 1.5rem;
   pointer-events: none;
@@ -461,6 +461,12 @@ nav {
   z-index: 100;
 }
 
+.section-arrow.dimmed {
+  opacity: 0.2;
+  pointer-events: none;
+  animation: none;
+}
+
 .section-arrow:hover {
   opacity: 0.7;
 }
@@ -513,16 +519,18 @@ nav {
    Game cards
 ========================= */
 .game-grid {
-  display: grid;
-  grid-template-columns: 340px;
-  gap: 10px;
+  display: flex;
+  align-items: center;
   justify-content: center;
+  width: 100%;
+  margin: 0 auto;
 }
 
 .game-card {
   position: relative;
   display: block;
-  width: 100%;
+  width: 292px;
+  height: 292px;
   text-decoration: none;
   border-radius: 14px;
   overflow: hidden;
@@ -653,22 +661,6 @@ nav {
   text-shadow: none;
 }
 
-@media (max-width: 768px) {
-  .game-grid {
-    grid-template-columns: 1fr;
-    gap: 0.5rem;
-    padding: 0;
-  }
-
-  .game-card {
-    width: 100%;
-  }
-
-  #games .content {
-    width: 90vw;
-  }
-}
-
 /* =========================
    Writing carousel
 ========================= */
@@ -743,7 +735,7 @@ nav {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  height: 420px;
+  aspect-ratio: 1 / 1;
   border-radius: 14px;
   overflow: hidden;
   text-decoration: none;
@@ -859,7 +851,8 @@ nav {
   }
 
   .writing-card {
-    height: 300px;
+    aspect-ratio: 1 / 1;
+    height: auto;
   }
 
   .writing-card-body {
@@ -891,6 +884,48 @@ nav {
 
 .writing-page .section-arrow {
   display: none;
+}
+
+/* =========================
+   Incognito Gate
+========================= */
+
+.writing-wrapper {
+  position: relative;
+}
+
+.writing-wrapper.locked #writing {
+  filter: blur(6px);
+  color: var(--muted);
+  user-select: none;
+  pointer-events: none;
+}
+
+.incognito-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding-top: 1.5rem;
+  justify-content: center;
+  z-index: 10;
+}
+
+.writing-wrapper.locked .incognito-overlay {
+  display: flex;
+}
+
+.incognito-overlay svg {
+  width: 80px;
+  height: 80px;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+.incognito-overlay svg.visible {
+  opacity: 0.5;
 }
 
 .writing-page .content {
@@ -972,11 +1007,11 @@ nav {
   position: absolute;
   bottom: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, 50%);
   width: auto;
   max-width: 90%;
   text-align: center;
-  font-size: 0.9rem;
+  font-size: 1.15rem;
   color: #fff;
   pointer-events: none;
   text-shadow: 0 0 4px rgba(0,0,0,0.7);
@@ -1047,21 +1082,32 @@ nav {
   }
 
   .simulation-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: 180px;
     gap: 0.5rem;
-    padding: 0 5.5rem;
+    padding: 0;
     margin-top: -2rem;
     margin-bottom: 1rem;
+    justify-content: center;
   }
 
   .simulation-card {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 9;
+    width: 180px;
+    height: 100px;
+    aspect-ratio: auto;
   }
 
-  .game-grid {
-    padding: 0 5.5rem;
+  /* Lock home, lightbulb, and brand sections to fixed sizes */
+  #home .content,
+  #lightbulb .content,
+  #shape .content {
+    width: 300px;
+    min-width: 300px;
+    max-width: 300px;
+  }
+
+  #shape-container {
+    width: 120px;
+    height: 120px;
   }
 }
 

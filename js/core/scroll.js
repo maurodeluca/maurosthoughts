@@ -7,15 +7,24 @@ function initSectionNavigation() {
 
   if (sections.length === 0) return { scrollToSection: () => {} };
 
+  const upArrow = document.querySelector('.section-arrow.last-section');
+  const downArrow = document.querySelector('.section-arrow:not(.last-section)');
+
+  function updateArrowStates() {
+    if (upArrow) upArrow.classList.toggle('dimmed', currentSectionIndex === 0);
+    if (downArrow) downArrow.classList.toggle('dimmed', currentSectionIndex === sections.length - 1);
+  }
+
   const sectionObserver = new IntersectionObserver(
     entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           currentSectionIndex = sections.indexOf(entry.target);
+          updateArrowStates();
         }
       });
     },
-    { threshold: 0.5 }
+    { threshold: 0.1 }
   );
 
   sections.forEach(section => sectionObserver.observe(section));
@@ -24,7 +33,11 @@ function initSectionNavigation() {
     if (!homePage || index < 0 || index >= sections.length) return;
     sections[index].scrollIntoView({ behavior: 'auto', block: 'start' });
     currentSectionIndex = index;
+    updateArrowStates();
   }
+
+  // Set initial state
+  updateArrowStates();
 
   // Arrow navigation
   document.addEventListener('click', e => {

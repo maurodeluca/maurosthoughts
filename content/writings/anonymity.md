@@ -1,0 +1,43 @@
+June 9th, 2026.
+
+Hello there.
+Take a look around.
+Don't you see it?
+Everyone is trying to answer that same question:
+Who are you?
+What do you mean? I am what defines me.
+My name. My body. My story.
+Wait, maybe I am *nobody*.
+
+Every interaction is asking for my name. My profile. My credential.
+It's being recorded, indexed, and filed away.
+Why?
+Identity is a commodity.
+An entry fee for *participation*.
+
+History is being filled with *figures*.
+Some who understood that anonymity was always our *architecture*. 
+They built things that outlived them, then stepped aside. 
+Their absence wasn't a gimmick. 
+It was part of the design. 
+By removing themselves from the centre of the story, 
+**they left the work standing on its own.**
+
+That feels increasingly foreign now.
+Modern technology is warping the self.
+A version of you that is assembled in public and then handed back to you.
+Opinions linked to profiles.
+Profile attached to reputation. 
+Reputation becoming something to maintain. 
+Gradually, you are becoming the *legacy caretaker*.
+
+**Anattā**?
+Attachment to identity is a source of suffering. 
+Anonymity was never really about concealment.
+It was about *freedom*.
+Freedom in speaking without cultivating a *persona*.
+Creating a space where thoughts can remain unfinished and mistakes can remain temporary.
+Because some ideas grow best in the dark.
+**Incognito mode.**
+
+*In a world that wants to know everything about you, the most radical thing you can be is nobody.*

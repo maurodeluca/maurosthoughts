@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>maurosthoughts - anonymityandabsence</title>
+  <meta name="description" content="On anonymity, privacy, and the right to be no one — an essay from maurosthoughts." />
+  <meta name="author" content="maurodeluca" />
+  <link rel="canonical" href="/content/writings/anonymity.html" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="anonymity and absence — maurosthoughts" />
+  <meta property="og:description"
+    content="On anonymity, privacy, and the right to be no one — an essay from maurosthoughts." />
+  <meta property="og:url" content="/content/writings/anonymity.html" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="stylesheet" href="../../css/styles.css">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "anonymity and absence",
+    "author": {
+      "@type": "Person",
+      "name": "maurodeluca"
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "/content/writings/anonymity.html"
+    },
+    "description": "On anonymity, privacy, and the right to be no one — an essay from maurosthoughts."
+  }
+  </script>
+</head>
+
+<body class="writing-page">
+
+  <!-- ANONYMITY -->
+  <section data-lock>
+    <div class="content">
+      <div class="control-buttons">
+        <button id="skipTyping" class="typing-toggle">skip</button>
+        <button id="shareBtn" class="typing-toggle share-btn" aria-label="Share this page">share</button>
+      </div>
+      <div class="terminal">
+        <div class="cursor-line">
+          thought.<span class="cursor"></span>
+        </div>
+      </div>
+
+      <h1>anonymity<span class="accent">and</span>absence</h1>
+      <div class="typed" id="intro"></div>
+      <div class="divider"></div>
+      <div id="read-text" class="audio-icon" data-target="/content/writings/anonymity.txt">
+        <svg viewBox="0 0 24 24" width="28" height="28">
+          <path d="M3 9v6h4l5 4V5L7 9H3z" />
+          <path d="M16 8c1.5 1.5 1.5 6.5 0 8" class="wave" />
+          <path d="M18.5 5.5c3 3 3 10 0 13" class="wave" />
+        </svg>
+      </div>
+      <div class="writing-wrapper">
+        <div class="typed" id="writing"></div>
+        <div class="incognito-overlay" id="incognito-overlay">
+          <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-label="Incognito">
+            <path d="M16 18 C16 10, 32 10, 32 18" fill="currentColor"/>
+            <ellipse cx="24" cy="18.5" rx="14" ry="2.8" fill="currentColor"/>
+            <circle cx="16.5" cy="30" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/>
+            <circle cx="31.5" cy="30" r="6.5" fill="none" stroke="currentColor" stroke-width="2.4"/>
+            <path d="M23 28.5 C23.5 26, 24.5 26, 25 28.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+  <div id="radio-player" class="radio-player" aria-hidden="false">
+    <div class="radio-controls-compact">
+      <svg class="music-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16"
+        fill="var(--accent)">
+        <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z" />
+      </svg>
+      <button class="radio-play" aria-label="Play/Pause" data-playing="false">▶</button>
+      <button id="radio-minimize" aria-label="Toggle Radio">
+        <!-- Minimize: horizontal bar -->
+        <svg class="radio-icon" width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <line x1="5" y1="12" x2="19" y2="12" stroke="currentColor" stroke-width="2" />
+        </svg>
+      </button>
+    </div>
+    <div class="radio-progress" title="Live progress">
+      <div class="radio-progress-fill"></div>
+    </div>
+    <input class="radio-volume" type="range" min="0" max="1" step="0.01" value="0.5" aria-label="Volume">
+  </div>
+  <nav id="nav" class="visible">
+    <a href="/" class="nav-home" aria-label="Home">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+      </svg>
+    </a>
+  </nav>
+
+  <a href="#" id="help-terminal" class="help-corner" aria-label="Help" style="display:none;">
+    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"
+      stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <path d="M9.5 9a2.5 2.5 0 1 1 4.5 1.5c-.5.7-1.5 1.2-1.5 2.5" />
+      <circle cx="12" cy="17" r="1" />
+    </svg>
+  </a>
+
+  <!-- Hidden terminal overlay -->
+  <div id="terminal-overlay" class="terminal-overlay" aria-hidden="true" style="display:none;">
+    <div class="terminal-window">
+      <div id="terminal-output"></div>
+      <div class="terminal-input-line">
+        <span class="prompt">></span>
+        <input type="text" id="terminal-input" autocomplete="off" spellcheck="false" />
+      </div>
+    </div>
+  </div>
+
+  <footer class="copyright">
+    <p>&copy; 2026 maurosthoughts. all rights reserved.</p>
+  </footer>
+  <script src="../../js/detectIncognito.min.js"></script>
+  <script type="module" src="../../js/pages/anonymity.js" defer></script>
+  <script type="module" src="../../js/terminal.js" defer></script>
+  <script type="module" src="../../js/radio.js" defer></script>
+  <script type="module" src="../../js/read.js"></script>
+  <script type="module" src="../../js/share.js"></script>
+  <script type="module" src="../../js/main.js"></script>
+</body>
+
+</html>

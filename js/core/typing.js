@@ -1,4 +1,5 @@
 let typingSkipped = false;
+let currentTimeoutId = null;
 
 // Parse Markdown to HTML
 function markdownToHtml(text) {
@@ -12,6 +13,12 @@ function markdownToHtml(text) {
 function typeText(text, element, speed = 40, callback) {
   if (!element) return;
 
+  // Cancel any previous typing session
+  if (currentTimeoutId !== null) {
+    clearTimeout(currentTimeoutId);
+    currentTimeoutId = null;
+  }
+
   typingSkipped = false; // reset when starting a new session
 
   const htmlText = markdownToHtml(text);
@@ -21,11 +28,13 @@ function typeText(text, element, speed = 40, callback) {
 
   let nodeIndex = 0;
   let charIndex = 0;
+  let activeTextNode = null;
   element.innerHTML = '';
 
   function type() {
     if (typingSkipped) {
       element.innerHTML = htmlText; // show full content
+      currentTimeoutId = null;
       if (callback) callback();
       return;
     }
@@ -34,21 +43,29 @@ function typeText(text, element, speed = 40, callback) {
       const currentNode = nodes[nodeIndex];
 
       if (currentNode.nodeType === 3) {
+        // Create one text node per parsed text segment, then append chars to it
+        if (charIndex === 0) {
+          activeTextNode = document.createTextNode('');
+          element.appendChild(activeTextNode);
+        }
         if (charIndex < currentNode.length) {
-          element.appendChild(document.createTextNode(currentNode.data[charIndex]));
+          activeTextNode.data += currentNode.data[charIndex];
           charIndex++;
         } else {
           nodeIndex++;
           charIndex = 0;
+          activeTextNode = null;
         }
       } else {
         element.appendChild(currentNode.cloneNode(true));
         nodeIndex++;
         charIndex = 0;
+        activeTextNode = null;
       }
-      setTimeout(type, speed);
-    } else if (callback) {
-      callback();
+      currentTimeoutId = setTimeout(type, speed);
+    } else {
+      currentTimeoutId = null;
+      if (callback) callback();
     }
   }
 

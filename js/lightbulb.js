@@ -62,26 +62,26 @@ let baseIntensity = 0.5;
 const warmColor = new THREE.Color(0xff9b2f); // dim filament
 const hotColor  = new THREE.Color(0xfff1c1); // hot white-orange
 
-// Helper: map text Y to Three.js world Y
-function getTextOffsetY() {
+// Helper: map text Y to Three.js world Y (computed once)
+let cachedBulbY = null;
+
+function computeBulbY() {
   const rect = textElement.getBoundingClientRect();
   const containerRect = container.getBoundingClientRect();
-  return rect.top - containerRect.top; // pixels from top of container
-}
-
-function updateBulbY() {
-  const textOffset = getTextOffsetY();
+  const textOffset = rect.top - containerRect.top;
   const containerHeight = container.clientHeight;
-
-  // Normalize 0 (bottom) -> 1 (top)
   const normalized = 1 - textOffset / containerHeight;
-
-  const BULB_OFFSET = -0.1; // units above text
+  const BULB_OFFSET = -0.1;
   return normalized + BULB_OFFSET;
 }
 
-// --- Camera responsiveness ---
-function updateCamera() {
+function updateBulbY() {
+  if (cachedBulbY === null) cachedBulbY = computeBulbY();
+  return cachedBulbY;
+}
+
+// --- Camera (set once, never changes on resize) ---
+function initCamera() {
     const w = container.clientWidth;
     const h = container.clientHeight;
 
@@ -94,11 +94,7 @@ function updateCamera() {
     camera.updateProjectionMatrix();
 }
 
-updateCamera();
-
-// ResizeObserver = mobile-safe
-const resizeObserver = new ResizeObserver(updateCamera);
-resizeObserver.observe(container);
+initCamera();
 
 // --- Animate ---
 function animate() {

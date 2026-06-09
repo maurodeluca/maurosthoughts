@@ -14,6 +14,26 @@ document.addEventListener('DOMContentLoaded', () => {
   window.speechSynthesis.onvoiceschanged = loadVoices;
   loadVoices();
 
+  function resetSpeech() {
+    window.speechSynthesis.cancel();
+    isReading = false;
+    isPaused = false;
+    readBtn.classList.remove('playing');
+  }
+
+  /* Reset when page reloads or closes */
+  window.addEventListener('beforeunload', resetSpeech);
+
+  /* Reset when navigating with back/forward cache */
+  window.addEventListener('pagehide', resetSpeech);
+
+  /* Stop when tab becomes hidden */
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      resetSpeech();
+    }
+  });
+
   async function startReading() {
     const path = readBtn.getAttribute('data-target');
     if (!path) return console.warn('No data-target set on read button');
@@ -62,26 +82,6 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (err) {
       console.error('Error reading text:', err);
     }
-
-    function resetSpeech() {
-      window.speechSynthesis.cancel();
-      isReading = false;
-      isPaused = false;
-      readBtn.classList.remove('playing');
-    }
-
-    /* Reset when page reloads or closes */
-    window.addEventListener('beforeunload', resetSpeech);
-
-    /* Reset when navigating with back/forward cache */
-    window.addEventListener('pagehide', resetSpeech);
-
-    /* Optional: stop when tab becomes hidden */
-    document.addEventListener('visibilitychange', () => {
-      if (document.hidden) {
-        resetSpeech();
-      }
-    });
   }
 
   readBtn.addEventListener('click', async () => {

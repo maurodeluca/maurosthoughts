@@ -2,7 +2,7 @@ February 22nd 2026
 
 Cancer is often seen as a failure of the body, a flaw in our biology that medicine races to fix. But from a systems perspective, cancer is less a mistake and more a natural consequence of how multicellular life works. It reveals both the marvel and the vulnerability of our bodies.
 
-To understand why cancer is so difficult to “solve,” it helps to compare it to a very different kind of complex problem: those studied in physics. Physics problems are usually about incomplete theory. Consider what “defining the problem” means in physics.
+To understand why cancer is so difficult to “solve”, it helps to compare it to a very different kind of complex problem: those studied in physics. Physics problems are usually about incomplete theory. Consider what “defining the problem” means in physics.
 
 For example, with quantum gravity, we have two frameworks, General Relativity and Quantum Mechanics, that both work extremely well but clash in extreme conditions. The problem can be phrased cleanly:
 
