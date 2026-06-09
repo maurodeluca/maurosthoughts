@@ -1,9 +1,9 @@
 /**
- * thoughts.js — ephemeral floating thoughts for writing pages
+ * thoughts.js — ephemeral floating thoughts playground (homepage)
  *
  * Users leave a thought with a TTL (1h / 6h / 24h / 7d).
- * Thoughts float as bubbles, fade out when expired, and are
- * cleaned up from Firestore via a TTL check on read.
+ * Thoughts float as bubbles within the #thoughts section,
+ * fade out when expired, and are cleaned up from Firestore on read.
  */
 
 import firebaseConfig from './firebase-config.js';
@@ -12,14 +12,7 @@ import firebaseConfig from './firebase-config.js';
 const app  = firebase.initializeApp(firebaseConfig);
 const db   = firebase.firestore();
 
-// ── Derive a page slug from the URL path ──
-function getPageSlug() {
-  const path = location.pathname.replace(/\/$/, '');
-  const file = path.split('/').pop().replace('.html', '');
-  return file || 'unknown';
-}
-
-const PAGE = getPageSlug();
+const PAGE = 'playground';
 const COLLECTION = 'thoughts';
 
 // TTL presets in milliseconds
@@ -32,8 +25,6 @@ const TTL_OPTIONS = {
 
 // ── DOM refs ──
 const container   = document.getElementById('thoughts-container');
-const toggleBtn   = document.getElementById('thoughts-toggle');
-const panel       = document.getElementById('thoughts-panel');
 const input       = document.getElementById('thoughts-input');
 const ttlSelect   = document.getElementById('thoughts-ttl');
 const palette     = document.getElementById('thoughts-palette');
@@ -48,23 +39,13 @@ palette?.querySelectorAll('.color-swatch').forEach(swatch => {
     selectedColor = swatch.dataset.color;
   });
 });
-const countEl     = document.getElementById('thoughts-count');
 
 if (!container) {
-  console.warn('[thoughts] container not found');
+  console.warn('[thoughts] container not found — not on homepage?');
 }
 
 // ── State ──
-let panelOpen = false;
-let thoughts  = [];  // { id, text, expiresAt, left, top }
-
-// ── Toggle panel ──
-toggleBtn?.addEventListener('click', () => {
-  panelOpen = !panelOpen;
-  panel?.classList.toggle('open', panelOpen);
-  toggleBtn?.classList.toggle('active', panelOpen);
-  if (panelOpen) input?.focus();
-});
+let thoughts = [];
 
 // ── Submit a thought ──
 submitBtn?.addEventListener('click', submit);
@@ -81,8 +62,8 @@ async function submit() {
   const ttlMs   = TTL_OPTIONS[ttlKey];
   const now     = Date.now();
 
-  const left = Math.round(5 + Math.random() * 80);  // 5-85%
-  const top  = Math.round(10 + Math.random() * 70); // 10-80%
+  const left = Math.round(3 + Math.random() * 84);  // 3-87%
+  const top  = Math.round(5 + Math.random() * 75);   // 5-80%
 
   const doc = {
     page: PAGE,
@@ -97,7 +78,6 @@ async function submit() {
   try {
     await db.collection(COLLECTION).add(doc);
     input.value = '';
-    // Panel stays open so user sees result
   } catch (err) {
     console.error('[thoughts] write failed:', err);
   }
@@ -118,13 +98,11 @@ function listenThoughts() {
         if (d.expiresAt > now) {
           thoughts.push({ id: doc.id, ...d });
         } else {
-          // Expired — delete silently
           doc.ref.delete().catch(() => {});
         }
       });
 
       renderBubbles();
-      updateCount();
     }, (err) => {
       console.error('[thoughts] listen error:', err);
     });
@@ -134,10 +112,8 @@ function listenThoughts() {
 function renderBubbles() {
   if (!container) return;
 
-  // Build a set of current IDs
   const currentIds = new Set(thoughts.map(t => t.id));
 
-  // Remove bubbles no longer in the data
   container.querySelectorAll('.thought-bubble').forEach((el) => {
     if (!currentIds.has(el.dataset.id)) {
       el.classList.add('fading');
@@ -145,7 +121,6 @@ function renderBubbles() {
     }
   });
 
-  // Add new bubbles
   const existingIds = new Set(
     [...container.querySelectorAll('.thought-bubble')].map(e => e.dataset.id)
   );
@@ -160,17 +135,15 @@ function renderBubbles() {
     bubble.style.left = `${t.left}%`;
     bubble.style.top  = `${t.top}%`;
 
-    // Random drift — generous range, free movement
-    const driftX = (Math.random() - 0.5) * 80;  // -40 to 40px
-    const driftY = (Math.random() - 0.5) * 60;  // -30 to 30px (any direction)
+    // Generous drift range
+    const driftX = (Math.random() - 0.5) * 80;
+    const driftY = (Math.random() - 0.5) * 60;
     bubble.style.setProperty('--drift-x', `${driftX}px`);
     bubble.style.setProperty('--drift-y', `${driftY}px`);
 
-    // Wider animation duration spread for organic feel
-    const dur = 5 + Math.random() * 10;  // 5-15s
+    const dur = 5 + Math.random() * 10;
     bubble.style.animationDuration = `0.6s, ${dur}s`;
 
-    // Time remaining label
     const remaining = formatTimeLeft(t.expiresAt - Date.now());
 
     bubble.innerHTML = `
@@ -180,14 +153,6 @@ function renderBubbles() {
 
     container.appendChild(bubble);
   });
-}
-
-// ── Update count badge ──
-function updateCount() {
-  if (!countEl) return;
-  const n = thoughts.length;
-  countEl.textContent = n;
-  countEl.style.display = n > 0 ? 'inline-flex' : 'none';
 }
 
 // ── Helpers ──
@@ -219,7 +184,6 @@ setInterval(() => {
     const ttlEl = el.querySelector('.thought-ttl');
     if (ttlEl) ttlEl.textContent = formatTimeLeft(t.expiresAt - now);
 
-    // Remove if expired
     if (t.expiresAt <= now) {
       el.classList.add('fading');
       setTimeout(() => el.remove(), 600);

@@ -230,6 +230,35 @@
     </div>
   </section>
 
+  <!-- THOUGHTS PLAYGROUND -->
+  <section id="thoughts">
+    <div class="content">
+      <h2 align="center">thought<span class="accent">playground</span></h2>
+      <p align="center" class="muted">drop a thought. it floats for a while, then fades.</p>
+    </div>
+    <div id="thoughts-container"></div>
+    <div id="thoughts-panel-inline">
+      <textarea id="thoughts-input" maxlength="200" placeholder="what are you thinking?"></textarea>
+      <div class="thoughts-controls">
+        <div id="thoughts-palette">
+          <button class="color-swatch active" data-color="red" style="--swatch: #b11212" aria-label="Red"></button>
+          <button class="color-swatch" data-color="blue" style="--swatch: #1264b1" aria-label="Blue"></button>
+          <button class="color-swatch" data-color="green" style="--swatch: #12b150" aria-label="Green"></button>
+          <button class="color-swatch" data-color="yellow" style="--swatch: #c89612" aria-label="Yellow"></button>
+          <button class="color-swatch" data-color="purple" style="--swatch: #8212b1" aria-label="Purple"></button>
+          <button class="color-swatch" data-color="pink" style="--swatch: #ff69b4" aria-label="Pink"></button>
+        </div>
+        <select id="thoughts-ttl">
+          <option value="1h">1h</option>
+          <option value="6h">6h</option>
+          <option value="24h" selected>24h</option>
+          <option value="7d">7d</option>
+        </select>
+        <button id="thoughts-submit">drop</button>
+      </div>
+    </div>
+  </section>
+
   <div class="section-arrow last-section">↑</div>
   <div class="section-arrow">↓</div>
 
@@ -251,6 +280,7 @@
           <li><a href="#simulations" role="menuitem">simulation<span class="accent">theory</span></a></li>
           <li><a href="#games" role="menuitem">retro<span class="accent">arcade</span></a></li>
           <li><a href="#writings" role="menuitem">vibe<span class="accent">writing</span></a></li>
+          <li><a href="#thoughts" role="menuitem">thought<span class="accent">playground</span></a></li>
         </ul>
       </div>
     </div>
@@ -337,9 +367,12 @@
       }
     }
   </script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
   <script type="module" src="js/terminal.js"></script>
   <script type="module" src="js/radio.js" defer></script>
   <script type="module" src="js/writing-carousel.js" defer></script>
+  <script type="module" src="js/thoughts.js"></script>
   <script type="module" src="js/main.js"></script>
 </body>
 
