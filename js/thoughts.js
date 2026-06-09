@@ -207,8 +207,8 @@ function renderBubbles() {
     const now = performance.now();
     const dt  = now - lastTime || 1;
 
-    velX = (p.clientX - lastX) / dt * 16;   // px per frame (~16ms)
-    velY = (p.clientY - lastY) / dt * 16;
+    velX = (p.clientX - lastX) / dt * 6;    // damped velocity
+    velY = (p.clientY - lastY) / dt * 6;
 
     lastX    = p.clientX;
     lastY    = p.clientY;
@@ -221,14 +221,20 @@ function renderBubbles() {
   function onUp() {
     if (!dragEl) return;
     dragEl.classList.remove('dragging');
+    // Cap throw speed
+    const maxV = 12;
+    velX = Math.max(-maxV, Math.min(maxV, velX));
+    velY = Math.max(-maxV, Math.min(maxV, velY));
     fling(dragEl, velX, velY);
     dragEl = null;
   }
 
   function fling(el, vx, vy) {
-    const friction = 0.94;
-    const minSpeed = 0.3;
+    const friction = 0.96;
+    const minSpeed = 0.2;
     const bounds   = container.getBoundingClientRect();
+    const w = bounds.width;
+    const h = bounds.height;
 
     function step() {
       vx *= friction;
@@ -237,11 +243,13 @@ function renderBubbles() {
       let x = el.offsetLeft + vx;
       let y = el.offsetTop  + vy;
 
-      // Bounce off container edges
-      if (x < 0)                           { x = 0; vx = -vx * 0.5; }
-      if (x + el.offsetWidth > bounds.width){ x = bounds.width - el.offsetWidth; vx = -vx * 0.5; }
-      if (y < 0)                           { y = 0; vy = -vy * 0.5; }
-      if (y + el.offsetHeight > bounds.height){ y = bounds.height - el.offsetHeight; vy = -vy * 0.5; }
+      // Wrap through edges
+      const bw = el.offsetWidth;
+      const bh = el.offsetHeight;
+      if (x + bw < 0) x = w;
+      else if (x > w) x = -bw;
+      if (y + bh < 0) y = h;
+      else if (y > h) y = -bh;
 
       el.style.left = `${x}px`;
       el.style.top  = `${y}px`;
