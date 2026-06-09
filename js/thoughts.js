@@ -40,6 +40,21 @@ palette?.querySelectorAll('.color-swatch').forEach(swatch => {
   });
 });
 
+// ── Fullscreen toggle ──
+const fsBtn     = document.getElementById('thoughts-fullscreen');
+const section   = document.getElementById('thoughts');
+
+fsBtn?.addEventListener('click', () => {
+  section?.classList.toggle('fullscreen');
+});
+
+// ESC to exit fullscreen
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && section?.classList.contains('fullscreen')) {
+    section.classList.remove('fullscreen');
+  }
+});
+
 if (!container) {
   console.warn('[thoughts] container not found — not on homepage?');
 }
@@ -146,23 +161,59 @@ function renderBubbles() {
   });
 }
 
-// ── Brownian motion ──
+// ── Brownian motion + collision ──
 const brownianState = new Map();  // el -> { vx, vy }
 
 function brownianStep() {
   if (!container) return;
   const w = container.offsetWidth;
   const h = container.offsetHeight;
-  const jitter   = 0.35;   // random acceleration strength
-  const maxSpeed = 0.6;    // px per frame cap
-  const damping  = 0.98;   // slight friction so they don't run away
+  const jitter   = 0.35;
+  const maxSpeed = 0.6;
+  const damping  = 0.98;
 
-  container.querySelectorAll('.thought-bubble:not(.dragging):not(.fading)').forEach(el => {
-    let s = brownianState.get(el);
-    if (!s) {
-      s = { vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4 };
-      brownianState.set(el, s);
+  const bubbles = [...container.querySelectorAll('.thought-bubble:not(.dragging):not(.fading)')];
+
+  // Init state for new bubbles
+  bubbles.forEach(el => {
+    if (!brownianState.has(el)) {
+      brownianState.set(el, { vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4 });
     }
+  });
+
+  // Collision detection — push overlapping bubbles apart
+  for (let i = 0; i < bubbles.length; i++) {
+    const a  = bubbles[i];
+    const sa = brownianState.get(a);
+    const ax = a.offsetLeft + a.offsetWidth  * 0.5;
+    const ay = a.offsetTop  + a.offsetHeight * 0.5;
+
+    for (let j = i + 1; j < bubbles.length; j++) {
+      const b  = bubbles[j];
+      const sb = brownianState.get(b);
+      const bx = b.offsetLeft + b.offsetWidth  * 0.5;
+      const by = b.offsetTop  + b.offsetHeight * 0.5;
+
+      const dx = bx - ax;
+      const dy = by - ay;
+      const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const minDist = (a.offsetWidth + b.offsetWidth) * 0.45;
+
+      if (dist < minDist) {
+        const push = (minDist - dist) * 0.05;
+        const nx = dx / dist;
+        const ny = dy / dist;
+        sa.vx -= nx * push;
+        sa.vy -= ny * push;
+        sb.vx += nx * push;
+        sb.vy += ny * push;
+      }
+    }
+  }
+
+  // Apply Brownian motion
+  bubbles.forEach(el => {
+    const s = brownianState.get(el);
 
     // Random nudge
     s.vx += (Math.random() - 0.5) * jitter;

@@ -1770,6 +1770,48 @@ body.minimal-mode #terminal-input {
   overflow: hidden;
 }
 
+/* Fullscreen toggle button */
+#thoughts-fullscreen {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 150;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: rgba(13, 13, 13, 0.8);
+  border: 1px solid rgba(177, 18, 18, 0.25);
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, border-color 0.2s ease;
+  backdrop-filter: blur(6px);
+}
+
+#thoughts-fullscreen:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Fullscreen state */
+#thoughts.fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  min-height: 100vh;
+  height: 100vh;
+  background: var(--bg, #0a0a0a);
+}
+
+#thoughts.fullscreen #thoughts-ui {
+  display: none;
+}
+
+#thoughts.fullscreen #thoughts-fullscreen .fs-expand { display: none; }
+#thoughts.fullscreen #thoughts-fullscreen .fs-collapse { display: block !important; }
+
 /* Container for floating bubbles — fills the section */
 #thoughts-container {
   position: absolute;
