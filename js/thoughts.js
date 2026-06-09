@@ -44,6 +44,12 @@ palette?.querySelectorAll('.color-swatch').forEach(swatch => {
 const fsBtn     = document.getElementById('thoughts-fullscreen');
 const section   = document.getElementById('thoughts');
 
+// ── Floating chat button → scroll to playground ──
+const toggleBtn = document.getElementById('thoughts-toggle');
+toggleBtn?.addEventListener('click', () => {
+  section?.scrollIntoView({ behavior: 'smooth' });
+});
+
 function exitFullscreen() {
   if (!section?.classList.contains('fullscreen')) return;
   section.classList.remove('fullscreen');

@@ -1761,6 +1761,72 @@ body.minimal-mode #terminal-input {
 }
 
 /* =========================
+   Floating Thoughts Button
+========================= */
+
+/* Toggle button (bottom-left, above radio) */
+#thoughts-toggle {
+  position: fixed;
+  bottom: 70px;
+  left: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(13, 13, 13, 0.9);
+  border: 1px solid rgba(177, 18, 18, 0.25);
+  color: var(--muted);
+  font-size: 1.1rem;
+  cursor: pointer;
+  z-index: 1001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  backdrop-filter: blur(6px);
+}
+
+#thoughts-toggle:hover,
+#thoughts-toggle.active {
+  color: var(--accent);
+  border-color: var(--accent);
+  transform: scale(1.08);
+}
+
+/* Slide-up panel (non-homepage pages) */
+#thoughts-panel {
+  position: fixed;
+  bottom: 118px;
+  left: 12px;
+  width: 280px;
+  background: rgba(13, 13, 13, 0.95);
+  border: 1px solid rgba(177, 18, 18, 0.2);
+  border-radius: 12px;
+  padding: 14px;
+  z-index: 1001;
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#thoughts-panel.open {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+#thoughts-panel label {
+  display: block;
+  font-family: 'Courier New', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+/* =========================
    Thoughts Playground Section
 ========================= */
 
@@ -2026,6 +2092,12 @@ body.minimal-mode #terminal-input {
   #thoughts-panel-inline {
     width: calc(100vw - 40px);
     max-width: 320px;
+  }
+
+  #thoughts-panel {
+    width: calc(100vw - 24px);
+    left: 12px;
+    right: 12px;
   }
 
   .thought-bubble {
