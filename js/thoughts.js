@@ -135,15 +135,6 @@ function renderBubbles() {
     bubble.style.left = `${t.left}%`;
     bubble.style.top  = `${t.top}%`;
 
-    // Generous drift range
-    const driftX = (Math.random() - 0.5) * 80;
-    const driftY = (Math.random() - 0.5) * 60;
-    bubble.style.setProperty('--drift-x', `${driftX}px`);
-    bubble.style.setProperty('--drift-y', `${driftY}px`);
-
-    const dur = 5 + Math.random() * 10;
-    bubble.style.animationDuration = `0.6s, ${dur}s`;
-
     const remaining = formatTimeLeft(t.expiresAt - Date.now());
 
     bubble.innerHTML = `
@@ -154,6 +145,60 @@ function renderBubbles() {
     container.appendChild(bubble);
   });
 }
+
+// ── Brownian motion ──
+const brownianState = new Map();  // el -> { vx, vy }
+
+function brownianStep() {
+  if (!container) return;
+  const w = container.offsetWidth;
+  const h = container.offsetHeight;
+  const jitter   = 0.35;   // random acceleration strength
+  const maxSpeed = 0.6;    // px per frame cap
+  const damping  = 0.98;   // slight friction so they don't run away
+
+  container.querySelectorAll('.thought-bubble:not(.dragging):not(.fading)').forEach(el => {
+    let s = brownianState.get(el);
+    if (!s) {
+      s = { vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4 };
+      brownianState.set(el, s);
+    }
+
+    // Random nudge
+    s.vx += (Math.random() - 0.5) * jitter;
+    s.vy += (Math.random() - 0.5) * jitter;
+
+    // Dampen
+    s.vx *= damping;
+    s.vy *= damping;
+
+    // Clamp speed
+    s.vx = Math.max(-maxSpeed, Math.min(maxSpeed, s.vx));
+    s.vy = Math.max(-maxSpeed, Math.min(maxSpeed, s.vy));
+
+    let x = el.offsetLeft + s.vx;
+    let y = el.offsetTop  + s.vy;
+
+    // Wrap edges
+    const bw = el.offsetWidth;
+    const bh = el.offsetHeight;
+    if (x + bw < 0) x = w;
+    else if (x > w) x = -bw;
+    if (y + bh < 0) y = h;
+    else if (y > h) y = -bh;
+
+    el.style.left = `${x}px`;
+    el.style.top  = `${y}px`;
+  });
+
+  // Clean removed elements from the map
+  for (const el of brownianState.keys()) {
+    if (!el.isConnected) brownianState.delete(el);
+  }
+
+  requestAnimationFrame(brownianStep);
+}
+requestAnimationFrame(brownianStep);
 
 // ── Drag & throw physics ──
 (function initDragThrow() {
