@@ -1998,7 +1998,9 @@ body.minimal-mode #terminal-input {
 /* Individual floating bubble */
 .thought-bubble {
   position: absolute;
+  width: max-content;
   max-width: 220px;
+  min-width: 80px;
   background: rgba(177, 18, 18, 0.08);
   border: 1px solid rgba(177, 18, 18, 0.15);
   border-radius: 10px;
